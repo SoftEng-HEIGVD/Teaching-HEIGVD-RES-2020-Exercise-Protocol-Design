@@ -16,6 +16,3 @@
     * Server sends "Unrecognized command"
 * Client wants to quit : sends "Quit"
 * Server closes connection
-
-
-OTHER STUDENT REPO : https://github.com/vitorva/Teaching-HEIGVD-RES-2020-Exercise-Protocol-Design
