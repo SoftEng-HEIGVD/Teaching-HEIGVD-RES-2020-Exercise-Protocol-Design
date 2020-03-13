@@ -1,5 +1,11 @@
 # Lab 3 - Protocol Design
 
+## Students
+
+Ludovic Bonzon
+
+Doran Kayoumi
+
 ## Transport protocol
 
 Since the client is expecting an answer from the server, we've decided to use the `TCP` transport protocol.
