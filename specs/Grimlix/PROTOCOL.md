@@ -30,3 +30,5 @@ The client send the second operand. The server gives the result and stops the co
 The server will be created with netcat and the command :
 nc -kl ==> continue listening  after disconnection 
 
+![protocol].\img.protocol.PNG
+
