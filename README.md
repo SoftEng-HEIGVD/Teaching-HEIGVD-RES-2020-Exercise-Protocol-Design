@@ -20,11 +20,11 @@ The specification must contain <u>**everything**</u> that is needed for **one pe
   * Who closes the connection and when?
 * **Submit a Pull Request**
 
-## Phase 2: review 3 specifications (15 minutes)
+## ~~Phase 2: review 3 specifications (15 minutes)~~
 
-- Are there big differences between the specification?
-- What are the common elements?
-- Are there missing or confusing elements in the specification?
+- ~~Are there big differences between the specification?~~
+- ~~What are the common elements?~~
+- ~~Are there missing or confusing elements in the specification?~~
 
 ## Phase 3: validate specs in pairs (15 minutes)
 
