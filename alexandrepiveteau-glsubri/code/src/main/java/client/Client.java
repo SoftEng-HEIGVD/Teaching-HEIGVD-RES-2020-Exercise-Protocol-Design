@@ -17,16 +17,14 @@ public class Client {
 
     private static final Logger LOG = Logger.getLogger(Client.class.getName());
 
+    private final InetAddress host;
     private final int PORT = 8080;
-    private final BufferedWriter writer;
-    private final BufferedReader reader;
 
-    public Client(InetAddress host) throws IOException {
-        Socket server = new Socket(host, PORT);
-        OutputStream os = server.getOutputStream();
-        InputStream is = server.getInputStream();
-        writer = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
-        reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+    private BufferedWriter writer;
+    private BufferedReader reader;
+
+    public Client(InetAddress host) {
+        this.host = host;
     }
 
     private void sendReq(String req) throws IOException {
@@ -71,11 +69,13 @@ public class Client {
     }
 
     public void start() throws IOException {
-        while (true) {
-            int f = 0;
-            int s = 0;
-            Op op = Op.ADD;
+        Socket server = new Socket(host, PORT);
+        int f = 0;
+        int s = 0;
+        Op op = Op.ADD;
 
+        boolean incorrectInput = true;
+        while (incorrectInput) {
             System.out.println("Enter a simple calculation to be made:");
             Scanner in = new Scanner(System.in);
             try {
@@ -98,13 +98,23 @@ public class Client {
                 }
 
                 s = in.nextInt();
+                incorrectInput = false;
             } catch (Throwable e) {
                 System.out.println(ERROR_FORMAT);
-                start();
             }
+        }
+
+        try {
+            OutputStream os = server.getOutputStream();
+            InputStream is = server.getInputStream();
+
+            writer = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
+            reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
 
             int res = askServer(f, op, s);
             System.out.println("Result is: " + res);
+        } finally {
+            server.close();
         }
     }
 }
