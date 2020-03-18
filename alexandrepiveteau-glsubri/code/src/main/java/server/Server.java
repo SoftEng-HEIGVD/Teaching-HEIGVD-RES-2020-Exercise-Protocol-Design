@@ -104,6 +104,8 @@ public class Server {
         } catch (IllegalArgumentException iae) {
           wrongMessage(socket, writer, String.format("%d %s %d", a, op, b));
         }
+      } catch (Throwable any) {
+        // Ignored.
       }
     }
   }
