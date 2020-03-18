@@ -60,7 +60,8 @@ public class Server {
                 LOG.log(Level.INFO, "Waiting a client to connect.", Protocol.DEFAULT_PORT);
                 clientSocket = serverSocket.accept();
 
-                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                //Je ne sais pas pourquoi j'arrive pas a utiliser des StringWriter / StringReader
+                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
                 out = new PrintWriter(clientSocket.getOutputStream());
 
                 //Writing the hello message
