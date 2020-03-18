@@ -13,9 +13,9 @@ public class Client {
             "a and b must be integers\n" +
             "<op> must be +, -, * or /\n";
     private static final String ERROR_COMM = "Error while talking with server.\n";
+    private static final int PORT = 8080;
 
     private final InetAddress host;
-    private final int PORT = 8080;
 
     private BufferedWriter writer;
     private BufferedReader reader;
