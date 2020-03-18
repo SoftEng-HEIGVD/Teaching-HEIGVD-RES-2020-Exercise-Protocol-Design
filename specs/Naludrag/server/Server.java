@@ -118,15 +118,14 @@ public class Server implements Runnable{
                         if(tokens[0].toUpperCase().equals(Protocol.CMD_HELLO)){
                             sendNotification("HELLO, GIVE CALCULATIONS(supported operators : + - * /)");
                         }else {
-                            sendNotification(result + " = " + commandLine);
                             try {
                                 if (tokens.length > 3) {
                                     throw new NumberFormatException();
                                 }
                                 int operand1 = Integer.parseInt(tokens[0]);
                                 int operand2 = Integer.parseInt(tokens[2]);
-                                if (tokens[1].length() > 1 || tokens[1].equals("+") || tokens[1].equals("-") ||
-                                        tokens[1].equals("*") || tokens[1].equals("/")) {
+                                if (tokens[1].length() > 1 || (!tokens[1].equals("+") && !tokens[1].equals("-") &&
+                                        !tokens[1].equals("*") && !tokens[1].equals("/"))) {
                                     throw new NumberFormatException();
                                 } else {
                                     switch (tokens[1].charAt(0)) {

@@ -49,6 +49,14 @@ public class Client {
         // Let us send the HELLO command to connect us to the server
         out.println(Protocol.CMD_HELLO);
         out.flush();
+        //See if the server responded to us
+        String response = "";
+        try {
+            response = in.readLine();
+            LOG.log(Level.INFO, String.format("Server response: %s", response));
+        } catch (IOException ex) {
+            LOG.log(Level.SEVERE, ex.getMessage(), ex);
+        }
     }
 
     public void disconnect() {
@@ -84,7 +92,7 @@ public class Client {
         LOG.log(Level.INFO, String.format("Sending to server: %d %s %d", a, op, b));
         String str = String.format("%d %s %d", a, op, b);
         out.println(str);
-
+        out.flush();
         String response = "";
         try {
             response = in.readLine();
