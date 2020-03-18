@@ -111,32 +111,39 @@ public class MultiThreadServer implements Runnable{
             try {
                 while (connected && ((commandLine = in.readLine()) != null)) {
                     String[] tokens = commandLine.split(" ");
-                    try{
-                        if(tokens.length > 3){
-                            throw new NumberFormatException();
-                        }
-                        int operand1 = Integer.parseInt(tokens[0]);
-                        int operand2 = Integer.parseInt(tokens[2]);
-                        if(tokens[1].length() > 1 || tokens[1].equals("+") || tokens[1].equals("-") ||
-                                tokens[1].equals("*") || tokens[1].equals("/")){
-                            throw new NumberFormatException();
-                        }
-                        else{
-                            switch(tokens[1].charAt(0)){
-                                case '+' : result = operand1 + operand2;
-                                break;
-                                case '-' : result = operand1 - operand2;
-                                break;
-                                case '*' : result = operand1 * operand2;
-                                break;
-                                case '/' : result = operand1 / operand2;
-                                break;
+                    if (tokens[0].toUpperCase().equals(Protocol.CMD_BYE)) {
+                        connected = false;
+                    } else {
+                        try {
+                            if (tokens.length > 3) {
+                                throw new NumberFormatException();
                             }
+                            int operand1 = Integer.parseInt(tokens[0]);
+                            int operand2 = Integer.parseInt(tokens[2]);
+                            if (tokens[1].length() > 1 || tokens[1].equals("+") || tokens[1].equals("-") ||
+                                    tokens[1].equals("*") || tokens[1].equals("/")) {
+                                throw new NumberFormatException();
+                            } else {
+                                switch (tokens[1].charAt(0)) {
+                                    case '+':
+                                        result = operand1 + operand2;
+                                        break;
+                                    case '-':
+                                        result = operand1 - operand2;
+                                        break;
+                                    case '*':
+                                        result = operand1 * operand2;
+                                        break;
+                                    case '/':
+                                        result = operand1 / operand2;
+                                        break;
+                                }
+                            }
+                            sendNotification(result + " = " + commandLine);
+                        } catch (NumberFormatException e) {
+                            System.out.println("The calcul passed is not the right format");
+                            sendNotification("Please send another calcul wrong format");
                         }
-                        sendNotification(result + " = " + commandLine);
-                    } catch (NumberFormatException e) {
-                        System.out.println("The calcul passed is not the right format");
-                        sendNotification("Please send another calcul wrong format");
                     }
                 }
             } catch (IOException ex) {
