@@ -12,7 +12,7 @@ public class Client {
     private static final String ERROR_FORMAT = "Error in format. Must be 'a <op> b'\n" +
             "a and b must be integers\n" +
             "<op> must be +, -, * or /\n";
-    private static final String ERROR_COMM = "Error while talking with server.'\n";
+    private static final String ERROR_COMM = "Error while talking with server.\n";
 
     private final InetAddress host;
     private final int PORT = 8080;
