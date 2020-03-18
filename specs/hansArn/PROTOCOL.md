@@ -10,6 +10,10 @@
     - requête incorrect envoie une erreur "ERROR" 
   - le client ferme la connexion "BYE" ou le serveur après un timeout "BYE"
 
+# Phase 3
+
+![](/home/jerome/HEIG/Labo/RES/Teaching-HEIGVD-RES-2020-Exercise-Protocol-Design/specs/hansArn/img/PROTOCOL.md.png)
+
 # Phase 4 
 
 
