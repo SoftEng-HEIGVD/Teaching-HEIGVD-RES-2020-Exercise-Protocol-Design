@@ -1,7 +1,5 @@
 package specs.Grimlix.src.src;
 
-import specs.Grimlix.src.src.Protocol;
-
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -47,31 +45,32 @@ public class Server {
     private Operator operator = null;
 
     public void run(){
-        //Binding serverSocket to the default port
         try {
+            //Binding serverSocket to the default port
             serverSocket = new ServerSocket(Protocol.DEFAULT_PORT);
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, null, ex);
             return;
         }
 
-        while (true) {
+        while(true) {
             try {
                 LOG.log(Level.INFO, "Waiting a client to connect.", Protocol.DEFAULT_PORT);
                 clientSocket = serverSocket.accept();
+                LOG.log(Level.INFO, "Someone connected");
 
                 //Je ne sais pas pourquoi j'arrive pas a utiliser des StringWriter / StringReader
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
                 out = new PrintWriter(clientSocket.getOutputStream());
 
-                //Writing the hello message
+                //Writing the weclome message
                 out.println(Protocol.CMD_HELLO);
                 out.flush();
+                LOG.log(Level.INFO, "I sent the welcome message");
 
-                String line = "";
-                boolean shouldRun = true;
+                String line;
+                boolean shouldRun = true, firstOperandDone = false, error = false;
                 int firstOperand = 0, secondOperand = 0;
-                boolean firstOperandDone = false, error = false;
 
                 while((shouldRun) && (line = in.readLine()) != null){
                     switch(turn){
@@ -83,12 +82,15 @@ public class Server {
                                 }
                             }
                             if(!error){
-                                if(firstOperandDone){
+                                if(firstOperandDone){ //second operand
+                                    LOG.log(Level.INFO, "I received second operand");
                                     secondOperand = Integer.parseInt(line);
                                     shouldRun = false;
-                                }else{
+                                }else{ //first operand
+                                    LOG.log(Level.INFO, "I received first operand");
                                     firstOperand = Integer.parseInt(line);
                                     firstOperandDone = true;
+                                    //We have our first operand we can send the question for operator
                                     out.println(Protocol.OPERATOR);
                                     out.flush();
                                     turn = Turn.OPERATOR;
@@ -111,6 +113,7 @@ public class Server {
                                 out.flush();
                                 break;
                             }
+                            LOG.log(Level.INFO, "I received the operator");
                             //we have the right operator, we ask for the second operand now.
                             out.println(Protocol.SECOND_OPERAND);
                             out.flush();
@@ -121,14 +124,13 @@ public class Server {
 
                 double result = operator.calculate(firstOperand, secondOperand);
 
-                out.write(Protocol.RESULT + result);
+                out.println(Protocol.RESULT + result);
                 out.flush();
-
+                LOG.log(Level.INFO, "I sent the result");
                 LOG.info("Cleaning up resources...");
                 clientSocket.close();
                 in.close();
                 out.close();
-
             } catch (IOException ex) {
                 if (in != null) {
                     try {
