@@ -43,8 +43,7 @@ public class Client {
             return;
         }
 
-        // Let us send the HELLO command to connect to the server
-        // is. Other clients will be notified.
+        // Let us send the HELLO command to connect us to the server
         out.println(Protocol.CMD_HELLO);
         out.flush();
     }
@@ -76,5 +75,20 @@ public class Client {
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, ex.getMessage(), ex);
         }
+    }
+
+    public String getCalculationResult(int a, int b, Operator op) {
+        LOG.log(Level.INFO, String.format("Sending to server: %d %s %d", a, op, b));
+        out.println(String.format("%d %s %d", a, op, b));
+
+        String response = "";
+        try {
+            response = in.readLine();
+            LOG.log(Level.INFO, String.format("Server response: %s", response));
+        } catch (IOException ex) {
+            LOG.log(Level.SEVERE, ex.getMessage(), ex);
+        }
+
+        return response;
     }
 }
