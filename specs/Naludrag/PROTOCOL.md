@@ -8,7 +8,7 @@ We use the TCP protocol.
 
 ## How does the client find the server (addresses and ports)?
 
-The client must know the IP adress and the port of the server. For the port we decided to use the port 12302 and for the IP it is diffcult to be able to decide that due to the fact that IP adresses can change.
+The client must know the IP adress and the port of the server. For the port we decided to use the port 12302 and for the IP it is difficult to be able to decide that due to the fact that IP adresses can change.
 
 ## Who speaks first?
 
