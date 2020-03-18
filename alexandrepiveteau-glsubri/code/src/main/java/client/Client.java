@@ -38,9 +38,13 @@ public class Client {
         LOG.log(Level.INFO, ans);
         if (! reader.readLine().equals(ans)) {
             sendReq("ERR");
-            System.out.println("An error occured.");
-            start();
+            reset();
         }
+    }
+
+    private void reset() throws IOException {
+        System.out.println("An error occured.");
+        start();
     }
 
     private int askServer(int f, Op op, int s) throws IOException {
@@ -60,7 +64,7 @@ public class Client {
         String line = reader.readLine();
 
         if (line.substring(0, 3).equals("ERR"))
-            askServer(f, op, s);
+            reset();
 
         int res = Integer.parseInt(line.substring(4));
         return res;
