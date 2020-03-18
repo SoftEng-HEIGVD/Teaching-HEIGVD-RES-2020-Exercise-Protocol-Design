@@ -58,7 +58,7 @@ public class Client {
         sendReq("PERFORM");
         String line = reader.readLine();
 
-        if (line.substring(0, 3).equals("ERR"))
+        if (line.length() < 3 || line.substring(0, 3).equals("ERR"))
             reset();
 
         int res = Integer.parseInt(line.substring(4));
