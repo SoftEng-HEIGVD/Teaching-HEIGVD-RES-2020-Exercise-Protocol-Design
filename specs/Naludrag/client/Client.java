@@ -15,7 +15,16 @@ public class Client {
     BufferedReader in;
     PrintWriter out;
     boolean connected = false;
-    
+
+    /**
+     * This method is used to connect to the server on the default port.
+     *
+     * @param serverAddress the IP address used by the Presence Server
+     */
+    public void connect(String serverAddress) {
+        connect(serverAddress, Protocol.PRESENCE_DEFAULT_PORT);
+    }
+
     /**
      * This method is used to connect to the server.
      *
