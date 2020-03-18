@@ -15,8 +15,6 @@ public class Client {
             "a and b must be integers\n" +
             "<op> must be +, -, * or /\n";
 
-    private static final Logger LOG = Logger.getLogger(Client.class.getName());
-
     private final InetAddress host;
     private final int PORT = 8080;
 
@@ -33,7 +31,6 @@ public class Client {
     }
 
     private void checkAnswer(String ans) throws IOException {
-        LOG.log(Level.INFO, ans);
         if (! reader.readLine().equals(ans)) {
             sendReq("ERR");
             reset();
