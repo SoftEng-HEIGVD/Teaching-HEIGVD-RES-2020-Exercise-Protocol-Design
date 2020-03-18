@@ -8,7 +8,8 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Client {
-    private enum Op { ADD, SUB, MUL, DIV };
+    private enum Op { ADD, SUB, MUL, DIV }
+
     private static final String ERROR_FORMAT = "Error in format. Must be 'a <op> b'\n" +
             "a and b must be integers\n" +
             "<op> must be +, -, * or /\n";
@@ -59,8 +60,7 @@ public class Client {
         if (line.length() < 3 || line.substring(0, 3).equals("ERR"))
             reset();
 
-        int res = Integer.parseInt(line.substring(4));
-        return res;
+        return Integer.parseInt(line.substring(4));
     }
 
     public void start() throws IOException {
