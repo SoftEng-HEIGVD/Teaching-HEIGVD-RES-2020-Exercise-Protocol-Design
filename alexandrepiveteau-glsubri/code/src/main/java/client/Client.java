@@ -12,6 +12,7 @@ public class Client {
     private static final String ERROR_FORMAT = "Error in format. Must be 'a <op> b'\n" +
             "a and b must be integers\n" +
             "<op> must be +, -, * or /\n";
+    private static final String ERROR_COMM = "Error while talking with server.'\n";
 
     private final InetAddress host;
     private final int PORT = 8080;
@@ -36,8 +37,7 @@ public class Client {
     }
 
     private void reset() throws IOException {
-        System.out.println("An error occured.");
-        start();
+        throw new IOException(ERROR_COMM);
     }
 
     private int askServer(int f, Op op, int s) throws IOException {
@@ -108,7 +108,9 @@ public class Client {
 
             int res = askServer(f, op, s);
             System.out.println("Result is: " + res);
-        } finally {
+        } catch (Throwable e) {
+            System.out.println(ERROR_COMM);
+        }finally {
             server.close();
         }
     }
