@@ -89,6 +89,11 @@ public class Client {
     }
 
     public String getCalculationResult(int a, int b, Operator op) {
+        if (!connected) {
+            LOG.log(Level.SEVERE, "Attempting to run getCalculationResult when not connected");
+            return "";
+        }
+
         LOG.log(Level.INFO, String.format("Sending to server: %d %s %d", a, op, b));
         String str = String.format("%d %s %d", a, op, b);
         out.println(str);
