@@ -3,6 +3,7 @@ package client;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -24,8 +25,8 @@ public class Client {
         Socket server = new Socket(host, PORT);
         OutputStream os = server.getOutputStream();
         InputStream is = server.getInputStream();
-        writer = new BufferedWriter(new OutputStreamWriter(os));
-        reader = new BufferedReader(new InputStreamReader(is));
+        writer = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
+        reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
     }
 
     private void sendReq(String req) throws IOException {
@@ -50,7 +51,7 @@ public class Client {
         checkAnswer("OK N");
 
         sendReq("O " + op);
-        checkAnswer("OK O");
+        checkAnswer("OK O " + op);
 
         sendReq("N " + s);
         checkAnswer("OK N");
@@ -75,7 +76,7 @@ public class Client {
             Scanner in = new Scanner(System.in);
             try {
                 f = in.nextInt();
-                switch (in.next("\\+|\\*|/|-")) {
+                switch (in.next("[+*/\\-]")) {
                     case "+":
                         op = Op.ADD;
                         break;
