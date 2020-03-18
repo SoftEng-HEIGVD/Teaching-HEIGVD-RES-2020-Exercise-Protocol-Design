@@ -16,9 +16,12 @@ public class Protocol {
 
 
     // Allowed operators
-    public static final char ADD_OPERATOR = '+';
-    public static final char SUB_OPERATOR = '-';
-    public static final char MUL_OPERATOR = '*';
-    public static final char DIV_OPERATOR = '/';
-    public static final char POW_OPERATOR = '^';
+    public static final String ADD_OPERATOR = "+";
+    public static final String SUB_OPERATOR = "-";
+    public static final String MUL_OPERATOR = "*";
+    public static final String DIV_OPERATOR = "/";
+    public static final String POW_OPERATOR = "^";
+
+    // Separator
+    public static final String SEPARATOR = " ";
 }
