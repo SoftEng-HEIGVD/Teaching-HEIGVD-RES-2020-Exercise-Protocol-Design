@@ -1,4 +1,4 @@
-package client;
+package common;
 
 public enum Operator {
     ADD, SUB, MULTIPLY, DIVIDE;

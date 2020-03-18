@@ -1,5 +1,6 @@
 package client;
 
+import common.Operator;
 import common.Protocol;
 
 import java.io.BufferedReader;
@@ -81,7 +82,8 @@ public class Client {
 
     public String getCalculationResult(int a, int b, Operator op) {
         LOG.log(Level.INFO, String.format("Sending to server: %d %s %d", a, op, b));
-        out.println(String.format("%d %s %d", a, op, b));
+        String str = String.format("%d %s %d", a, op, b);
+        out.println(str);
 
         String response = "";
         try {
