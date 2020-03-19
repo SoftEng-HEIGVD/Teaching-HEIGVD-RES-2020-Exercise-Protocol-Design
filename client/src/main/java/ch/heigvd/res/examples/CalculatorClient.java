@@ -5,18 +5,9 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * This is not really an HTTP client, but rather a very simple program that
- * establishes a TCP connection with a real HTTP server. Once connected, the 
- * client sends "garbage" to the server (the client does not send a proper
- * HTTP request that the server would understand). The client then reads the
- * response sent back by the server and logs it onto the console.
- * 
- * @author Olivier Liechti
- */
-public class DumbHttpClient {
+public class CalculatorClient {
 
-	static final Logger LOG = Logger.getLogger(DumbHttpClient.class.getName());
+	static final Logger LOG = Logger.getLogger(CalculatorClient.class.getName());
 
 	final static int BUFFER_SIZE = 1024;
 
@@ -47,13 +38,13 @@ public class DumbHttpClient {
 			try {
 				is.close();
 			} catch (IOException ex) {
-				Logger.getLogger(DumbHttpClient.class.getName()).log(Level.SEVERE, null, ex);
+				Logger.getLogger(CalculatorClient.class.getName()).log(Level.SEVERE, null, ex);
 			}
 			os.close();
 			try {
 				clientSocket.close();
 			} catch (IOException ex) {
-				Logger.getLogger(DumbHttpClient.class.getName()).log(Level.SEVERE, null, ex);
+				Logger.getLogger(CalculatorClient.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
 	}
@@ -64,7 +55,7 @@ public class DumbHttpClient {
 	public static void main(String[] args) {
 		System.setProperty("java.util.logging.SimpleFormatter.format", "%5$s %n");
 
-		DumbHttpClient client = new DumbHttpClient();
+		CalculatorClient client = new CalculatorClient();
 		client.sendWrongHttpRequest();
 
 	}
