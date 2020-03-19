@@ -75,7 +75,7 @@ public class Server {
                 LOG.log(Level.INFO, "Waiting (blocking) for a new client on port {0}", port);
                 try {
                     Socket clientSocket = serverSocket.accept();
-                    LOG.info("A new client has arrived. Starting a new thread and delegating work to a new servant...");
+                    LOG.log(Level.INFO,"A new client has arrived. Starting a new thread and delegating work to a new servant...");
                     new Thread(new ServantWorker(clientSocket)).start();
                 } catch (IOException ex) {
                     Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
@@ -112,17 +112,19 @@ public class Server {
                 boolean shouldRun = true;
 
                 try {
-                    LOG.info("Reading until client sends BYE or closes the connection...");
+                    LOG.log(Level.INFO, "Reading until client sends {0} or closes the connection...", Protocol.CMD_BYE);
                     while ((shouldRun) && (clientMsg = in.readLine()) != null) {
 
                         switch(clientMsg){
                             case Protocol.CMD_HELLO:
                                 // Client wants help to compute calculus
+                                LOG.log(Level.INFO, "Received {0} from client.\n Replying {1}...", new Object[]{Protocol.CMD_HELLO, Protocol.CMD_WELCOME});
                                 // Greeting client
                                 sendMessage(Protocol.CMD_WELCOME);
                                 break;
                             case Protocol.CMD_BYE:
                                 // Client wants to end communication
+                                LOG.log(Level.INFO, "Received {0} from client.\n Ending connection...", Protocol.CMD_BYE);
                                 // End communication
                                 shouldRun = false;
                                 break;
@@ -179,20 +181,26 @@ public class Server {
                         switch (tokens[1]){
                             case Protocol.ADD_OPERATOR:
                                 solution = firstOperand + secondOperand;
+                                LOG.log(Level.INFO, "Processing : {0} {1} {2} = {3}", new Object[]{firstOperand, Protocol.ADD_OPERATOR,secondOperand, solution});
                                 return Double.toString(solution);
                             case Protocol.SUB_OPERATOR:
                                 solution = firstOperand - secondOperand;
+                                LOG.log(Level.INFO, "Processing : {0} {1} {2} = {3}", new Object[]{firstOperand, Protocol.SUB_OPERATOR,secondOperand, solution});
                                 return Double.toString(solution);
                             case Protocol.MUL_OPERATOR:
                                 solution = firstOperand * secondOperand;
+                                LOG.log(Level.INFO, "Processing : {0} {1} {2} = {3}", new Object[]{firstOperand, Protocol.MUL_OPERATOR,secondOperand, solution});
                                 return Double.toString(solution);
                             case Protocol.DIV_OPERATOR:
                                 solution = firstOperand / secondOperand;
+                                LOG.log(Level.INFO, "Processing : {0} {1} {2} = {3}", new Object[]{firstOperand, Protocol.DIV_OPERATOR,secondOperand, solution});
                                 return Double.toString(solution);
                             case Protocol.POW_OPERATOR:
                                 solution = Math.pow(firstOperand, secondOperand);
+                                LOG.log(Level.INFO, "Processing : {0} {1} {2} = {3}", new Object[]{firstOperand, Protocol.POW_OPERATOR,secondOperand, solution});
                                 return Double.toString(solution);
                             default:
+                                LOG.log(Level.INFO, "Client sent bad request");
                                 return Protocol.CMD_WRONG;
                         }
                     }
@@ -200,9 +208,11 @@ public class Server {
                         // Double.parseDouble() return two exceptions :
                         // - NullPointerException– when the string parsed is null
                         // - NumberFormatException– when the string parsed does not contain a parsable float
+                        LOG.log(Level.INFO, "Client sent bad request");
                         return Protocol.CMD_WRONG;
                     }
                 } else{
+                    LOG.log(Level.INFO, "Client sent bad request");
                     return Protocol.CMD_WRONG;
                 }
 
