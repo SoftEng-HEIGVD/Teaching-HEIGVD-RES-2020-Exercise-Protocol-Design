@@ -42,29 +42,30 @@ public class CalculatorServer {
       serverSocket = new ServerSocket(LISTEN_PORT);
       logServerSocketAddress(serverSocket);
 
+      LOG.log(Level.INFO, "Waiting (blocking) for a connection request on {0} : {1}", new Object[]{serverSocket.getInetAddress(), Integer.toString(serverSocket.getLocalPort())});
+      clientSocket = serverSocket.accept();
+
+      LOG.log(Level.INFO, "A client has arrived. We now have a client socket with following attributes:");
+      logSocketAddress(clientSocket);
+
+      LOG.log(Level.INFO, "Getting a Reader and a Writer connected to the client socket...");
+      reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+      writer = new PrintWriter(clientSocket.getOutputStream());
+
+      String operand;
+      int leftOperator = 0;
+      int rightOperator = 0;
+      int result = 0;
+
+      LOG.log(Level.INFO,"starting the state communication");
+      //first we need the operand
+
       while (true) {
-        LOG.log(Level.INFO, "Waiting (blocking) for a connection request on {0} : {1}", new Object[]{serverSocket.getInetAddress(), Integer.toString(serverSocket.getLocalPort())});
-        clientSocket = serverSocket.accept();
-
-        LOG.log(Level.INFO, "A client has arrived. We now have a client socket with following attributes:");
-        logSocketAddress(clientSocket);
-
-        LOG.log(Level.INFO, "Getting a Reader and a Writer connected to the client socket...");
-        reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        writer = new PrintWriter(clientSocket.getOutputStream());
-
-        String operand;
-        int leftOperator = 0;
-        int rightOperator = 0;
-        int result = 0;
-
-        LOG.log(Level.INFO,"starting the state communication");
-        //first we need the operand
 
         operand = reader.readLine();
 
 
-        if(operand.compareTo("+") != 0 && operand.compareTo("-") != 0)
+        if(operand.compareTo("+") != 0 && operand.compareTo("-") != 0 && operand.compareTo("*") != 0)
           throw new InterruptedException("not an understandable operand");
 
         LOG.log(Level.INFO, "Here we need the first operator");
@@ -86,15 +87,20 @@ public class CalculatorServer {
           case "-":
             result = leftOperator - rightOperator;
             break;
+          case "*":
+            result = leftOperator * rightOperator;
+            break;
         }
 
         writer.println("Your result is : " + result);
         writer.flush();
-        reader.close();
-        writer.close();
-        clientSocket.close();
 
       }
+
+//      writer.flush();
+//      reader.close();
+//      writer.close();
+//      clientSocket.close();
 
     } catch (IOException | InterruptedException ex) {
       LOG.log(Level.SEVERE, ex.getMessage());

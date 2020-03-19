@@ -25,26 +25,22 @@ public class DumbHttpClient {
 	 */
 	public void sendWrongHttpRequest() {
 		Socket clientSocket = null;
-		OutputStream os = null;
-		InputStream is = null;
+		PrintWriter os = null;
+		BufferedReader is = null;
 		
 		try {
-			clientSocket = new Socket("localhost", 2019);
-			os = clientSocket.getOutputStream();
-			is = clientSocket.getInputStream();
+			clientSocket = new Socket("localhost", 2020);
+			os = new PrintWriter(clientSocket.getOutputStream());
+			is = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-			String malformedHttpRequest = "Hello, sorry, but I don't speak HTTP...\r\n\r\n";
-			os.write(malformedHttpRequest.getBytes());
+			while(true){
+				String userInput = reader.readLine();
+				os.println(userInput);
+				os.flush();
 
-			ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream();
-			byte[] buffer = new byte[BUFFER_SIZE];
-			int newBytes;
-			while ((newBytes = is.read(buffer)) != -1) {
-				responseBuffer.write(buffer, 0, newBytes);
+				LOG.log(Level.INFO, String.format("Server response: %s", is.readLine()));
 			}
-
-			LOG.log(Level.INFO, "Response sent by the server: ");
-			LOG.log(Level.INFO, responseBuffer.toString());
 		} catch (IOException ex) {
 			LOG.log(Level.SEVERE, null, ex);
 		} finally {
@@ -53,11 +49,7 @@ public class DumbHttpClient {
 			} catch (IOException ex) {
 				Logger.getLogger(DumbHttpClient.class.getName()).log(Level.SEVERE, null, ex);
 			}
-			try {
-				os.close();
-			} catch (IOException ex) {
-				Logger.getLogger(DumbHttpClient.class.getName()).log(Level.SEVERE, null, ex);
-			}
+			os.close();
 			try {
 				clientSocket.close();
 			} catch (IOException ex) {
