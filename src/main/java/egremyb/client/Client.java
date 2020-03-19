@@ -152,7 +152,7 @@ public class Client {
      * @param operand2 Second operand
      * @return Result of calculation
      */
-    public Double sendCalculationToCompute(final int operand1, final char operator, final int operand2) {
+    public int sendCalculationToCompute(final int operand1, final char operator, final int operand2) {
         String response;
         if (connected) {
             try {
@@ -162,10 +162,10 @@ public class Client {
                 response = getResponse();
                 if (response.equals(Protocol.CMD_WRONG)) {
                     System.out.println(BAD_REQUEST);
-                    return null;
+                    return 0;
                 }
                 // return the response as an int
-                return Double.parseDouble(response);
+                return Integer.parseInt(response);
             } catch (IOException | NumberFormatException ex) {
                 System.out.println(ex.getMessage());
             }
@@ -173,6 +173,6 @@ public class Client {
             System.out.println(NO_CONNECTION_OPENED);
         }
 
-        return null;
+        return 0;
     }
 }
