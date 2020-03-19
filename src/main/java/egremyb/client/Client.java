@@ -3,6 +3,7 @@ package egremyb.client;
 import egremyb.common.Protocol;
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class Client {
     private final static int    BUFFER_SIZE = 1024;
@@ -11,8 +12,8 @@ public class Client {
     private final static String BAD_REQUEST          = "The operation must have been badly written.\n";
 
     private Socket       clientSocket;
-    private OutputStream os;
-    private InputStream  is;
+    private BufferedWriter writer;
+    private BufferedReader reader;
     private String       ip;
     private int          port;
     private boolean      connected;
@@ -23,8 +24,8 @@ public class Client {
      * @throws IOException if an error occurred while writing
      */
     private void sendRequest(String s) throws IOException {
-        os.write((s + '\n').getBytes());
-        os.flush();
+        writer.write(s + '\n');
+        writer.flush();
     }
 
     /**
@@ -44,15 +45,7 @@ public class Client {
      *                     or if the response wasn't the one expected
      */
     private String getResponse(String expected) throws IOException{
-        byte[] buffer = new byte[BUFFER_SIZE];
-        int    newBytes;
-        ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream();
-        String response;
-        // read the response
-        while ((newBytes = is.read(buffer)) != -1) {
-            responseBuffer.write(buffer, 0, newBytes);
-        }
-        response = responseBuffer.toString();
+        String response = reader.readLine();
         // return response
         if (expected == null || response.equals(expected)) {
             return response;
@@ -83,8 +76,8 @@ public class Client {
      */
     public Client(String ip, int port) {
         clientSocket   = null;
-        os             = null;
-        is             = null;
+        writer = null;
+        reader = null;
         this.ip        = ip;
         this.port      = port;
         this.connected = false;
@@ -102,12 +95,12 @@ public class Client {
         try {
             // init the socket and streams
             clientSocket = new Socket(ip, port);
-            os           = clientSocket.getOutputStream();
-            is           = clientSocket.getInputStream();
+            writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream(), StandardCharsets.UTF_8));
+            reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));
             // send HELLO message
             sendRequest(Protocol.CMD_HELLO);
             // get response expected as a WELCOME message
-            getResponse(Protocol.CMD_WELCOME);
+            System.out.println(getResponse(Protocol.CMD_WELCOME));
             connected = true;
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
@@ -126,14 +119,14 @@ public class Client {
         }
         // close Input Stream
         try {
-            is.close();
+            reader.close();
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
         // close Output Stream
         try {
             sendRequest(Protocol.CMD_BYE);
-            os.close();
+            writer.close();
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
@@ -152,12 +145,12 @@ public class Client {
      * @param operand2 Second operand
      * @return Result of calculation
      */
-    public Double sendCalculationToCompute(final int operand1, final char operator, final int operand2) {
+    public Double sendCalculationToCompute(final Double operand1, final String operator, final Double operand2) {
         String response;
         if (connected) {
             try {
                 // send request
-                sendRequest(Integer.toString(operand1) + ' ' + operator + ' ' + operand2);
+                sendRequest(Double.toString(operand1) + ' ' + operator + ' ' + operand2);
                 // check the response of the server
                 response = getResponse();
                 if (response.equals(Protocol.CMD_WRONG)) {
