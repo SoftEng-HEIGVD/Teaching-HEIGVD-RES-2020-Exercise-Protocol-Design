@@ -5,6 +5,7 @@
 - Port : 22500
 - Server IP : 10.192.107.63
 - Client IP : 10.192.95.120
+- Encoding : StandardCharsets.UTF_8
 
 ## FLOW
 *All transmissions describe bellow are in the good order*
@@ -13,7 +14,7 @@ Client speaks first.
 
 1. **Client** : Asks to begin a calculation by sending the keyword : **HELLO**
 
-1. **Server** : Responds **READY** or **NOT READY** (depends on the server workload)
+1. **Server** : Responds **READY** 
 
 1. **Client** :  Sends a complete calculation string (for instance, "39 + 3")
 
@@ -23,23 +24,27 @@ Client speaks first.
 
 1. **Client** : Sends the keyword **BYE** to close the connection
 
-*All other key word will generate a "Unknown Command" from the server and all wrong calculations will generate an **ERROR** response from the server.*
+1. **Server** : Responds **Bye** and close the connection
+
+*All other key word or wrong calculations will generate an **ERROR** response from the server.*
 
 ## Client Keywords
 - **HELLO** : Ask for a calculation loop
 - **BYE** : Close a connection
 - Calculations must formatted like so : "`operand1 operation operand2`" (space between each part)
 	- Example : 1 + 2
+- Available operation are : +, -, *, /
 
 ## Example
 **Client** : HELLO  
-**Server** : READY
+**Server** : Ready
 **Client** : 12 + 3  
 **Server** : 15 
 **Client** : 15 + 2
 **Server** : 17
 **Client** : hey  
-**Server** : ERROR 
+**Server** : Error 
 **Client** : 10/0
-**Server** : ERROR
+**Server** : Error
 **Client** : BYE
+**Server** : Bye
