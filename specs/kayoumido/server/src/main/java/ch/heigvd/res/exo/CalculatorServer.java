@@ -1,5 +1,7 @@
 package ch.heigvd.res.exo;
 
+import ch.heigvd.res.exo.Calculator;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -21,8 +23,10 @@ public class CalculatorServer {
         Socket client           = null;
         BufferedReader reader   = null;
         PrintWriter writer      = null;
-        
+
         try {
+            Calculator calculator = new Calculator();
+
             server = new ServerSocket(LISTEN_PORT);
 
             client  = server.accept();
@@ -37,7 +41,10 @@ public class CalculatorServer {
                 if (cmd.equalsIgnoreCase(QUIT))
                     break;
 
-                writer.println("> " + cmd.toUpperCase());
+                String[] operation = cmd.split(" ");
+
+                int res = calculator.calculate(operation[0], operation[1], operation[2]);
+                writer.println("> " + cmd.toUpperCase() + " = " + res);
                 writer.flush();
             }
 
