@@ -10,7 +10,8 @@ Le protocole utilisera TCP pour le transport des paquets.
 
 ### Adresse et port
 
-**Port écouté: ** 666
+**Port écouté:** 666
+
 **Adresse IP:** 127.0.0.1 (serveur local)
 
 
@@ -19,7 +20,7 @@ Le protocole utilisera TCP pour le transport des paquets.
 
 C’est le client qui initie la communication. Lorsque la connexion est établie, le client peut envoyer un calcul à une seule opération à effectuer. 
 
-Le calcul se trouve être sous la forme: $\text{Operande1 <Opération> Operande2}$
+Le calcul se trouve être sous la forme: *Operande1 <Opération> Operande2*
 
 Cette forme est spécifiée par le serveur au client lorsqu’une connexion est correctement établie.
 
@@ -43,7 +44,7 @@ Si le client envoie un *exit*, alors la connection est interrompue.
 ```mermaid
 sequenceDiagram
 	
-	Client ->> Server: Hello
+	Client -->> Server: Connexion au server 
 	Server ->> Client: Corona?
 	Client ->> Server: No
 	Client --> Server: Connexion établie
