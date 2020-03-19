@@ -7,20 +7,22 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Server {
+import static java.lang.Thread.sleep;
+
+public class Server implements Runnable{
 
     static final Logger LOG = Logger.getLogger(Server.class.getName());
 
     private final Charset encoding = StandardCharsets.UTF_8;
     private final int LISTEN_PORT = 2205;
 
+    @Override
     public void run(){
         LOG.info("Starting the server");
 
         ServerSocket serverSocket = null;
         Socket clientSocket = null;
         BufferedReader reader = null;
-        Scanner s = null;
         PrintWriter writer = null;
 
         try{
@@ -37,9 +39,9 @@ public class Server {
                 reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), encoding));
                 writer = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), encoding));
 
-                writer.write("Welcome to the calculator ! \n" +
-                        "You can enter an operation with '+', '-', '*' or '/' and 2 operands\n" +
-                                "'exit' to quit \n");
+                writer.write("Welcome to the calculator ! " +
+                        "You can enter an operation with '+', '-', '*' or '/' and 2 operands," +
+                        " 'exit' to quit \n");
                 writer.flush();
 
 
@@ -114,8 +116,10 @@ public class Server {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args){
         Server server = new Server();
         server.run();
+
+
     }
 }
