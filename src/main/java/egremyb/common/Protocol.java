@@ -9,10 +9,10 @@ public class Protocol {
     public static final int DEFAULT_PORT = 2020;
 
     // Protocol messages
-    public static final String CMD_HELLO = "hello";
+    public static final String CMD_HELLO   = "hello";
     public static final String CMD_WELCOME = "welcome";
-    public static final String CMD_WRONG = "wrong";
-    public static final String CMD_BYE = "bye";
+    public static final String CMD_WRONG   = "wrong";
+    public static final String CMD_BYE     = "bye";
 
 
     // Allowed operators

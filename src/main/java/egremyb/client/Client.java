@@ -96,12 +96,14 @@ public class Client {
 
     /**
      * Open a connection with to the server
+     * @return 0 if a connection is opened, -1 if an error occurred
      */
-    public void openConnection() {
+    public int openConnection() {
         // close open connection if there is one
         if (connected) {
             LOG.info("Closing old connection and opening a new connection");
             closeConnection();
+            return 0;
         }
         // try to connect to the server
         try {
@@ -117,9 +119,10 @@ public class Client {
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, UNABLE_TO_CONNECT + " : {0}", ex.getMessage());
             System.out.println(UNABLE_TO_CONNECT + ".");
-        } finally {
             closeConnection();
+            return -1;
         }
+        return 0;
     }
 
     /**
@@ -127,23 +130,23 @@ public class Client {
      */
     public void closeConnection() {
         // check if a connection was open
-        if (connected) {
+        if (!connected) {
             LOG.info(NO_CONNECTION_OPENED);
             return;
-        }
-        // close Input Stream
-        try {
-            if (reader != null) {
-                reader.close();
-            }
-        } catch (IOException ex) {
-            LOG.log(Level.SEVERE, ex.getMessage(), ex);
         }
         // close Output Stream
         try {
             if (writer != null) {
                 sendRequest(Protocol.CMD_BYE);
                 writer.close();
+            }
+        } catch (IOException ex) {
+            LOG.log(Level.SEVERE, ex.getMessage(), ex);
+        }
+        // close Input Stream
+        try {
+            if (reader != null) {
+                reader.close();
             }
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, ex.getMessage(), ex);
@@ -156,6 +159,7 @@ public class Client {
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, ex.getMessage(), ex);
         }
+        LOG.info("Connection closed.");
     }
 
     /**
@@ -170,7 +174,7 @@ public class Client {
         if (connected) {
             try {
                 // send request
-                sendRequest(Double.toString(operand1) + Protocol.SEPARATOR + operator + Protocol.SEPARATOR + operand2);
+                sendRequest(operand1 + Protocol.SEPARATOR + operator + Protocol.SEPARATOR + operand2);
                 // check the response of the server
                 response = getResponse();
                 if (response.equals(Protocol.CMD_WRONG)) {
