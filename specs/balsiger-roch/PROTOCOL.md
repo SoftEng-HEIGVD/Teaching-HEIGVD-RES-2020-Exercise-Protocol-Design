@@ -80,5 +80,3 @@ srv -> cli: 1
 cli -> srv: ERROR parsing failed
 cli -->> srv: TCP close
 ```
-
-### 
