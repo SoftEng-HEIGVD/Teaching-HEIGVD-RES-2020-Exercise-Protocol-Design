@@ -53,6 +53,8 @@ public class CalculatorServer {
       LOG.log(Level.INFO,"starting the state communication");
 
       while (true) {
+        writer.println("Hi : give me one of those three: + - *");
+        writer.flush();
 
         operand = reader.readLine();
 
