@@ -148,7 +148,7 @@ public class Server implements Runnable{
                     }
                 }
             } catch (IOException ex) {
-                if(ex instanceof SocketException){
+                if (!shouldRun){
                     LOG.info("socket closed server is going down");
                 }else {
                     LOG.log(Level.SEVERE, ex.getMessage(), ex);
