@@ -11,38 +11,35 @@
 
 Client speaks first.
 
-1. **Client** : Asks to begin a calculation by sending the keyword : **calculation**
+1. **Client** : Asks to begin a calculation by sending the keyword : **HELLO**
 
-1. **Server** : Responds "Ready" or "Not Ready" (depends on the server workload)
+1. **Server** : Responds **READY** or **NOT READY** (depends on the server workload)
 
-1. **Client** :  Sends a complete calculation string
+1. **Client** :  Sends a complete calculation string (for instance, "39 + 3")
 
-1. **Server** : Fetches the calculation string, parse it, and respond with the result
+1. **Server** : Fetches the calculation string, parse it, and respond with the result or **ERROR** if the client's request is incorrect
 
-*Client can ask new calculation without sending keyword again*
+1. Client can now ask new calculations without sending keyword again
 
-Client : 
-- Sends the keyword **bye** to close the connection
+1. **Client** : Sends the keyword **BYE** to close the connection
 
-Server :
-- Sends "Good bye - Client disconnected"
-
-*All other key word will generate a "Unknown Command" from the server and all wrong calculation definition will generate an "Error : {{ msg }}" response from the server.*
+*All other key word will generate a "Unknown Command" from the server and all wrong calculations will generate an **ERROR** response from the server.*
 
 ## Client Keywords
-- **calculation** : Start a calculation loop
-- **bye** : Close a connection
+- **HELLO** : Ask for a calculation loop
+- **BYE** : Close a connection
+- Calculations must formatted like so : "`operand1 operation operand2`" (space between each part)
+	- Example : 1 + 2
 
 ## Example
-**Client** : calculation  
-**Server** : Ready
+**Client** : HELLO  
+**Server** : READY
 **Client** : 12 + 3  
 **Server** : 15 
 **Client** : 15 + 2
 **Server** : 17
-**Client** : Hello  
-**Server** : Error : Bad calculation 
-**Client** : 10 / 0
-**Server** : Error : Devided by zero
-**Client** : bye
-**Server** : Client disconnected
+**Client** : hey  
+**Server** : ERROR 
+**Client** : 10/0
+**Server** : ERROR
+**Client** : BYE
