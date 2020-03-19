@@ -28,7 +28,8 @@ Client speaks first.
 
 *All other key word or wrong calculations will generate an **ERROR** response from the server.*
 
-## Client Keywords
+## Client Keywords - Grammar
+*All keywords are not case sensitive*
 - **HELLO** : Ask for a calculation loop
 - **BYE** : Close a connection
 - Calculations must formatted like so : "`operand1 operation operand2`" (space between each part)
@@ -37,14 +38,14 @@ Client speaks first.
 
 ## Example
 **Client** : HELLO  
-**Server** : Ready
+**Server** : Ready  
 **Client** : 12 + 3  
-**Server** : 15 
-**Client** : 15 + 2
-**Server** : 17
-**Client** : hey  
-**Server** : Error 
-**Client** : 10/0
-**Server** : Error
-**Client** : BYE
-**Server** : Bye
+**Server** : 15   
+**Client** : 15 + 2  
+**Server** : 17  
+**Client** : hey   
+**Server** : Error   
+**Client** : 10/0  
+**Server** : Error  
+**Client** : BYE  
+**Server** : Bye  
