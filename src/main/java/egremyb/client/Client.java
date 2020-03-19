@@ -170,7 +170,7 @@ public class Client {
         if (connected) {
             try {
                 // send request
-                sendRequest(Double.toString(operand1) + ' ' + operator + ' ' + operand2);
+                sendRequest(Double.toString(operand1) + Protocol.SEPARATOR + operator + Protocol.SEPARATOR + operand2);
                 // check the response of the server
                 response = getResponse();
                 if (response.equals(Protocol.CMD_WRONG)) {
