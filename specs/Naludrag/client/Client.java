@@ -37,7 +37,7 @@ public class Client {
     public void connect(String serverAddress, int serverPort) {
         try {
             clientSocket = new Socket(serverAddress, serverPort);
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(),Protocol.CHARSET));
             out = new PrintWriter(clientSocket.getOutputStream());
             connected = true;
         } catch (IOException e) {
@@ -49,11 +49,9 @@ public class Client {
         // Let us send the HELLO command to connect us to the server
         out.println(Protocol.CMD_HELLO);
         out.flush();
-        //See if the server responded to us
-        String response = "";
         try {
-            response = in.readLine();
-            LOG.log(Level.INFO, String.format("Server response: %s", response));
+            //See what the server responded to us
+            LOG.log(Level.INFO, String.format("Server response: %s", in.readLine()));
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, ex.getMessage(), ex);
         }

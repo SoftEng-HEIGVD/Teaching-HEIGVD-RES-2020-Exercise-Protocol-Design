@@ -11,5 +11,6 @@ public class Protocol {
 
     public static final String CMD_HELLO = "HELLO";
     public static final String CMD_BYE = "BYE";
+    public static final String CHARSET = "UTF-8";
 
 }

@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.logging.Logger;
  * connection requests.
  *
  * @author Olivier Liechti
+ * @modified Stéphane Teixeira Carvalho
  */
 public class Server implements Runnable{
 
@@ -71,12 +73,16 @@ public class Server implements Runnable{
             serverSocket.close();
             LOG.info("shouldRun is false... server going down");
         } catch (IOException ex) {
-            LOG.log(Level.SEVERE, ex.getMessage(), ex);
-            System.exit(-1);
+            if(ex instanceof SocketException){
+                LOG.info("socket closed server is going down");
+            }else {
+                LOG.log(Level.SEVERE, ex.getMessage(), ex);
+                System.exit(-1);
+            }
         }
     }
 
-    private void shutdown() {
+    public void shutdown() {
         LOG.info("Shutting down server...");
         shouldRun = false;
         try {
@@ -97,7 +103,7 @@ public class Server implements Runnable{
         public Worker(Socket clientSocket) {
             this.clientSocket = clientSocket;
             try {
-                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(),Protocol.CHARSET));
                 out = new PrintWriter(clientSocket.getOutputStream());
                 connected = true;
             } catch (IOException ex) {
@@ -108,52 +114,67 @@ public class Server implements Runnable{
         @Override
         public void run() {
             String commandLine;
+            Operator operatorUsed = null;
             int result = 0;
+            int operand1 = 0;
+            int operand2 = 0;
             try {
                 while (connected && ((commandLine = in.readLine()) != null)) {
                     String[] tokens = commandLine.split(" ");
                     if (tokens[0].toUpperCase().equals(Protocol.CMD_BYE)) {
                         connected = false;
+                    } else if(tokens[0].toUpperCase().equals(Protocol.CMD_HELLO)){
+                        sendNotification("HELLO, GIVE CALCULATIONS(supported operators : + - * /)");
                     } else {
-                        if(tokens[0].toUpperCase().equals(Protocol.CMD_HELLO)){
-                            sendNotification("HELLO, GIVE CALCULATIONS(supported operators : + - * /)");
-                        }else {
+                        //If tokens has more than 3 arguments error
+                        if (tokens.length > 3) {
+                            sendNotification("Please send another calcul wrong number of arguments");
+                        }
+                        else {
                             try {
-                                if (tokens.length > 3) {
-                                    throw new NumberFormatException();
+                                operand1 = Integer.parseInt(tokens[0]);
+                                operand2 = Integer.parseInt(tokens[2]);
+                            } catch (NumberFormatException e) {
+                                sendNotification("Please send another calcul number incorrect");
+                            }finally {
+                                //Search in the current operators if the one passed is in the list
+                                for (Operator op : Operator.values()) {
+                                    if (tokens[1].equals(op.toString())) {
+                                        operatorUsed = op;
+                                        break;
+                                    }
                                 }
-                                int operand1 = Integer.parseInt(tokens[0]);
-                                int operand2 = Integer.parseInt(tokens[2]);
-                                if (tokens[1].length() > 1 || (!tokens[1].equals("+") && !tokens[1].equals("-") &&
-                                        !tokens[1].equals("*") && !tokens[1].equals("/"))) {
-                                    throw new NumberFormatException();
+                                //If we didn't find any of the valid operators error
+                                if (operatorUsed == null) {
+                                    sendNotification("Unknown operator");
                                 } else {
-                                    switch (tokens[1].charAt(0)) {
-                                        case '+':
+                                    switch (operatorUsed) {
+                                        case ADD:
                                             result = operand1 + operand2;
                                             break;
-                                        case '-':
+                                        case SUB:
                                             result = operand1 - operand2;
                                             break;
-                                        case '*':
+                                        case MULTIPLY:
                                             result = operand1 * operand2;
                                             break;
-                                        case '/':
+                                        case DIVIDE:
                                             result = operand1 / operand2;
                                             break;
                                     }
                                     sendNotification(result + " = " + commandLine);
                                 }
-                                sendNotification(result + " = " + commandLine);
-                            } catch (NumberFormatException e) {
-                                System.out.println("The calcul passed is not the right format");
-                                sendNotification("Please send another calcul wrong format");
                             }
                         }
                     }
                 }
             } catch (IOException ex) {
-                LOG.log(Level.SEVERE, ex.getMessage(), ex);
+                if(ex instanceof SocketException){
+                    LOG.info("socket closed server is going down");
+                }else {
+                    LOG.log(Level.SEVERE, ex.getMessage(), ex);
+                    System.exit(-1);
+                }
             } finally {
                 unregisterWorker(this);
                 cleanup();
@@ -199,6 +220,5 @@ public class Server implements Runnable{
             connected = false;
             cleanup();
         }
-
     }
 }
