@@ -74,6 +74,7 @@ public class Server {
         ServantWorker(Socket clientSocket) {
             this.clientSocket = clientSocket;
             try {
+                // Notice that we have a UTF-8 encoding
                 this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));
                 this.out = new PrintWriter(clientSocket.getOutputStream());
             } catch (IOException e) {
@@ -93,10 +94,11 @@ public class Server {
             int nb2 = 0;
             int answer = 0;
             String operation;
+            // Split our calculation in 3 parts (operand1, operator, operand2)
             String[] parts = calculation.split(" ");
             boolean error = false;
 
-            // Calculate only NB Operation NB => so 3 parts
+            // We must have our 3 parts for a right calculation
             if(parts.length != 3) {
                 error = true;
             } else{
@@ -146,9 +148,6 @@ public class Server {
             String line;
             boolean shouldRun = true;
 
-            out.println("Welcome to the multi-threaded server.");
-            out.flush();
-
             try {
                 System.out.println("Reading until client sends BYE or close connection ...");
                 while((shouldRun && (line = in.readLine()) != null)){
@@ -182,6 +181,7 @@ public class Server {
                         break;
                     }
 
+                    // Unknown keyword -> error
                     out.println("Error");
                     out.flush();
                 }
