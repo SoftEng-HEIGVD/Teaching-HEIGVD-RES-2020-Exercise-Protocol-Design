@@ -1,9 +1,6 @@
 package ch.heigvd.res.examples;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
@@ -23,14 +20,11 @@ import java.util.logging.Logger;
  *
  * @author Olivier Liechti
  */
-public class StreamingTimeServer {
+public class CalculatorServer {
 
-  static final Logger LOG = Logger.getLogger(StreamingTimeServer.class.getName());
+  static final Logger LOG = Logger.getLogger(CalculatorServer.class.getName());
 
-  private final int TEST_DURATION = 15000;
-  private final int PAUSE_DURATION = 1000;
-  private final int NUMBER_OF_ITERATIONS = TEST_DURATION / PAUSE_DURATION;
-  private final int LISTEN_PORT = 2205;
+  private final int LISTEN_PORT = 2020;
 
   /**
    * This method does the entire processing.
@@ -59,18 +53,42 @@ public class StreamingTimeServer {
         reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         writer = new PrintWriter(clientSocket.getOutputStream());
 
-        LOG.log(Level.INFO, "Starting my job... sending current time to the client for {0} ms", TEST_DURATION);
-        for (int i = 0; i < NUMBER_OF_ITERATIONS; i++) {
-          writer.println(String.format("{'time' : '%s'}", new Date()));
-          writer.flush();
-          LOG.log(Level.INFO, "Sent data to client, doing a pause...");
-          Thread.sleep(PAUSE_DURATION);
+        char operand;
+        int leftOperator = 0;
+        int rightOperator = 0;
+        int result = 0;
+
+        LOG.log(Level.INFO,"starting the state communication");
+        //first we need the operand
+        operand = ((char) reader.read());
+
+        if(operand != '+' && operand != '-')
+          throw new InterruptedException("not an understandable operand");
+
+        LOG.log(Level.INFO, "Here we need the first operator");
+        writer.write("\nOK : give me the left operand");
+
+        leftOperator = reader.read();
+
+        LOG.log(Level.INFO, "Here we need the second operator");
+        writer.write("\nOK : give me the right operand");
+
+        rightOperator = reader.read();
+
+        switch (operand){
+          case '+':
+            result = leftOperator + rightOperator;
+          break;
+          case '-':
+            result = leftOperator - rightOperator;
+            break;
         }
+
+        writer.write("\nYour result is : " + result);
 
         reader.close();
         writer.close();
         clientSocket.close();
-
 
       }
 
@@ -81,18 +99,18 @@ public class StreamingTimeServer {
       try {
         reader.close();
       } catch (IOException ex) {
-        Logger.getLogger(StreamingTimeServer.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(CalculatorServer.class.getName()).log(Level.SEVERE, null, ex);
       }
       writer.close();
       try {
         clientSocket.close();
       } catch (IOException ex) {
-        Logger.getLogger(StreamingTimeServer.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(CalculatorServer.class.getName()).log(Level.SEVERE, null, ex);
       }
       try {
         serverSocket.close();
       } catch (IOException ex) {
-        Logger.getLogger(StreamingTimeServer.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(CalculatorServer.class.getName()).log(Level.SEVERE, null, ex);
       }
     }
 
@@ -127,7 +145,7 @@ public class StreamingTimeServer {
   public static void main(String[] args) {
     System.setProperty("java.util.logging.SimpleFormatter.format", "%5$s %n");
 
-    StreamingTimeServer server = new StreamingTimeServer();
+    CalculatorServer server = new CalculatorServer();
     server.start();
   }
 
