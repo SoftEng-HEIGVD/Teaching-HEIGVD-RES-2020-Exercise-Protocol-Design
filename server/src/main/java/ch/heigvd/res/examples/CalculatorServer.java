@@ -53,39 +53,43 @@ public class CalculatorServer {
         reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         writer = new PrintWriter(clientSocket.getOutputStream());
 
-        char operand;
+        String operand;
         int leftOperator = 0;
         int rightOperator = 0;
         int result = 0;
 
         LOG.log(Level.INFO,"starting the state communication");
         //first we need the operand
-        operand = ((char) reader.read());
 
-        if(operand != '+' && operand != '-')
+        operand = reader.readLine();
+
+
+        if(operand.compareTo("+") != 0 && operand.compareTo("-") != 0)
           throw new InterruptedException("not an understandable operand");
 
         LOG.log(Level.INFO, "Here we need the first operator");
-        writer.write("\nOK : give me the left operand");
+        writer.println("OK : give me the left operand");
+        writer.flush();
 
-        leftOperator = reader.read();
+        leftOperator = Integer.parseInt(reader.readLine());
 
         LOG.log(Level.INFO, "Here we need the second operator");
-        writer.write("\nOK : give me the right operand");
+        writer.println("OK : give me the right operand");
+        writer.flush();
 
-        rightOperator = reader.read();
+        rightOperator = Integer.parseInt(reader.readLine());
 
         switch (operand){
-          case '+':
+          case "+":
             result = leftOperator + rightOperator;
           break;
-          case '-':
+          case "-":
             result = leftOperator - rightOperator;
             break;
         }
 
-        writer.write("\nYour result is : " + result);
-
+        writer.println("Your result is : " + result);
+        writer.flush();
         reader.close();
         writer.close();
         clientSocket.close();
