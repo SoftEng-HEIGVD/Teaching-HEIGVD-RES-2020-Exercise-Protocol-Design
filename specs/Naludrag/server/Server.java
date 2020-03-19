@@ -114,55 +114,34 @@ public class Server implements Runnable{
         @Override
         public void run() {
             String commandLine;
-            Operator operatorUsed = null;
-            int result = 0;
             int operand1 = 0;
             int operand2 = 0;
+            int result;
             try {
                 while (connected && ((commandLine = in.readLine()) != null)) {
                     String[] tokens = commandLine.split(" ");
                     if (tokens[0].toUpperCase().equals(Protocol.CMD_BYE)) {
                         connected = false;
-                    } else if(tokens[0].toUpperCase().equals(Protocol.CMD_HELLO)){
+                    } else if (tokens[0].toUpperCase().equals(Protocol.CMD_HELLO)) {
                         sendNotification("HELLO, GIVE CALCULATIONS(supported operators : + - * /)");
                     } else {
                         //If tokens has more than 3 arguments error
                         if (tokens.length > 3) {
                             sendNotification("Please send another calcul wrong number of arguments");
-                        }
-                        else {
+                        } else {
                             try {
                                 operand1 = Integer.parseInt(tokens[0]);
                                 operand2 = Integer.parseInt(tokens[2]);
                             } catch (NumberFormatException e) {
                                 sendNotification("Please send another calcul number incorrect");
-                            }finally {
-                                //Search in the current operators if the one passed is in the list
-                                for (Operator op : Operator.values()) {
-                                    if (tokens[1].equals(op.toString())) {
-                                        operatorUsed = op;
-                                        break;
-                                    }
-                                }
-                                //If we didn't find any of the valid operators error
-                                if (operatorUsed == null) {
+                            } finally {
+                                //Search in the operators if the one passed is in the list
+                                Operator op = Operator.getOperator(tokens[1]);
+                                if (op == null) {
                                     sendNotification("Unknown operator");
                                 } else {
-                                    switch (operatorUsed) {
-                                        case ADD:
-                                            result = operand1 + operand2;
-                                            break;
-                                        case SUB:
-                                            result = operand1 - operand2;
-                                            break;
-                                        case MULTIPLY:
-                                            result = operand1 * operand2;
-                                            break;
-                                        case DIVIDE:
-                                            result = operand1 / operand2;
-                                            break;
-                                    }
-                                    sendNotification(result + " = " + commandLine);
+                                    result = op.eval(operand1, operand2);
+                                    sendNotification(commandLine + " = " + result);
                                 }
                             }
                         }
