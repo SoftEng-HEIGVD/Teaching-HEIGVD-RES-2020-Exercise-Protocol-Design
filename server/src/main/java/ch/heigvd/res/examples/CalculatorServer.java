@@ -8,17 +8,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * A very simple example of TCP server. When the server starts, it binds a
- * server socket on any of the available network interfaces and on port 2205. It
- * then waits until one (only one!) client makes a connection request. When the
- * client arrives, the server does not even check if the client sends data. It
- * simply writes the current time, every second, during 15 seconds.
+ * inpired by O.Liechti
+ * here we implement a very simple Protocol
  *
- * To test the server, simply open a terminal, do a "telnet localhost 2205" and
- * see what you get back. Use Wireshark to have a look at the transmitted TCP
- * segments.
- *
- * @author Olivier Liechti
+ * @author Sacha Perdrizat & Pablo Mercado
  */
 public class CalculatorServer {
 
@@ -53,20 +46,15 @@ public class CalculatorServer {
       writer = new PrintWriter(clientSocket.getOutputStream());
 
       String operand;
-      int leftOperator = 0;
-      int rightOperator = 0;
-      int result = 0;
+      int leftOperator;
+      int rightOperator;
+      int result;
 
       LOG.log(Level.INFO,"starting the state communication");
-      //first we need the operand
 
       while (true) {
 
         operand = reader.readLine();
-
-
-        if(operand.compareTo("+") != 0 && operand.compareTo("-") != 0 && operand.compareTo("*") != 0)
-          throw new InterruptedException("not an understandable operand");
 
         LOG.log(Level.INFO, "Here we need the first operator");
         writer.println("OK : give me the left operand");
@@ -90,6 +78,8 @@ public class CalculatorServer {
           case "*":
             result = leftOperator * rightOperator;
             break;
+          default:
+            throw new InterruptedException("not an valid operand");
         }
 
         writer.println("Your result is : " + result);
@@ -97,26 +87,26 @@ public class CalculatorServer {
 
       }
 
-//      writer.flush();
-//      reader.close();
-//      writer.close();
-//      clientSocket.close();
 
     } catch (IOException | InterruptedException ex) {
       LOG.log(Level.SEVERE, ex.getMessage());
     } finally {
       LOG.log(Level.INFO, "We are done. Cleaning up resources, closing streams and sockets...");
+
       try {
         reader.close();
       } catch (IOException ex) {
         Logger.getLogger(CalculatorServer.class.getName()).log(Level.SEVERE, null, ex);
       }
+
       writer.close();
+
       try {
         clientSocket.close();
       } catch (IOException ex) {
         Logger.getLogger(CalculatorServer.class.getName()).log(Level.SEVERE, null, ex);
       }
+
       try {
         serverSocket.close();
       } catch (IOException ex) {
