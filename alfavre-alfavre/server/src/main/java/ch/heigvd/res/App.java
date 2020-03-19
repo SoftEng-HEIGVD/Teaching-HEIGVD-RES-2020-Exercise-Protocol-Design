@@ -1,40 +1,20 @@
 package main.java.ch.heigvd.res;
 
-/**
- * The server reacts to the following commands, defined in the protocol:
- * - HELLO name: the user "behind" the client is not anonymous anymore
- * - SAY message: the message is broadcasted to connected clients
- * - WHO: the server returns the list of connected users
- * - BYE: the client is disconnected and the others are notified
- *
- * @author Olivier Liechti
- */
+import java.io.IOException;
+
 public class App {
 
     /**
+     * server, I half assed the log, it logs almost nothing
+     * Doesn't work with double, int only (idk why, but i wont fix)
+     * Does return the double division (3/6=0.5 and not 0)
+     *
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-        System.setProperty("java.util.logging.SimpleFormatter.format", "%5$s %n");
+    public static void main(String[] args) throws IOException {
 
-        Thread listenThread = new Thread(new Server());
-        listenThread.start();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        /*
-        Client c1 = new Client();
-        c1.connect("localhost", Protocol.PRESENCE_DEFAULT_PORT, "Sacha");
-        new Client().connect("localhost", Protocol.PRESENCE_DEFAULT_PORT, "Fabienne");
-        new Client().connect("localhost", Protocol.PRESENCE_DEFAULT_PORT, "Olivier");
-        c1.disconnect();
-        new Client().connect("localhost", Protocol.PRESENCE_DEFAULT_PORT, "Jean");
-        new Client().connect("localhost", Protocol.PRESENCE_DEFAULT_PORT, "Nicole");
-        */
-
+        Server server = new Server();
+        server.start();
     }
 
 }
