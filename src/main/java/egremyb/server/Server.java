@@ -1,7 +1,6 @@
 package egremyb.server;
 
 import egremyb.common.Protocol;
-import jdk.nashorn.internal.objects.annotations.Constructor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
