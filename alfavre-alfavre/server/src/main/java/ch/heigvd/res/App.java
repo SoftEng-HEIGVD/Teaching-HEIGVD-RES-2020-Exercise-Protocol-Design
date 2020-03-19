@@ -1,0 +1,40 @@
+package main.java.ch.heigvd.res;
+
+/**
+ * The server reacts to the following commands, defined in the protocol:
+ * - HELLO name: the user "behind" the client is not anonymous anymore
+ * - SAY message: the message is broadcasted to connected clients
+ * - WHO: the server returns the list of connected users
+ * - BYE: the client is disconnected and the others are notified
+ *
+ * @author Olivier Liechti
+ */
+public class App {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        System.setProperty("java.util.logging.SimpleFormatter.format", "%5$s %n");
+
+        Thread listenThread = new Thread(new Server());
+        listenThread.start();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        /*
+        Client c1 = new Client();
+        c1.connect("localhost", Protocol.PRESENCE_DEFAULT_PORT, "Sacha");
+        new Client().connect("localhost", Protocol.PRESENCE_DEFAULT_PORT, "Fabienne");
+        new Client().connect("localhost", Protocol.PRESENCE_DEFAULT_PORT, "Olivier");
+        c1.disconnect();
+        new Client().connect("localhost", Protocol.PRESENCE_DEFAULT_PORT, "Jean");
+        new Client().connect("localhost", Protocol.PRESENCE_DEFAULT_PORT, "Nicole");
+        */
+
+    }
+
+}
