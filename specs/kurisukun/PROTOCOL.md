@@ -46,10 +46,12 @@ sequenceDiagram
 	
 	Client -->> Server: Connexion au server 
 	Server ->> Client: Corona?
-	Client ->> Server: No
+	Client ->> Server: no
 	Client --> Server: Connexion établie
 	Client ->> Server: 3 + 2
 	Server ->> Client: 5
+	Client ->> Server: 3.3 - 2
+	Server ->> Client: 1.3
 	Client ->> Server: 4 ! 5
 	Server ->> Client: Input incorrect
 	Client ->> Server: exit
