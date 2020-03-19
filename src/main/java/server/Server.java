@@ -1,4 +1,4 @@
-package com.company;
+package server;
 
 public class Server
 {
