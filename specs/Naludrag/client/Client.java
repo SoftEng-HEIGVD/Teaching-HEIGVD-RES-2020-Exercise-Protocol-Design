@@ -92,8 +92,8 @@ public class Client {
             return "";
         }
 
-        LOG.log(Level.INFO, String.format("Sending to server: %d %s %d", a, op, b));
         String str = String.format("%d %s %d", a, op, b);
+        LOG.log(Level.INFO, "Sending to server: {0}", str);
         out.println(str);
         out.flush();
         String response = "";
