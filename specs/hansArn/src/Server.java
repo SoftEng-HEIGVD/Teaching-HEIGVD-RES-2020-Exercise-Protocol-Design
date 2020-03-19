@@ -60,10 +60,6 @@ public class Server {
                 // booléen d'arrêt
                 boolean shouldRun = true;
 
-                // message d'acceuil
-                out.println("Welcome to calculator Server.\nSend me something to calculate with the form \" number sign number \" and conclude with the BYE command.\n" +
-                        "4 operations are available (+, -, \\, *)");
-                out.flush();
 
                 while ( (shouldRun) && (line = in.readLine()) != null ) {
                     // si le client dit bye on ferme la connexion
