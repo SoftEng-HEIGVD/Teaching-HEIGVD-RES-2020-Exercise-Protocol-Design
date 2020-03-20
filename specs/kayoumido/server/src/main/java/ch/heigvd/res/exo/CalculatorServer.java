@@ -20,63 +20,103 @@ public class CalculatorServer {
     static final Logger LOG = Logger.getLogger(CalculatorServer.class.getName());
 
     /**
-     * Method starting a server capable of performing small arithmetic operations based on a client input.
-     * The server starts, waits for a client to connect and then
-     * performs the calculation once asked and returns the result, then goes back to waiting state
+     * This class has the job to accept any incoming connection request, by creating a new server socket and accept the request.
+     * For every client, a new instance of the `Worker` is created and passed to the `Thread` and start the newly created thread.
+     * And then it returns in a waiting state for a new client.
+     */
+    private class Receptionist implements Runnable {
+
+        @Override
+        public void run() {
+            ServerSocket server;
+
+            try {
+                server = new ServerSocket(LISTEN_PORT);
+            } catch (IOException ex) {
+                LOG.log(Level.SEVERE, null, ex);
+                return;
+            }
+
+            while (true) {
+                LOG.info("Waiting (blocking) for a new client...");
+                try {
+                    // accept the new client and start a new thread to handle it
+                    Socket client = server.accept();
+                    new Thread(new Worker(client)).start();
+
+                } catch (IOException e) {
+                    // something bad happened
+                    LOG.log(Level.SEVERE, e.getMessage(), e);
+                }
+            }
+        }
+    }
+
+    /**
+     * This class will take care of a single client.
+     * Uses the input and output streams connected to the socket to receive the calculation asked by the client
+     * then return the result, then goes back to a waiting state.
+     */
+    private class Worker implements Runnable {
+
+        Socket client;
+        BufferedReader reader;
+        PrintWriter writer;
+
+        public Worker(Socket client) {
+            try {
+                this.client = client;
+                this.reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                this.writer = new PrintWriter(client.getOutputStream());
+            } catch (IOException e) {
+                LOG.log(Level.SEVERE, e.getMessage());
+            }
+        }
+
+        @Override
+        public void run() {
+            try {
+                Calculator calculator = new Calculator();
+
+                // Reading client's input
+                String cmd;
+                while((cmd = this.reader.readLine()) != null) {
+
+                    // Splits the input and performs the calculation
+                    String[] operation = cmd.split(" ");
+
+                    int res = calculator.calculate(operation[0], operation[1], operation[2]);
+                    this.writer.println("> " + cmd.toUpperCase() + " = " + res);
+                    this.writer.flush();
+                }
+            } catch (IOException e) {
+                LOG.log(Level.SEVERE, e.getMessage());
+            } finally {
+                // current client is finished,
+                // we can cleanup the resources
+                try {
+                    this.reader.close();
+                } catch (IOException e) {
+                    Logger.getLogger(CalculatorServer.class.getName()).log(Level.SEVERE, null, e);
+                }
+
+                this.writer.close();
+
+                try {
+                    this.client.close();
+                } catch (IOException e) {
+                    Logger.getLogger(CalculatorServer.class.getName()).log(Level.SEVERE, null, e);
+                }
+            }
+        }
+    }
+    
+    /**
+     * @brief Start the Server so clients can connect
      */
     private void start() {
         LOG.info("Starting server...");
-
-        ServerSocket server = null;
-        Socket client = null;
-        BufferedReader reader = null;
-        PrintWriter writer = null;
-
-        try {
-            Calculator calculator = new Calculator();
-
-            server = new ServerSocket(LISTEN_PORT);
-
-            // Watining until a client tries to connect and establish streams to get and send data
-            client = server.accept();
-            reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            writer = new PrintWriter(client.getOutputStream());
-
-            // Reading client's input
-            String cmd;
-            while((cmd = reader.readLine()) != null) {
-
-                // Splits the input and performs the calculation
-                String[] operation = cmd.split(" ");
-
-                int res = calculator.calculate(operation[0], operation[1], operation[2]);
-                writer.println("> " + cmd.toUpperCase() + " = " + res);
-                writer.flush();
-            }
-            // Closes streams
-            writer.close();
-            reader.close();
-        } catch(IOException e) {
-            LOG.log(Level.SEVERE, e.getMessage());
-        } finally {
-            LOG.log(Level.INFO, "We are done. Cleaning up resources, closing streams and sockets...");
-            try {
-                reader.close();
-            } catch(IOException ex) {
-                Logger.getLogger(CalculatorServer.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            writer.close();
-            try {
-                client.close();
-            } catch(IOException ex) {
-                Logger.getLogger(CalculatorServer.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            try {
-                server.close();
-            } catch(IOException ex) {
-                Logger.getLogger(CalculatorServer.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        new Thread(new Receptionist()).start();
     }
 
     /**
