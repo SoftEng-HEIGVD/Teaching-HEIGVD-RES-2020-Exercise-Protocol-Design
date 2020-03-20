@@ -110,7 +110,7 @@ public class CalculatorServer {
             }
         }
     }
-    
+
     /**
      * @brief Start the Server so clients can connect
      */
