@@ -24,4 +24,7 @@ public class Protocol {
 
     // Separator
     public static final String SEPARATOR = " ";
+
+    // Number format pattern
+    public static final String NUMBER_FORMAT = "#0.00";
 }

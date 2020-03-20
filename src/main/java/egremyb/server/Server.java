@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -177,28 +179,29 @@ public class Server {
                         double firstOperand = Double.parseDouble(tokens[0]);
                         double secondOperand = Double.parseDouble(tokens[2]);
                         double solution;
+                        NumberFormat formater = new DecimalFormat(Protocol.NUMBER_FORMAT);
 
                         switch (tokens[1]){
                             case Protocol.ADD_OPERATOR:
                                 solution = firstOperand + secondOperand;
                                 LOG.log(Level.INFO, "Processing : {0} {1} {2} = {3}", new Object[]{firstOperand, Protocol.ADD_OPERATOR,secondOperand, solution});
-                                return Double.toString(solution);
+                                return formater.format(solution);
                             case Protocol.SUB_OPERATOR:
                                 solution = firstOperand - secondOperand;
                                 LOG.log(Level.INFO, "Processing : {0} {1} {2} = {3}", new Object[]{firstOperand, Protocol.SUB_OPERATOR,secondOperand, solution});
-                                return Double.toString(solution);
+                                return formater.format(solution);
                             case Protocol.MUL_OPERATOR:
                                 solution = firstOperand * secondOperand;
                                 LOG.log(Level.INFO, "Processing : {0} {1} {2} = {3}", new Object[]{firstOperand, Protocol.MUL_OPERATOR,secondOperand, solution});
-                                return Double.toString(solution);
+                                return formater.format(solution);
                             case Protocol.DIV_OPERATOR:
                                 solution = firstOperand / secondOperand;
                                 LOG.log(Level.INFO, "Processing : {0} {1} {2} = {3}", new Object[]{firstOperand, Protocol.DIV_OPERATOR,secondOperand, solution});
-                                return Double.toString(solution);
+                                return formater.format(solution);
                             case Protocol.POW_OPERATOR:
                                 solution = Math.pow(firstOperand, secondOperand);
                                 LOG.log(Level.INFO, "Processing : {0} {1} {2} = {3}", new Object[]{firstOperand, Protocol.POW_OPERATOR,secondOperand, solution});
-                                return Double.toString(solution);
+                                return formater.format(solution);
                             default:
                                 LOG.log(Level.INFO, "Client sent bad request");
                                 return Protocol.CMD_WRONG;
