@@ -11,9 +11,11 @@ public class CalculatorServer {
 
     public static void main(String[] args) {
 
-        CalculatorSingleThread server = new CalculatorSingleThread(220);
-        server.serveClients();
+        //CalculatorSingleThread server = new CalculatorSingleThread(220);
+        //server.serveClients();
 
+        CalculatorMultiThread serverMultithread = new CalculatorMultiThread(220);
+        serverMultithread.serveClients();
     }
 
 }
