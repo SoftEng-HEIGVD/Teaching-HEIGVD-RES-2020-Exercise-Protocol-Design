@@ -41,10 +41,14 @@ public class ClientTest {
     }
 
     @Test
-    public void shouldBeAbleToOpenAConnectionToServer() {
+    public void shouldBeAbleToOpenAConnectionToServer() throws IOException {
         Client client = new Client();
+        // open connection
         assertEquals(0, client.openConnection());
+        assertEquals(Protocol.CMD_HELLO,  clientIn.readLine());
+        // close connection
         client.closeConnection();
+        assertEquals(Protocol.CMD_BYE,  clientIn.readLine());
     }
 
     @Test
@@ -58,7 +62,7 @@ public class ClientTest {
         // connect to server
         Client client = new Client();
         assertEquals(0, client.openConnection());
-        clientIn.readLine();
+        assertEquals(Protocol.CMD_HELLO,  clientIn.readLine());
 
         // server send result first for client to read it
         // client send equation
@@ -67,10 +71,12 @@ public class ClientTest {
 
         // check what each ends received
         assertEquals(OPERAND1 + Protocol.SEPARATOR + OPERATOR + Protocol.SEPARATOR + OPERAND2, clientIn.readLine());
-        assertEquals(new Double(OPERAND1 + OPERAND2), result);
+        Double expected = OPERAND1 + OPERAND2;
+        assertEquals(expected, result);
 
         // close client
         client.closeConnection();
+        assertEquals(Protocol.CMD_BYE,  clientIn.readLine());
     }
 
     @Test
@@ -84,7 +90,7 @@ public class ClientTest {
         // connect to server
         Client client = new Client();
         assertEquals(0, client.openConnection());
-        clientIn.readLine();
+        assertEquals(Protocol.CMD_HELLO,  clientIn.readLine());
 
         // server send result first for client to read it
         // client send equation
@@ -97,6 +103,7 @@ public class ClientTest {
 
         // close client
         client.closeConnection();
+        assertEquals(Protocol.CMD_BYE,  clientIn.readLine());
     }
 
     @AfterClass
