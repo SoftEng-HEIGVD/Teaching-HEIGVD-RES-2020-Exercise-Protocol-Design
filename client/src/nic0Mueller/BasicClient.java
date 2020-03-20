@@ -12,7 +12,7 @@ public class BasicClient {
 
     private final static int BUFFER_SIZE = 1024;
 
-    private final int serverPort = 6842;
+    private final int serverPort = 6942;
     private final String serverIp = "10.192.19.20";
 
     private Socket clientSocket;
