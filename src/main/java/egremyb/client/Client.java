@@ -183,11 +183,12 @@ public class Client {
                 response = getResponse();
                 if (response.equals(Protocol.CMD_WRONG)) {
                     System.out.println(BAD_REQUEST);
+
                     LOG.info(BAD_REQUEST);
                     return null;
                 }
                 // return the response as an int
-                return Double.parseDouble(response);
+                return Integer.parseInt(response);
             } catch (IOException | NumberFormatException ex) {
                 System.out.println(ex.getMessage());
             }
@@ -196,6 +197,6 @@ public class Client {
             LOG.info(NO_CONNECTION_OPENED);
         }
 
-        return null;
+        return 0;
     }
 }
