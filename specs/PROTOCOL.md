@@ -29,15 +29,26 @@ The other party sends an ACK (it acknoledges the message received)
 
 # Syntax : What is the syntax of the messages ? How do we generate and parse them ?
 
-+ We can choose XML for the syntax of the messages
-Example:
-<message id= "501">
-	<operandeA> 1 </operandeA>
-	<operateur> + </operateur>
-	<operandeB> 2 </operandeB>
-</message>
++ The syntax operations will be:
+[OPERANDE] [OPERATEUR1] [OPERATEUR2]
 
-+ We can generate and parse messages using an XML parser like DOM or JDOM.
+Exemple: ADD 1 2 -> 1 + 2
+ou SUB 2 1 -> 2 - 1
+ou MULT 2 2 -> 2 * 2
+
++ We parse messages with space.
+
++ An example of communication would be :
+
+Client: SYN
+Server: SYN-ACK
+Client: ACK
+Client: ADD 1 2
+Server: 3
+Client: ACK
+Client: SUB 2 1
+Server: 1
+Client: ACK
 
 # Who closes the connection and when ?
 
