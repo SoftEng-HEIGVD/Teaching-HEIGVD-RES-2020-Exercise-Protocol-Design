@@ -4,6 +4,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Logger;
 
 /**
  * This class allows the user to send simple calculation requests to a server.
@@ -24,30 +25,32 @@ public class Client {
     private final static String SERVER_ERROR_MSG = "ERROR";
     private final static String EXIT_MSG = "BYE";
 
+    private final static Logger LOG = Logger.getLogger(Server.class.getName());
+
     /**
      * Establish connection with server
      * @param serverAddress
      * @param port
      */
-    public void connect(String serverAddress, int port) {
+    public Client(String serverAddress, int port) {
         try {
             clientSocket = new Socket(serverAddress, port);
             out = new PrintWriter(clientSocket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));
 
             // Initiate connection
-
             out.println(INIT_MSG);
             out.flush();
 
             String message = in.readLine();
             if (!message.equalsIgnoreCase(SERVER_READY_MSG)) {
-                System.out.println("Server is busy. Try again. " + message);
+                LOG.warning("Server is busy. Try again. " + message);
             } else {
                 connected = true;
+                LOG.info("Connected to server.");
             }
         } catch(IOException e) {
-            System.out.println(e.getMessage());
+            LOG.info(e.getMessage());
         }
     }
 
@@ -58,7 +61,7 @@ public class Client {
     public void calculate(String calculation) {
         try{
             if(!connected) {
-                System.out.println("Not connected to server.");
+                LOG.severe("Not connected to server.");
                 return;
             }
 
@@ -67,19 +70,19 @@ public class Client {
 
             String message = in.readLine();
             if(message.equalsIgnoreCase(SERVER_ERROR_MSG)) {
-                System.out.println("Server responded with error.");
-            } else {
-                System.out.println(message);
+                LOG.severe("Server responded with error.");
+            } else { // Server did the calculation, display result
+                LOG.info("Result: " + message + "\n");
             }
         } catch(IOException e) {
-            System.out.println(e.getMessage());
+            LOG.info(e.getMessage());
         }
     }
 
     /**
      * Exit app and tell server
      */
-    public void exit() {
+    public void close() {
         out.println(EXIT_MSG);
         out.flush();
         cleanUp();
@@ -94,7 +97,7 @@ public class Client {
             in.close();
             clientSocket.close();
         } catch(IOException e) {
-            System.out.println(e.getMessage());
+            LOG.info(e.getMessage());
         }
     }
 

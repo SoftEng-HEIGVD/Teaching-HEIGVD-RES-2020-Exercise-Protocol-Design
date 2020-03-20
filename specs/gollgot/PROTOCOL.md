@@ -3,8 +3,6 @@
 ## Specs
 - Network protocol : TCP
 - Port : 22500
-- Server IP : 10.192.107.63
-- Client IP : 10.192.95.120
 - Encoding : StandardCharsets.UTF_8
 
 ## FLOW
@@ -24,8 +22,6 @@ Client speaks first.
 
 1. **Client** : Sends the keyword **BYE** to close the connection
 
-1. **Server** : Responds **Bye** and close the connection
-
 *All other key word or wrong calculations will generate an **ERROR** response from the server.*
 
 ## Client Keywords - Grammar
@@ -38,14 +34,13 @@ Client speaks first.
 
 ## Example
 **Client** : HELLO  
-**Server** : Ready  
+**Server** : READY  
 **Client** : 12 + 3  
 **Server** : 15   
 **Client** : 15 + 2  
 **Server** : 17  
 **Client** : hey   
-**Server** : Error   
+**Server** : ERROR   
 **Client** : 10/0  
-**Server** : Error  
-**Client** : BYE  
-**Server** : Bye  
+**Server** : ERROR  
+**Client** : BYE

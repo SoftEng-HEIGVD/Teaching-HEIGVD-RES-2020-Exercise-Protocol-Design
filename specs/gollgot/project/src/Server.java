@@ -183,8 +183,6 @@ public class Server {
 
                     // Client ask to quit
                     if(line.equalsIgnoreCase(EXIT_MSG)){
-                        out.println(EXIT_MSG);
-                        out.flush();
                         break;
                     }
 
