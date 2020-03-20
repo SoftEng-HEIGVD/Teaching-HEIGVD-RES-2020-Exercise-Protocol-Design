@@ -1,5 +1,3 @@
-package ch.heigvd.res.examples;
-
 /**
  * Protocol.java file based on the protocol given by Olivier Liechti as an example in class
  * @author Mathias Maillard
