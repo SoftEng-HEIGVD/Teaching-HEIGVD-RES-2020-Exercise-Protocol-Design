@@ -34,7 +34,8 @@ public class Server {
                 LOG.log(Level.INFO, "New client has arrived");
                 LOG.log(Level.INFO, "Getting Reader and Writer connected to the client");
                 writer = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-                writer.println("Corona? [yes/no]");
+                writer.println("Corona? [yes/no] \n"+
+                                "END");
                 writer.flush();
 
                 reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -53,14 +54,19 @@ public class Server {
                                 "List of available operations: \n" +
                                 "- Addition / Substraction \n" +
                                 "- Multiplication / Division \n \n" +
-                                "You can quit at any moment by sending exit \n");
+                                "You can quit at any moment by sending exit \n" +
+                                "END");
+
+
                 writer.flush();
 
                 LOG.log(Level.INFO, "Welcome message sent to client");
 
                 while((line = reader.readLine()) != null) {
                     if (line.equals(EXIT_MESSAGE)) {
-                        writer.println("Have a nice day!");
+                        writer.println("Have a nice day!\n" +
+                                        "END");
+
                         writer.flush();
                         LOG.log(Level.INFO, "Client disconnected");
                         clientSocket.close();
@@ -98,6 +104,7 @@ public class Server {
                             writer.println(Double.toString(Double.parseDouble(operands[0]) / Double.parseDouble(operands[1])));
                             break;
                     }
+                    writer.println("END");
                     writer.flush();
                 }
             }
