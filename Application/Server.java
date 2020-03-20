@@ -36,7 +36,7 @@ public class Server {
      * it to the previously specified port. It then waits for clients in a infinite
      * loop. When a client arrives, the server will read its input line by line
      * and send back the data converted to uppercase. This will continue until
-     * the client sends the "BYE" command.
+     * the client sends the "FIN" command.
      */
     public void serveClients() {
         ServerSocket serverSocket;
@@ -54,21 +54,21 @@ public class Server {
         while (true) {
             try {
 
-                LOG.log(Level.INFO, "Waiting (blocking) for a new client on port {0}", port);
+                LOG.log(Level.INFO, "Waiting (blocking) for a new client on port {1000}", port);
                 clientSocket = serverSocket.accept();
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 out = new PrintWriter(clientSocket.getOutputStream());
                 String line;
                 boolean shouldRun = true;
 
-                out.println("Welcome to the Single-Threaded Server.\nSend me text lines and conclude with the BYE command.");
+                out.println("Welcome to the Single-Threaded Server.\nSend me text lines and conclude with the FIN command.");
                 out.flush();
-                LOG.info("Reading until client sends BYE or closes the connection...");
+                LOG.info("Reading until client sends FIN or closes the connection...");
                 while ( (shouldRun) && (line = in.readLine()) != null ) {
-                    if (line.equalsIgnoreCase("bye")) {
+                    if (line.equalsIgnoreCase("FIN")) {
                         shouldRun = false;
                     }
-                    out.println("> " + line.toUpperCase());
+                    out.println("> " + line.calculate());
                     out.flush();
                 }
 
@@ -98,5 +98,9 @@ public class Server {
                 LOG.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
+    }
+
+    public calculate(String line){
+
     }
 }
