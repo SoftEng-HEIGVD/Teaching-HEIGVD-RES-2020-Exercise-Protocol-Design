@@ -50,7 +50,7 @@ public class Client {
                 LOG.info("Connected to server.");
             }
         } catch(IOException e) {
-            LOG.info(e.getMessage());
+            LOG.warning(e.getMessage());
         }
     }
 
@@ -75,7 +75,7 @@ public class Client {
                 LOG.info("Result: " + message + "\n");
             }
         } catch(IOException e) {
-            LOG.info(e.getMessage());
+            LOG.warning(e.getMessage());
         }
     }
 
@@ -83,6 +83,11 @@ public class Client {
      * Exit app and tell server
      */
     public void close() {
+        if(!connected) {
+            LOG.severe("Not connected to server.");
+            return;
+        }
+
         out.println(EXIT_MSG);
         out.flush();
         cleanUp();
@@ -93,12 +98,30 @@ public class Client {
      */
     private void cleanUp() {
         try {
-            out.close();
-            in.close();
-            clientSocket.close();
+            if(out != null) out.close();
+            if(in != null) in.close();
+            if(clientSocket != null) clientSocket.close();
         } catch(IOException e) {
             LOG.info(e.getMessage());
         }
+    }
+
+    /**
+     * Connect to server using args parameters and performs simple calculation tests.
+     * @param args [0] : server address, [1] : port
+     */
+    public static void main(String[] args) {
+        try {
+            Client client = new Client(args[0], Integer.parseInt(args[1]));
+            client.calculate("37 + 5"); // Correct calculation request
+            client.calculate("Hey"); // Wrong message
+            client.calculate("68 + 29"); // Another correct calculation request
+
+            client.close();
+        } catch(NumberFormatException e){
+            LOG.warning("Wrong argument, the port must be an integer value ");
+        }
+
     }
 
 }
