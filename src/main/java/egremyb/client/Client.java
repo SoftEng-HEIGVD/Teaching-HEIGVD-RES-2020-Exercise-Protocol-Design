@@ -1,18 +1,25 @@
 package egremyb.client;
 
 import egremyb.common.Protocol;
+import egremyb.server.Server;
+
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Client {
-    private final static int    BUFFER_SIZE = 1024;
+    final static Logger LOG = Logger.getLogger(Server.class.getName());
+
     private final static String NO_CONNECTION_OPENED = "There is no connection opened to the server.\n";
     private final static String UNEXPECTED_RESPONSE  = "The response of the server was unexpected.\n";
     private final static String BAD_REQUEST          = "The operation must have been badly written.\n";
+    private final static String UNABLE_TO_CONNECT    = "Unable to connect to server";
 
     private Socket       clientSocket;
-    private OutputStream os;
-    private InputStream  is;
+    private BufferedWriter writer;
+    private BufferedReader reader;
     private String       ip;
     private int          port;
     private boolean      connected;
@@ -23,8 +30,9 @@ public class Client {
      * @throws IOException if an error occurred while writing
      */
     private void sendRequest(String s) throws IOException {
-        os.write((s + '\n').getBytes());
-        os.flush();
+        writer.write(s + '\n');
+        writer.flush();
+        LOG.info("Sending a new request to server : " + s);
     }
 
     /**
@@ -44,20 +52,15 @@ public class Client {
      *                     or if the response wasn't the one expected
      */
     private String getResponse(String expected) throws IOException{
-        byte[] buffer = new byte[BUFFER_SIZE];
-        int    newBytes;
-        ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream();
-        String response;
-        // read the response
-        while ((newBytes = is.read(buffer)) != -1) {
-            responseBuffer.write(buffer, 0, newBytes);
-        }
-        response = responseBuffer.toString();
+        String response = reader.readLine();
         // return response
         if (expected == null || response.equals(expected)) {
+            LOG.info("Received response from server : " + response);
             return response;
         } else {
-            throw new IOException(UNEXPECTED_RESPONSE);
+            String error = UNEXPECTED_RESPONSE + " : received \"" + response + "\", expected \"" + expected + "\"";
+            LOG.info(error);
+            throw new IOException(error);
         }
     }
 
@@ -83,37 +86,47 @@ public class Client {
      */
     public Client(String ip, int port) {
         clientSocket   = null;
-        os             = null;
-        is             = null;
+        writer         = null;
+        reader         = null;
         this.ip        = ip;
         this.port      = port;
         this.connected = false;
+        LOG.info("Created a new client, ip=\"" + ip + "\", port=" + port);
     }
 
     /**
      * Open a connection with to the server
+     * @return 0 if a connection is opened, -1 if an error occurred
      */
-    public void openConnection() {
+    public int openConnection() {
         // close open connection if there is one
         if (connected) {
+            LOG.info("Closing old connection and opening a new connection");
             closeConnection();
+            return 0;
         }
         // try to connect to the server
         try {
             // init the socket and streams
             clientSocket = new Socket(ip, port);
-            os           = clientSocket.getOutputStream();
-            is           = clientSocket.getInputStream();
-            // send HELLO message
-            sendRequest(Protocol.CMD_HELLO);
-            // get response expected as a WELCOME message
-            getResponse(Protocol.CMD_WELCOME);
-            connected = true;
+            writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream(), StandardCharsets.UTF_8));
+            reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));
+            if (clientSocket.isConnected()) {
+                // send HELLO message
+                sendRequest(Protocol.CMD_HELLO);
+                // get response expected as a WELCOME message
+                getResponse(Protocol.CMD_WELCOME);
+                connected = true;
+            } else {
+                return -1;
+            }
         } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        } finally {
+            LOG.log(Level.SEVERE, UNABLE_TO_CONNECT + " : {0}", ex.getMessage());
+            System.out.println(UNABLE_TO_CONNECT + ".");
             closeConnection();
+            return -1;
         }
+        return 0;
     }
 
     /**
@@ -121,28 +134,36 @@ public class Client {
      */
     public void closeConnection() {
         // check if a connection was open
-        if (connected) {
+        if (!connected) {
+            LOG.info(NO_CONNECTION_OPENED);
             return;
-        }
-        // close Input Stream
-        try {
-            is.close();
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
         }
         // close Output Stream
         try {
-            sendRequest(Protocol.CMD_BYE);
-            os.close();
+            if (writer != null) {
+                sendRequest(Protocol.CMD_BYE);
+                writer.close();
+            }
         } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+            LOG.log(Level.SEVERE, ex.getMessage(), ex);
+        }
+        // close Input Stream
+        try {
+            if (reader != null) {
+                reader.close();
+            }
+        } catch (IOException ex) {
+            LOG.log(Level.SEVERE, ex.getMessage(), ex);
         }
         // close Socket
         try {
-            clientSocket.close();
+            if (clientSocket != null) {
+                clientSocket.close();
+            }
         } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+            LOG.log(Level.SEVERE, ex.getMessage(), ex);
         }
+        LOG.info("Connection closed.");
     }
 
     /**
@@ -152,17 +173,19 @@ public class Client {
      * @param operand2 Second operand
      * @return Result of calculation
      */
-    public int sendCalculationToCompute(final int operand1, final char operator, final int operand2) {
+    public Double sendCalculationToCompute(final Double operand1, final String operator, final Double operand2) {
         String response;
         if (connected) {
             try {
                 // send request
-                sendRequest(Integer.toString(operand1) + ' ' + operator + ' ' + operand2);
+                sendRequest(operand1 + Protocol.SEPARATOR + operator + Protocol.SEPARATOR + operand2);
                 // check the response of the server
                 response = getResponse();
                 if (response.equals(Protocol.CMD_WRONG)) {
                     System.out.println(BAD_REQUEST);
-                    return 0;
+
+                    LOG.info(BAD_REQUEST);
+                    return null;
                 }
                 // return the response as an int
                 return Integer.parseInt(response);
@@ -171,6 +194,7 @@ public class Client {
             }
         } else {
             System.out.println(NO_CONNECTION_OPENED);
+            LOG.info(NO_CONNECTION_OPENED);
         }
 
         return 0;
