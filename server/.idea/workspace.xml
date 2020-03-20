@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="5437479b-f0e3-44f7-bc7e-788eea073e32" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../client/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/.idea/compiler.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/DumbHttpClient.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/src/main/java/ch/heigvd/res/examples/CalculatorClient.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/StreamingTimeServer.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/heigvd/res/examples/CalculatorServer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../specs/Sinyks_Brassens/PROTOCOL.md" beforeDir="false" afterPath="$PROJECT_DIR$/../specs/Sinyks_Brassens/PROTOCOL.md" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="IgnoredFileRootStore">
+    <option name="generatedRoots">
+      <set>
+        <option value="$PROJECT_DIR$/.idea" />
+      </set>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="importAutomatically" value="true" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="1Z5bXcSBnlWmrpaA7I2iNH8i4Tu" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
+  </component>
+  <component name="RunManager">
+    <configuration name="CalculatorServer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="ch.heigvd.res.examples.CalculatorServer" />
+      <module name="StreamingTimeServer" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="ch.heigvd.res.examples.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.CalculatorServer" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="5437479b-f0e3-44f7-bc7e-788eea073e32" name="Default Changelist" comment="" />
+      <created>1584131942128</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1584131942128</updated>
+      <workItem from="1584131943441" duration="27000" />
+      <workItem from="1584132018161" duration="747000" />
+      <workItem from="1584134736749" duration="83000" />
+      <workItem from="1584134918040" duration="600000" />
+      <workItem from="1584484386706" duration="2000" />
+      <workItem from="1584637019962" duration="3735000" />
+      <workItem from="1584644409122" duration="2627000" />
+      <workItem from="1584652005330" duration="787000" />
+      <workItem from="1584653793527" duration="437000" />
+      <workItem from="1584700455517" duration="2252000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="555" y="223" width="806" height="674" key="#Project_Structure" timestamp="1584132070560">
+      <screen x="0" y="40" width="1920" height="1040" />
+    </state>
+    <state x="555" y="223" width="806" height="674" key="#Project_Structure/0.40.1920.1040/1920.0.1920.1080@0.40.1920.1040" timestamp="1584132070560" />
+    <state x="743" y="319" width="430" height="481" key="FileChooserDialogImpl" timestamp="1584652018002">
+      <screen x="0" y="40" width="1920" height="1040" />
+    </state>
+    <state x="743" y="319" width="430" height="481" key="FileChooserDialogImpl/0.40.1920.1040/1920.0.1920.1080@0.40.1920.1040" timestamp="1584652018002" />
+    <state width="1878" height="300" key="GridCell.Tab.0.bottom" timestamp="1584654229837">
+      <screen x="0" y="40" width="1920" height="1040" />
+    </state>
+    <state width="1878" height="300" key="GridCell.Tab.0.bottom/0.40.1920.1040/1920.0.1920.1080@0.40.1920.1040" timestamp="1584654229837" />
+    <state width="1878" height="300" key="GridCell.Tab.0.center" timestamp="1584654229837">
+      <screen x="0" y="40" width="1920" height="1040" />
+    </state>
+    <state width="1878" height="300" key="GridCell.Tab.0.center/0.40.1920.1040/1920.0.1920.1080@0.40.1920.1040" timestamp="1584654229837" />
+    <state width="1878" height="300" key="GridCell.Tab.0.left" timestamp="1584654229837">
+      <screen x="0" y="40" width="1920" height="1040" />
+    </state>
+    <state width="1878" height="300" key="GridCell.Tab.0.left/0.40.1920.1040/1920.0.1920.1080@0.40.1920.1040" timestamp="1584654229837" />
+    <state width="1878" height="300" key="GridCell.Tab.0.right" timestamp="1584654229837">
+      <screen x="0" y="40" width="1920" height="1040" />
+    </state>
+    <state width="1878" height="300" key="GridCell.Tab.0.right/0.40.1920.1040/1920.0.1920.1080@0.40.1920.1040" timestamp="1584654229837" />
+    <state width="1878" height="342" key="GridCell.Tab.1.bottom" timestamp="1584642408427">
+      <screen x="0" y="40" width="1920" height="1040" />
+    </state>
+    <state width="1878" height="342" key="GridCell.Tab.1.bottom/0.40.1920.1040/1920.0.1920.1080@0.40.1920.1040" timestamp="1584642408427" />
+    <state width="1878" height="342" key="GridCell.Tab.1.center" timestamp="1584642408427">
+      <screen x="0" y="40" width="1920" height="1040" />
+    </state>
+    <state width="1878" height="342" key="GridCell.Tab.1.center/0.40.1920.1040/1920.0.1920.1080@0.40.1920.1040" timestamp="1584642408427" />
+    <state width="1878" height="342" key="GridCell.Tab.1.left" timestamp="1584642408427">
+      <screen x="0" y="40" width="1920" height="1040" />
+    </state>
+    <state width="1878" height="342" key="GridCell.Tab.1.left/0.40.1920.1040/1920.0.1920.1080@0.40.1920.1040" timestamp="1584642408427" />
+    <state width="1878" height="342" key="GridCell.Tab.1.right" timestamp="1584642408427">
+      <screen x="0" y="40" width="1920" height="1040" />
+    </state>
+    <state width="1878" height="342" key="GridCell.Tab.1.right/0.40.1920.1040/1920.0.1920.1080@0.40.1920.1040" timestamp="1584642408427" />
+    <state x="480" y="185" key="SettingsEditor" timestamp="1584646393282">
+      <screen x="0" y="40" width="1920" height="1040" />
+    </state>
+    <state x="480" y="185" key="SettingsEditor/0.40.1920.1040/1920.0.1920.1080@0.40.1920.1040" timestamp="1584646393282" />
+    <state x="643" y="389" key="com.intellij.ide.util.TipDialog" timestamp="1584700456733">
+      <screen x="0" y="40" width="1920" height="1040" />
+    </state>
+    <state x="643" y="389" key="com.intellij.ide.util.TipDialog/0.40.1920.1040/1920.0.1920.1080@0.40.1920.1040" timestamp="1584700456733" />
+    <state x="623" y="269" width="672" height="678" key="search.everywhere.popup" timestamp="1584641845061">
+      <screen x="0" y="40" width="1920" height="1040" />
+    </state>
+    <state x="623" y="269" width="672" height="678" key="search.everywhere.popup/0.40.1920.1040/1920.0.1920.1080@0.40.1920.1040" timestamp="1584641845061" />
+  </component>
+</project>
