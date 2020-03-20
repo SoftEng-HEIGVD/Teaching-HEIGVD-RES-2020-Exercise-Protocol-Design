@@ -1,6 +1,7 @@
-package server;
+package ch.heigvd.res.server;
 
-import common.*;
+import ch.heigvd.res.common.Protocol;
+import ch.heigvd.res.common.Operator;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

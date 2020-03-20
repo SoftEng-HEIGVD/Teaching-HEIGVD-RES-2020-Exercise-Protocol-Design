@@ -1,7 +1,6 @@
-package client;
+package ch.heigvd.res.client;
 
-import common.Operator;
-import common.Protocol;
+import ch.heigvd.res.common.Operator;
 
 public class ClientApplication {
     public static void main(String[] args) {

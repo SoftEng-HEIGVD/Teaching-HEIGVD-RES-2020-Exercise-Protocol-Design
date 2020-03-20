@@ -1,4 +1,4 @@
-package common;
+package ch.heigvd.res.common;
 /**
  *
  * @author Olivier Liechti
