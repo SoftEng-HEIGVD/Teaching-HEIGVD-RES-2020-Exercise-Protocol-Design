@@ -5,9 +5,11 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Logger;
 
 public class Server {
 
+    final static Logger LOG = Logger.getLogger(Server.class.getName());
     private int port;
 
     public Server(int port){
@@ -19,7 +21,7 @@ public class Server {
      * clients inside an infinite loop. When client arrives, server will read it's input line.
      */
     public void serveClients(){
-        System.out.println("Starting the Receptionist Worker on a new thread ...");
+        LOG.info("Starting the Receptionist Worker on a new thread ...");
         new Thread(new ReceptionistWorker()).start();
     }
 
@@ -39,19 +41,19 @@ public class Server {
                 serverSocket = new ServerSocket(port);
             } catch (IOException e) {
                 e.printStackTrace();
-                System.out.println("Error occurred on the ServerSocket initialisation : " + e.getMessage());
+                LOG.warning("Error occurred on the ServerSocket initialisation : " + e.getMessage());
                 return;
             }
 
             while(true){
-                System.out.println("Waiting for a new client on port " + port);
+                LOG.info("Waiting for a new client on port " + port);
                 try {
                     Socket clientSocket = serverSocket.accept();
-                    System.out.println("A new client has arrived. Starting a new thread and delegating work to a new servant...");
+                    LOG.info("A new client has arrived. Starting a new thread and delegating work to a new servant...");
                     new Thread(new ServantWorker(clientSocket)).start();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    System.out.println("Error occurred on the Socket Client initialisation (server accept) : " + e.getMessage());
+                    LOG.warning("Error occurred on the Socket Client initialisation (server accept) : " + e.getMessage());
                 }
             }
 
@@ -71,6 +73,11 @@ public class Server {
         BufferedReader in = null;
         PrintWriter out = null;
 
+        private final static String INIT_MSG = "HELLO";
+        private final static String SERVER_READY_MSG = "READY";
+        private final static String SERVER_ERROR_MSG = "ERROR";
+        private final static String EXIT_MSG = "BYE";
+
         ServantWorker(Socket clientSocket) {
             this.clientSocket = clientSocket;
             try {
@@ -79,7 +86,7 @@ public class Server {
                 this.out = new PrintWriter(clientSocket.getOutputStream());
             } catch (IOException e) {
                 e.printStackTrace();
-                System.out.println("Error occurred on in / out buffer creation : " + e.getMessage());
+                LOG.warning("Error occurred on in / out buffer creation : " + e.getMessage());
             }
         }
 
@@ -106,7 +113,7 @@ public class Server {
                     nb1 = Integer.parseInt(parts[0]);
                     nb2 = Integer.parseInt(parts[2]);
                 } catch(NumberFormatException e){
-                    System.out.println("Error occurred on calculation parsing : " + e.getMessage());
+                    LOG.warning("Error occurred on calculation parsing : " + e.getMessage());
                     error = true;
                 }
 
@@ -126,7 +133,7 @@ public class Server {
                             try{
                                 answer = nb1 / nb2;
                             }catch(ArithmeticException e){
-                                System.out.println("Error occurred, arithmetic exception : " + e.getMessage());
+                                LOG.warning("Error occurred, arithmetic exception : " + e.getMessage());
                                 error = true;
                             }
                             break;
@@ -149,16 +156,16 @@ public class Server {
             boolean shouldRun = true;
 
             try {
-                System.out.println("Reading until client sends BYE or close connection ...");
+                LOG.info("Reading until client sends BYE or close connection ...");
                 while((shouldRun && (line = in.readLine()) != null)){
                     // Client ask for calculation
-                    if(line.equalsIgnoreCase("hello")){
-                        out.println("Ready");
+                    if(line.equalsIgnoreCase(INIT_MSG)){
+                        out.println(SERVER_READY_MSG);
                         out.flush();
                         // Loop through all calculation the client want to do
                         while(shouldRun && (line = in.readLine()) != null){
                             // Client ask to quit
-                            if(line.equalsIgnoreCase("bye")){
+                            if(line.equalsIgnoreCase(EXIT_MSG)){
                                 shouldRun = false;
                             }
                             // Otherwise client may ask for a calculation
@@ -167,7 +174,7 @@ public class Server {
                                 if(!result.equals("invalid")){
                                     out.println(result);
                                 }else{
-                                    out.println("Error");
+                                    out.println(SERVER_ERROR_MSG);
                                 }
                                 out.flush();
                             }
@@ -175,50 +182,59 @@ public class Server {
                     }
 
                     // Client ask to quit
-                    if(line.equalsIgnoreCase("bye")){
-                        out.println("Bye");
+                    if(line.equalsIgnoreCase(EXIT_MSG)){
+                        out.println(EXIT_MSG);
                         out.flush();
                         break;
                     }
 
                     // Unknown keyword -> error
-                    out.println("Error");
+                    out.println(SERVER_ERROR_MSG);
                     out.flush();
                 }
 
-                System.out.println("Cleaning up resources...");
+                LOG.info("Cleaning up resources...");
                 clientSocket.close();
                 in.close();
                 out.close();
 
             } catch (IOException e) {
-                // Correctly close the BufferedReader
-                if(in != null){
-                    try {
-                        in.close();
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }
 
-                // Correctly close the PrintWriter
-                if(out != null){
-                    out.close();
-                }
-
-                // Correctly close the Socket
-                if(clientSocket != null) {
-                    try {
-                        clientSocket.close();
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }
+                cleanUp();
 
                 e.printStackTrace();
-                System.out.println("Error occurred on read line : " + e.getMessage());
+                LOG.warning("Error occurred on read line : " + e.getMessage());
             }
         }
+
+        /**
+         * Cleanup all our opened resources
+         */
+        private void cleanUp(){
+            // Correctly close the BufferedReader
+            if(in != null){
+                try {
+                    in.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            // Correctly close the PrintWriter
+            if(out != null){
+                out.close();
+            }
+
+            // Correctly close the Socket
+            if(clientSocket != null) {
+                try {
+                    clientSocket.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+
     }
 
 }

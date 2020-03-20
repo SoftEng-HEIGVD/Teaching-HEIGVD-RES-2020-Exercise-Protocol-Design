@@ -17,7 +17,7 @@ public class Client {
     private boolean connected = false;
 
     public final static String DEFAULT_SERVER_ADDRESS = "localhost";
-    public final static int DEFAULT_PORT = 22500;
+    public final static int DEFAULT_PORT = 12500;
 
     private final static String INIT_MSG = "HELLO";
     private final static String SERVER_READY_MSG = "READY";
