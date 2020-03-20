@@ -28,23 +28,6 @@ public class PresenceClient {
      * method can execute on its own thread. This method reads data sent from the
      * server, line by line, until the connection is closed or lost.
      */
-    class NotificationListener implements Runnable {
-
-        @Override
-        public void run() {
-            String notification;
-            try {
-                while ((connected && (notification = in.readLine()) != null)) {
-                    LOG.log(Level.INFO, "Server notification for {1}: {0}", new Object[]{notification,userName});
-                }
-            } catch (IOException e) {
-                LOG.log(Level.SEVERE, "Connection problem in client used by {1}: {0}", new Object[]{e.getMessage(),userName});
-                connected = false;
-            } finally {
-                cleanup();
-            }
-        }
-    }
 
     /**
      * This method is used to connect to the server and to inform the server that
@@ -60,30 +43,48 @@ public class PresenceClient {
             clientSocket = new Socket(serverAddress, serverPort);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             out = new PrintWriter(clientSocket.getOutputStream());
-            connected = true;
+            // Let us send the SYN command to inform the server about our intention to connect
+            sendNotification(Protocol.CMD_SYN);
+            while(!connected && line = in.readLine != null){
+                String tokens = line.split(" ");
+                switch(tokens[0].toUpperCase()){
+                    case(Protocol.CMD_SYN_ACK):
+                        connected = true;
+                        sendNotification(Protocol.CMD_ACK);
+                        break;
+                    default:
+                        sendNotification("You are not connected to the server yet");
+                }
+            }
         } catch (IOException e) {
             LOG.log(Level.SEVERE, "Unable to connect to server: {0}", e.getMessage());
             cleanup();
             return;
         }
-        // Let us start a thread, so that we can listen for server notifications
-        new Thread(new NotificationListener()).start();
+        //we listen for server notifications. We read data sent from the
+        //server, line by line, until the connection is closed or lost.
+        String notification;
+        try {
+            while ((connected && (notification = in.readLine()) != null)) {
+                LOG.log(Level.INFO, "Server notification for {1}: {0}", new Object[]{notification});
+            }
+        } catch (IOException e) {
+            LOG.log(Level.SEVERE, "Connection problem in client used by {1}: {0}", new Object[]{e.getMessage()});
+            connected = false;
+        } finally {
+            cleanup();
+        }
 
-        // Let us send the HELLO command to inform the server about who the user
-        // is. Other clients will be notified.
-        out.println("SYN");
-        out.flush();
     }
 
     public void disconnect() {
         LOG.log(Level.INFO, "{0} has requested to be disconnected.", userName);
         connected = false;
-        out.println("FIN");
+        sendNotification(Protocol.CMD_FIN);
         cleanup();
     }
 
     private void cleanup() {
-
         try {
             if (in != null) {
                 in.close();
@@ -103,6 +104,10 @@ public class PresenceClient {
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, ex.getMessage(), ex);
         }
+    }
+    public void sendNotification(String message) {
+        out.println(message);
+        out.flush();
     }
 
 

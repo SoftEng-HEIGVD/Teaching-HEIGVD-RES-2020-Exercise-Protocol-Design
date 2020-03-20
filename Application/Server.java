@@ -27,7 +27,8 @@ public class Server {
      * Constructor
      * @param port the port to listen on
      */
-    public Server(int port) {
+    public Server(String serverAddress, int port) {
+        this.serverAddress = serverAddress;
         this.port = port;
     }
 
@@ -104,6 +105,8 @@ public class Server {
                             else
                                 sendNotification("Invalid operation");
                             break;
+                        default:
+                            sendNotification("What? I only understand SYN, ACK, FIN, KILL, ADD, SUB");
                     }
 
                 }
@@ -144,7 +147,7 @@ public class Server {
         out.println(message);
         out.flush();
     }
-    
+
     /**
      * This private method shuts down the server.
      */

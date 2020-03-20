@@ -15,7 +15,7 @@ public class Calculator {
         s1.serveClients();
         Client c1 = new Client();
         c1.connect("localhost", Protocol.PRESENCE_DEFAULT_PORT);
-        c1.disconnect();
+       // c1.disconnect();
 
     }
 
