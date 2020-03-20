@@ -68,7 +68,7 @@ public class Server {
                     if (line.equalsIgnoreCase("FIN")) {
                         shouldRun = false;
                     }
-                    out.println("> " + line.calculate());
+                    out.println("> " + calculate(line));
                     out.flush();
                 }
 
