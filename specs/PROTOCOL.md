@@ -39,16 +39,20 @@ ou MULT 2 2 -> 2 * 2
 + We parse messages with space.
 
 + An example of communication would be :
-
+CONNECTION
 Client: SYN
 Server: SYN-ACK
 Client: ACK
+CALCULATION REQUESTS
 Client: ADD 1 2
 Server: 3
 Client: ACK
 Client: SUB 2 1
 Server: 1
 Client: ACK
+DISCONNECTION
+Client: FIN
+Server: ACK
 
 # Who closes the connection and when ?
 
