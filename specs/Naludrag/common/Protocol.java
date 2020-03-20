@@ -1,5 +1,4 @@
 package common;
-
 /**
  *
  * @author Olivier Liechti
