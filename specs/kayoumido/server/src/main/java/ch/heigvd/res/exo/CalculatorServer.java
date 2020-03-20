@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 public class CalculatorServer {
     private final int LISTEN_PORT = 49153;
     static final Logger LOG = Logger.getLogger(CalculatorServer.class.getName());
-    static final String QUIT = "QUIT";
 
     /**
      * Method starting a server capable of performing small arithmetic operations based on a client input.
@@ -46,9 +45,6 @@ public class CalculatorServer {
             // Reading client's input
             String cmd;
             while((cmd = reader.readLine()) != null) {
-                // TODO : no need for that, checked on the client side
-                if(cmd.equalsIgnoreCase(QUIT))
-                    break;
 
                 // Splits the input and performs the calculation
                 String[] operation = cmd.split(" ");
