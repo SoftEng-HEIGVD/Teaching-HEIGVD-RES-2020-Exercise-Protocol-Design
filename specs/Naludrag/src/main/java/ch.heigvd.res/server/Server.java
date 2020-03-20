@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -115,9 +116,6 @@ public class Server implements Runnable{
         @Override
         public void run() {
             String commandLine;
-            int operand1 = 0;
-            int operand2 = 0;
-            int result;
             try {
                 while (connected && ((commandLine = in.readLine()) != null)) {
                     String[] tokens = commandLine.split(" ");
@@ -126,26 +124,8 @@ public class Server implements Runnable{
                     } else if (tokens[0].toUpperCase().equals(Protocol.CMD_HELLO)) {
                         sendNotification("HELLO, GIVE CALCULATIONS(supported operators : + - * /)");
                     } else {
-                        //If tokens has more than 3 arguments error
-                        if (tokens.length > 3) {
-                            sendNotification("Please send another calcul wrong number of arguments");
-                        } else {
-                            try {
-                                operand1 = Integer.parseInt(tokens[0]);
-                                operand2 = Integer.parseInt(tokens[2]);
-                            } catch (NumberFormatException e) {
-                                sendNotification("Please send another calcul number incorrect");
-                            } finally {
-                                //Search in the operators if the one passed is in the list
-                                Operator op = Operator.getOperator(tokens[1]);
-                                if (op == null) {
-                                    sendNotification("Unknown operator");
-                                } else {
-                                    result = op.eval(operand1, operand2);
-                                    sendNotification(commandLine + " = " + result);
-                                }
-                            }
-                        }
+                        Calculator calculator = new Calculator(tokens);
+                        new Thread(calculator).start();
                     }
                 }
             } catch (IOException ex) {
@@ -200,5 +180,45 @@ public class Server implements Runnable{
             connected = false;
             cleanup();
         }
+
+        class Calculator implements Runnable {
+            String[] tokens;
+            int result;
+            int operand1;
+            int operand2;
+
+            public Calculator(String[] tokens) {
+                this.tokens = tokens;
+                result = 0;
+                operand1 = 0;
+                operand2 = 0;
+            }
+
+            @Override
+            public void run() {
+                //If tokens has more than 3 arguments error
+                if (tokens.length > 3) {
+                    sendNotification("Please send another calcul wrong number of arguments");
+                } else {
+                    try {
+                        operand1 = Integer.parseInt(tokens[0]);
+                        operand2 = Integer.parseInt(tokens[2]);
+                    } catch (NumberFormatException e) {
+                        sendNotification("Please send another calcul number incorrect");
+                    } finally {
+                        //Search in the operators if the one passed is in the list
+                        Operator op = Operator.getOperator(tokens[1]);
+                        if (op == null) {
+                            sendNotification("Unknown operator");
+                        } else {
+                            result = op.eval(operand1, operand2);
+                            sendNotification(operand1 + " " + op.toString() + " " + operand2 + " = " + result);
+                        }
+                    }
+                }
+            }
+        }
     }
+
+
 }
