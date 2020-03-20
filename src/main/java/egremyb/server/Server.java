@@ -112,28 +112,47 @@ public class Server {
             public void run() {
                 String clientMsg;
                 boolean shouldRun = true;
+                boolean saidHello = false;
+                boolean sendWrong = false;
 
                 try {
                     LOG.log(Level.INFO, "Reading until client sends {0} or closes the connection...", Protocol.CMD_BYE);
                     while ((shouldRun) && (clientMsg = in.readLine()) != null) {
-
+                        sendWrong = false;
                         switch(clientMsg){
                             case Protocol.CMD_HELLO:
-                                // Client wants help to compute calculus
-                                LOG.log(Level.INFO, "Received {0} from client.\n Replying {1}...", new Object[]{Protocol.CMD_HELLO, Protocol.CMD_WELCOME});
-                                // Greeting client
-                                sendMessage(Protocol.CMD_WELCOME);
+                                if(!saidHello){
+                                    saidHello = true;
+                                    // Client wants help to compute calculus
+                                    LOG.log(Level.INFO, "Received {0} from client.\n Replying {1}...", new Object[]{Protocol.CMD_HELLO, Protocol.CMD_WELCOME});
+                                    // Greeting client
+                                    sendMessage(Protocol.CMD_WELCOME);
+                                } else {
+                                    sendWrong = true;
+                                }
                                 break;
                             case Protocol.CMD_BYE:
-                                // Client wants to end communication
-                                LOG.log(Level.INFO, "Received {0} from client.\n Ending connection...", Protocol.CMD_BYE);
-                                // End communication
-                                shouldRun = false;
+                                if(saidHello){
+                                    // Client wants to end communication
+                                    LOG.log(Level.INFO, "Received {0} from client.\n Ending connection...", Protocol.CMD_BYE);
+                                    // End communication
+                                    shouldRun = false;
+                                } else{
+                                    sendWrong = true;
+                                }
                                 break;
                             default :
-                                // Client might want the server to compute an equation
-                                sendMessage(processClientMsg(clientMsg));
+                                if(saidHello){
+                                    // Client might want the server to compute an equation
+                                    sendMessage(processClientMsg(clientMsg));
+                                } else {
+                                    sendWrong = true;
+                                }
                                 break;
+                        }
+
+                        if(sendWrong){
+                            sendMessage(Protocol.CMD_WRONG);
                         }
                     }
 
