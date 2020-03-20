@@ -55,13 +55,12 @@ public class PresenceClient {
      * @param serverPort the port used by the Presence Server
      * @param userName the name of the user, used as a parameter for the HELLO command
      */
-    public void connect(String serverAddress, int serverPort, String userName) {
+    public void connect(String serverAddress, int serverPort) {
         try {
             clientSocket = new Socket(serverAddress, serverPort);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             out = new PrintWriter(clientSocket.getOutputStream());
             connected = true;
-            this.userName = userName;
         } catch (IOException e) {
             LOG.log(Level.SEVERE, "Unable to connect to server: {0}", e.getMessage());
             cleanup();
@@ -72,14 +71,14 @@ public class PresenceClient {
 
         // Let us send the HELLO command to inform the server about who the user
         // is. Other clients will be notified.
-        out.println("HELLO " + userName);
+        out.println("SYN");
         out.flush();
     }
 
     public void disconnect() {
         LOG.log(Level.INFO, "{0} has requested to be disconnected.", userName);
         connected = false;
-        out.println("BYE");
+        out.println("FIN");
         cleanup();
     }
 

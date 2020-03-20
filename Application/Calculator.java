@@ -12,6 +12,7 @@ public class Calculator {
     public static void main(String[] args) {
         System.setProperty("java.util.logging.SimpleFormatter.format", "%5$s %n");
         Server s1 = new Server(1000);
+        s1.serveClients();
         Client c1 = new Client();
         c1.connect("localhost", Protocol.PRESENCE_DEFAULT_PORT);
         c1.disconnect();
