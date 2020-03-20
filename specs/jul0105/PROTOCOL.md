@@ -75,7 +75,7 @@ CALC SERVER;ADD SUB MUL DIV
 **send operation :**
 
 ```
-<OPERAND 1> <OPERATION> >OPERAND 2>
+<OPERAND 1> <OPERATION> <OPERAND 2>
 ```
 
 Example :
