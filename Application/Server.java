@@ -43,6 +43,8 @@ public class Server {
         Socket clientSocket = null;
         BufferedReader in = null;
         PrintWriter out = null;
+        boolean shouldRun;
+        boolean connected;
 
         try {
             serverSocket = new ServerSocket(port);
@@ -59,17 +61,51 @@ public class Server {
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 out = new PrintWriter(clientSocket.getOutputStream());
                 String line;
-                boolean shouldRun = true;
+
+                shouldRun = true;
+                connected = false;
 
                 out.println("Welcome to the Single-Threaded Server.\nSend me text lines and conclude with the FIN command.");
                 out.flush();
                 LOG.info("Reading until client sends FIN or closes the connection...");
                 while ( (shouldRun) && (line = in.readLine()) != null ) {
-                    if (line.equalsIgnoreCase("FIN")) {
-                        shouldRun = false;
+                    String[] tokens = line.split(" ");
+                    switch(tokens[0].toUpperCase()){
+                        case (Protocol.CMD_SYN):
+                            sendNotification(Protocol.CMD_SYN_ACK);
+                            break;
+                        case (Protocol.CMD_ACK):
+                            if (!connected)
+                                connected = true;
+                            break;
+                        case (Protocol.CMD_FIN):
+                            if (connected) {
+                                sendNotification(Protocol.CMD_ACK);
+                                connected = false;
+                            }
+                            break;
+                        case (Protocol.CMD_KILL):
+                            sendNotification("KILL command received. Bringing server down...");
+                            shutdown();
+                            break;
+                        case (Protocol.CMD_ADD):
+                            if(tokens.length() == 3 && connected) {
+                                int result = tokens[1] + tokens[2];
+                                sendNotification(Integer.toString(result));
+                            }
+                            else
+                                sendNotification("Invalid operation");
+                            break;
+                        case (Protocol.CMD_SUB):
+                            if (tokens.length() == 3 && connected){
+                                int result = tokens[1] - tokens[2];
+                                sendNotification(Integer.toString(result));
+                            }
+                            else
+                                sendNotification("Invalid operation");
+                            break;
                     }
-                    out.println("> " + calculate(line));
-                    out.flush();
+
                 }
 
                 LOG.info("Cleaning up resources...");
@@ -100,7 +136,19 @@ public class Server {
         }
     }
 
-    public calculate(String line){
+    public void sendNotification(String message) {
+        out.println(message);
+        out.flush();
+    }
 
+    private void shutdown() {
+        LOG.info("Shutting down server...");
+        shouldRun = false;
+        connected = false;
+        try {
+            serverSocket.close();
+        } catch (IOException ex) {
+            LOG.log(Level.SEVERE, ex.getMessage(), ex);
+        }
     }
 }

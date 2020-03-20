@@ -11,4 +11,7 @@ public class Protocol {
     public static final String CMD_SYN_ACK = "SYN-ACK";
     public static final String CMD_ACK = "ACK";
     public static final String CMD_FIN = "FIN";
+    public static final String CMD_ADD = "ADD";
+    public static final String CMD_SUB = "SUB";
+    public static final String CMD_KILL = "KILL";
 }

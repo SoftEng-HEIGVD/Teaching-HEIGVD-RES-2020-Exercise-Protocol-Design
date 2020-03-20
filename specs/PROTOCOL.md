@@ -24,6 +24,10 @@ Client: ACK     -> The client tells the server it received its answer.
 Client : The client asks the server to compute a calculation.
 Server : The server answers the result to the client
 
++ Disconnecting 
+Client : The client asks the server to disconnect
+Server: The server tells the client it has received that request and answers.
+
 # Semantics : What happens when a message is received from the other party ?
 The other party sends an ACK (it acknoledges the message received)
 
@@ -53,6 +57,8 @@ Client: ACK
 DISCONNECTION
 Client: FIN
 Server: ACK
+
+You can shutdown the server by using the KILL command.
 
 # Who closes the connection and when ?
 
