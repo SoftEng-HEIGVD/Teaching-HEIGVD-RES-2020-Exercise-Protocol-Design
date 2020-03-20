@@ -22,6 +22,13 @@ public class Server {
     final static Logger LOG = Logger.getLogger(Server.class.getName());
 
     int port;
+    String serverAddress;
+    ServerSocket serverSocket;
+    Socket clientSocket = null;
+    BufferedReader in = null;
+    PrintWriter out = null;
+    boolean shouldRun;
+    boolean connected;
 
     /**
      * Constructor
@@ -40,12 +47,11 @@ public class Server {
      * the client sends the "FIN" command.
      */
     public void serveClients() {
-        ServerSocket serverSocket;
-        Socket clientSocket = null;
-        BufferedReader in = null;
-        PrintWriter out = null;
-        boolean shouldRun;
-        boolean connected;
+
+        clientSocket = null;
+        in = null;
+        out = null;
+
 
         try {
             serverSocket = new ServerSocket(port);
@@ -90,20 +96,21 @@ public class Server {
                             shutdown();
                             break;
                         case (Protocol.CMD_ADD):
-                            if(tokens.length() == 3 && connected) {
-                                int result = tokens[1] + tokens[2];
+                            if(tokens.length == 3 && connected) {
+                                int result = Integer.parseInt(tokens[1]) + Integer.parseInt(tokens[2]);
                                 sendNotification(Integer.toString(result));
                             }
                             else
                                 sendNotification("Invalid operation");
                             break;
                         case (Protocol.CMD_SUB):
-                            if (tokens.length() == 3 && connected){
-                                int result = tokens[1] - tokens[2];
+                            if (tokens.length == 3 && connected){
+                                int result = Integer.parseInt(tokens[1]) + Integer.parseInt(tokens[2]);
                                 sendNotification(Integer.toString(result));
                             }
-                            else
+                            else {
                                 sendNotification("Invalid operation");
+                            }
                             break;
                         default:
                             sendNotification("What? I only understand SYN, ACK, FIN, KILL, ADD, SUB");
@@ -143,7 +150,7 @@ public class Server {
      * This method prints messages to the standard output when the client has a request.
      */
 
-    public void sendNotification(String message) {
+    private void sendNotification(String message) {
         out.println(message);
         out.flush();
     }

@@ -13,15 +13,17 @@ import java.util.logging.Logger;
  *
  * @author Olivier Liechti
  */
-public class PresenceClient {
+public class Client {
 
-    final static Logger LOG = Logger.getLogger(PresenceClient.class.getName());
+    final static Logger LOG = Logger.getLogger(Client.class.getName());
 
     Socket clientSocket;
     BufferedReader in;
     PrintWriter out;
     boolean connected = false;
     String userName;
+    String line;
+
 
     /**
      * This inner class implements the Runnable interface, so that the run()
@@ -36,17 +38,17 @@ public class PresenceClient {
      *
      * @param serverAddress the IP address used by the Presence Server
      * @param serverPort the port used by the Presence Server
-     * @param userName the name of the user, used as a parameter for the HELLO command
      */
     public void connect(String serverAddress, int serverPort) {
         try {
             clientSocket = new Socket(serverAddress, serverPort);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             out = new PrintWriter(clientSocket.getOutputStream());
+
             // Let us send the SYN command to inform the server about our intention to connect
             sendNotification(Protocol.CMD_SYN);
-            while(!connected && line = in.readLine != null){
-                String tokens = line.split(" ");
+            while ( (connected) && (line = in.readLine()) != null ) {
+                String[] tokens = line.split(" ");
                 switch(tokens[0].toUpperCase()){
                     case(Protocol.CMD_SYN_ACK):
                         connected = true;
