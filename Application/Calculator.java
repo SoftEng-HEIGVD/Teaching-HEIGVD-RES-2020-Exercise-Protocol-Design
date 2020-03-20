@@ -6,7 +6,6 @@
  * @author Rosy-Laure Wonjamouna
  */
 public class Calculator {
-
     /**
      * @param args the command line arguments
      */
