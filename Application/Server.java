@@ -136,11 +136,18 @@ public class Server {
         }
     }
 
+    /**
+     * This method prints messages to the standard output when the client has a request.
+     */
+
     public void sendNotification(String message) {
         out.println(message);
         out.flush();
     }
-
+    
+    /**
+     * This private method shuts down the server.
+     */
     private void shutdown() {
         LOG.info("Shutting down server...");
         shouldRun = false;
