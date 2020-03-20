@@ -10,10 +10,12 @@ Authors : Sinyks & Brassens
 
 1. What transport protocol do we use?
 
-* __We use UDP__
+* __We will use TCP__
 
 2. How does the client find the server (addresses and ports)?
 * __IPdest:__ splinux-XPS, __portdest__ : 2020
+
+  __But for the tests we will use the loop back address (127.0.0.1)__
 
 3. Who speaks first?
 * __The client__

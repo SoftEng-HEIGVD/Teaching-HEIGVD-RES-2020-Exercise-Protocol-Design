@@ -20,6 +20,33 @@ public class CalculatorServer {
   private final int LISTEN_PORT = 2020;
 
   /**
+   *
+   * @param operator
+   * @param leftOperand
+   * @param rightOperand
+   * @return the result of the coper
+   */
+  private int executor(String operator, int leftOperand, int rightOperand) throws InterruptedException {
+    int result = 0;
+
+    switch (operator){
+      case "+":
+        result = leftOperand + rightOperand;
+        break;
+      case "-":
+        result = leftOperand - rightOperand;
+        break;
+      case "*":
+        result = leftOperand * rightOperand;
+        break;
+      default:
+        throw new InterruptedException("not an valid operand");
+    }
+
+    return result;
+  }
+
+  /**
    * This method does the entire processing.
    */
   public void start() {
@@ -31,23 +58,11 @@ public class CalculatorServer {
     PrintWriter writer = null;
 
     try {
-      LOG.log(Level.INFO, "Creating a server socket and binding it on any of the available network interfaces and on port {0}", new Object[]{Integer.toString(LISTEN_PORT)});
-      serverSocket = new ServerSocket(LISTEN_PORT);
-      logServerSocketAddress(serverSocket);
 
-      LOG.log(Level.INFO, "Waiting (blocking) for a connection request on {0} : {1}", new Object[]{serverSocket.getInetAddress(), Integer.toString(serverSocket.getLocalPort())});
-      clientSocket = serverSocket.accept();
-
-      LOG.log(Level.INFO, "A client has arrived. We now have a client socket with following attributes:");
-      logSocketAddress(clientSocket);
-
-      LOG.log(Level.INFO, "Getting a Reader and a Writer connected to the client socket...");
-      reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-      writer = new PrintWriter(clientSocket.getOutputStream());
 
       String operand;
-      int leftOperator;
-      int rightOperator;
+      int leftOperand;
+      int rightOperand;
       int result;
 
       LOG.log(Level.INFO,"starting the state communication");
@@ -62,27 +77,15 @@ public class CalculatorServer {
         writer.println("OK : give me the left operand");
         writer.flush();
 
-        leftOperator = Integer.parseInt(reader.readLine());
+        leftOperand = Integer.parseInt(reader.readLine());
 
         LOG.log(Level.INFO, "Here we need the second operator");
         writer.println("OK : give me the right operand");
         writer.flush();
 
-        rightOperator = Integer.parseInt(reader.readLine());
+        rightOperand = Integer.parseInt(reader.readLine());
 
-        switch (operand){
-          case "+":
-            result = leftOperator + rightOperator;
-          break;
-          case "-":
-            result = leftOperator - rightOperator;
-            break;
-          case "*":
-            result = leftOperator * rightOperator;
-            break;
-          default:
-            throw new InterruptedException("not an valid operand");
-        }
+        result = this.executor(operand,leftOperand,rightOperand);
 
         writer.println("Your result is : " + result);
         writer.flush();
