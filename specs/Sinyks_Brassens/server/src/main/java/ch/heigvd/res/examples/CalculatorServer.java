@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 /**
  * inpired by O.Liechti
  * here we implement a very simple Protocol
- * Here is the server for
+ *
  * @author Sacha Perdrizat & Pablo Mercado
  */
 public class CalculatorServer {
@@ -58,7 +58,9 @@ public class CalculatorServer {
     PrintWriter writer = null;
 
     try {
-
+      LOG.log(Level.INFO, "Creating a server socket and binding it on any of the available network interfaces and on port {0}", new Object[]{Integer.toString(LISTEN_PORT)});
+      serverSocket = new ServerSocket(LISTEN_PORT);
+      logServerSocketAddress(serverSocket);
 
       String operand;
       int leftOperand;
@@ -68,6 +70,12 @@ public class CalculatorServer {
       LOG.log(Level.INFO,"starting the state communication");
 
       while (true) {
+        LOG.log(Level.INFO, "Waiting (blocking) for a connection request on {0} : {1}", new Object[]{serverSocket.getInetAddress(), Integer.toString(serverSocket.getLocalPort())});
+        clientSocket = serverSocket.accept();
+
+        reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        writer = new PrintWriter(clientSocket.getOutputStream());
+
         writer.println("Hi : give me one of those three: + - *");
         writer.flush();
 
