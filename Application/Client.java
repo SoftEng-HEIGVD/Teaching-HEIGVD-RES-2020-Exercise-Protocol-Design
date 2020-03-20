@@ -46,7 +46,7 @@ public class Client {
             out = new PrintWriter(clientSocket.getOutputStream());
 
             // Let us send the SYN command to inform the server about our intention to connect
-            sendNotification(Protocol.CMD_SYN);
+          //  sendNotification(Protocol.CMD_SYN);
             while ( (connected) && (line = in.readLine()) != null ) {
                 String[] tokens = line.split(" ");
                 switch(tokens[0].toUpperCase()){
@@ -79,12 +79,6 @@ public class Client {
 
     }
 
-    public void disconnect() {
-        LOG.log(Level.INFO, "{0} has requested to be disconnected.", userName);
-        connected = false;
-        sendNotification(Protocol.CMD_FIN);
-        cleanup();
-    }
 
     private void cleanup() {
         try {
@@ -107,10 +101,16 @@ public class Client {
             LOG.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
-    public void sendNotification(String message) {
+    private void sendNotification(String message) {
         out.println(message);
         out.flush();
     }
+    public static void main(String[] args) {
+        System.setProperty("java.util.logging.SimpleFormatter.format", "%5$s %n");
 
+        Client client = new Client();
+        client.connect(Protocol.CALCULATOR_DEFAULT_ADDRESS, Protocol.CALCULATOR_DEFAULT_PORT);
+
+    }
 
 }

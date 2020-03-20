@@ -52,7 +52,6 @@ public class Server {
         in = null;
         out = null;
 
-
         try {
             serverSocket = new ServerSocket(port);
         } catch (IOException ex) {
@@ -62,7 +61,6 @@ public class Server {
 
         while (true) {
             try {
-
                 LOG.log(Level.INFO, "Waiting (blocking) for a new client on port {1000}", port);
                 clientSocket = serverSocket.accept();
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -100,12 +98,31 @@ public class Server {
                                 int result = Integer.parseInt(tokens[1]) + Integer.parseInt(tokens[2]);
                                 sendNotification(Integer.toString(result));
                             }
-                            else
+                            else {
                                 sendNotification("Invalid operation");
+                            }
                             break;
                         case (Protocol.CMD_SUB):
-                            if (tokens.length == 3 && connected){
-                                int result = Integer.parseInt(tokens[1]) + Integer.parseInt(tokens[2]);
+                            if(tokens.length == 3 && connected){
+                                int result = Integer.parseInt(tokens[1]) - Integer.parseInt(tokens[2]);
+                                sendNotification(Integer.toString(result));
+                            }
+                            else {
+                                sendNotification("Invalid operation");
+                            }
+                            break;
+                        case (Protocol.CMD_MULT):
+                            if(tokens.length == 3 && connected){
+                                int result = Integer.parseInt(tokens[1]) * Integer.parseInt(tokens[2]);
+                                sendNotification(Integer.toString(result));
+                            }
+                            else {
+                                sendNotification("Invalid operation");
+                            }
+                            break;
+                        case (Protocol.CMD_DIV):
+                            if(tokens.length == 3 && connected){
+                                int result = Integer.parseInt(tokens[1]) / Integer.parseInt(tokens[2]);
                                 sendNotification(Integer.toString(result));
                             }
                             else {
@@ -113,7 +130,7 @@ public class Server {
                             }
                             break;
                         default:
-                            sendNotification("What? I only understand SYN, ACK, FIN, KILL, ADD, SUB");
+                            sendNotification("What? I only understand SYN, ACK, FIN, KILL, ADD, SUB, MULT, DIV");
                     }
 
                 }
@@ -158,7 +175,7 @@ public class Server {
     /**
      * This private method shuts down the server.
      */
-    private void shutdown() {
+    public void shutdown() {
         LOG.info("Shutting down server...");
         shouldRun = false;
         connected = false;
@@ -168,4 +185,14 @@ public class Server {
             LOG.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        System.setProperty("java.util.logging.SimpleFormatter.format", "%5$s %n");
+
+        Server server = new Server(Protocol.CALCULATOR_DEFAULT_ADDRESS, Protocol.CALCULATOR_DEFAULT_PORT);
+        server.serveClients();
+    }
+
 }
