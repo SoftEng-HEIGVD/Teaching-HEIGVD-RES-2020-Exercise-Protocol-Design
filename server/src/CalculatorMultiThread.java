@@ -4,6 +4,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -103,13 +104,16 @@ public class CalculatorMultiThread  {
 
                         String[] inputArray = line.split(" ");
 
-                        if(CalculatorUtils.isInputValid(inputArray)) {
-                            double result = CalculatorUtils.computeInput(inputArray);
-                            out.println("= " + result);
-                            out.flush();
-                        } else if (shouldRun) {
-                            out.println("Invalid input.");
-                            out.flush();
+                        if (inputArray[0].equals("COMPUTE")) {
+                            String[] subInputArray = Arrays.copyOfRange(inputArray, 1,4 );
+                            if (CalculatorUtils.isInputValid(subInputArray)) {
+                                double result = CalculatorUtils.computeInput(subInputArray);
+                                out.println("= " + result);
+                                out.flush();
+                            } else {
+                                out.println("Invalid input.");
+                                out.flush();
+                            }
                         }
                     }
 

@@ -6,8 +6,8 @@ public class CalculatorUtils {
     private static final char OP_MULTIPLICATION = '*';
 
     public static boolean isInputValid(String[] inputArray) {
-        return inputArray.length == 3 && isNumeric(inputArray[0]) && isNumeric(inputArray[2]) && inputArray[1]
-                .length() == 1 && isValidOperator(inputArray[1].charAt(0));
+        return inputArray.length == 3 && isNumeric(inputArray[1]) && isNumeric(inputArray[2]) && inputArray[0]
+                .length() == 1 && isValidOperator(inputArray[0].charAt(0));
     }
 
     public static boolean isNumeric(String str) {
@@ -34,18 +34,18 @@ public class CalculatorUtils {
     public static double computeInput(String[] inputArray) {
         double result = 0;
 
-        switch(inputArray[1].charAt(0)) {
+        switch(inputArray[0].charAt(0)) {
             case OP_ADDITION:
-                result = Double.parseDouble(inputArray[0]) + Double.parseDouble(inputArray[2]);
+                result = Double.parseDouble(inputArray[1]) + Double.parseDouble(inputArray[2]);
                 break;
             case OP_SUBSTRACTION:
-                result = Double.parseDouble(inputArray[0]) - Double.parseDouble(inputArray[2]);
+                result = Double.parseDouble(inputArray[1]) - Double.parseDouble(inputArray[2]);
                 break;
             case OP_MULTIPLICATION:
-                result = Double.parseDouble(inputArray[0]) * Double.parseDouble(inputArray[2]);
+                result = Double.parseDouble(inputArray[1]) * Double.parseDouble(inputArray[2]);
                 break;
             case OP_DIVISION:
-                result = Double.parseDouble(inputArray[0]) / Double.parseDouble(inputArray[2]);
+                result = Double.parseDouble(inputArray[1]) / Double.parseDouble(inputArray[2]);
                 break;
         }
 

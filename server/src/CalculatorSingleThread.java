@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -22,8 +23,11 @@ public class CalculatorSingleThread {
 
     int port;
 
+    private final static String SERVER_IP_LOCAL = "127.0.0.1";
+
     /**
      * Constructor
+     *
      * @param port the port to listen on
      */
     public CalculatorSingleThread(int port) {
@@ -44,7 +48,9 @@ public class CalculatorSingleThread {
         PrintWriter out = null;
 
         try {
-            serverSocket = new ServerSocket(port);
+            InetAddress address = InetAddress.getByName(SERVER_IP_LOCAL);
+            serverSocket = new ServerSocket(port, 1, address);
+            LOG.log(Level.INFO, "Socket Address {0}", serverSocket.getLocalSocketAddress());
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, null, ex);
             return;
@@ -52,7 +58,6 @@ public class CalculatorSingleThread {
 
         while (true) {
             try {
-
                 LOG.log(Level.INFO, "Waiting (blocking) for a new client on port {0}", port);
                 clientSocket = serverSocket.accept();
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -60,22 +65,31 @@ public class CalculatorSingleThread {
                 String line;
                 boolean shouldRun = true;
 
-                out.println("Welcome to the Single-Threaded Calculator Server.\nWhat operation would you like to do ? (quit with END line)");
+                out.println(
+                        "Welcome to the Single-Threaded Calculator Server.\nWhat operation would you like to do ? " +
+                                "(quit with END line)");
                 out.flush();
-                while ( (shouldRun) && (line = in.readLine()) != null ) {
+                line = in.readLine();
+                while ((shouldRun) && line != null) {
                     if (line.equalsIgnoreCase("end")) {
+                        LOG.log(Level.INFO, "Close Connection");
                         shouldRun = false;
                     }
 
+                    LOG.log(Level.INFO, "Message receive {0}", line);
+
                     String[] inputArray = line.split(" ");
 
-                    if(CalculatorUtils.isInputValid(inputArray)) {
-                        double result = CalculatorUtils.computeInput(inputArray);
-                        out.println("= " + result);
-                        out.flush();
-                    } else {
-                        out.println("Invalid input.");
-                        out.flush();
+                    if (inputArray[0].equals("COMPUTE")) {
+                        String[] subInputArray = Arrays.copyOfRange(inputArray, 1,4 );
+                        if (CalculatorUtils.isInputValid(subInputArray)) {
+                            double result = CalculatorUtils.computeInput(subInputArray);
+                            out.println("= " + result);
+                            out.flush();
+                        } else {
+                            out.println("Invalid input.");
+                            out.flush();
+                        }
                     }
 
                 }
