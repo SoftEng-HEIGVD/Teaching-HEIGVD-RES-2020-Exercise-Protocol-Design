@@ -111,11 +111,15 @@ public class Client {
             clientSocket = new Socket(ip, port);
             writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream(), StandardCharsets.UTF_8));
             reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));
-            // send HELLO message
-            sendRequest(Protocol.CMD_HELLO);
-            // get response expected as a WELCOME message
-            getResponse(Protocol.CMD_WELCOME);
-            connected = true;
+            if (clientSocket.isConnected()) {
+                // send HELLO message
+                sendRequest(Protocol.CMD_HELLO);
+                // get response expected as a WELCOME message
+                getResponse(Protocol.CMD_WELCOME);
+                connected = true;
+            } else {
+                return -1;
+            }
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, UNABLE_TO_CONNECT + " : {0}", ex.getMessage());
             System.out.println(UNABLE_TO_CONNECT + ".");
