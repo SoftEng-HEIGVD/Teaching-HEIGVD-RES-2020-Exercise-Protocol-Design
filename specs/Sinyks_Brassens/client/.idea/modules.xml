@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/DumbHttpClient.iml" filepath="$PROJECT_DIR$/DumbHttpClient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CalculatorClient.iml" filepath="$PROJECT_DIR$/CalculatorClient.iml" />
     </modules>
   </component>
 </project>

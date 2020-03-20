@@ -6,11 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="DumbHttpClient" />
+        <module name="CalculatorClient" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="DumbHttpClient" target="1.7" />
+      <module name="CalculatorClient" target="1.7" />
     </bytecodeTargetLevel>
   </component>
 </project>

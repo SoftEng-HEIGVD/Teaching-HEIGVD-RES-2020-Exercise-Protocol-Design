@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 /**
  * inpired by O.Liechti
  * here we implement a very simple Protocol
- *
+ * Here is the server for
  * @author Sacha Perdrizat & Pablo Mercado
  */
 public class CalculatorServer {
