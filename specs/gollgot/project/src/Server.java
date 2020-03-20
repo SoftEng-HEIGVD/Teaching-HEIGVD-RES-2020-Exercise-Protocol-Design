@@ -7,10 +7,31 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
+/**
+ * This class is a server implementation to do basic calculation from a specific client
+ *
+ * @author Loïc Dessaules
+ */
 public class Server {
 
     final static Logger LOG = Logger.getLogger(Server.class.getName());
     private int port;
+
+
+    /**
+     * Run a server with the port in args parameters. This way it can be used standalone
+     * @param args [0] port
+     */
+    public static void main(String[] args) {
+        try {
+            int port = Integer.parseInt(args[0]);
+            Server server = new Server(port);
+            server.serveClients();
+        }catch(NumberFormatException e){
+            LOG.warning("Wrong argument, the port must be an integer value ");
+        }
+    }
+
 
     public Server(int port){
         this.port = port;
@@ -40,8 +61,10 @@ public class Server {
             try {
                 serverSocket = new ServerSocket(port);
             } catch (IOException e) {
-                e.printStackTrace();
                 LOG.warning("Error occurred on the ServerSocket initialisation : " + e.getMessage());
+                return;
+            } catch(IllegalArgumentException e){
+                LOG.warning("Error port value out of range");
                 return;
             }
 
@@ -52,7 +75,6 @@ public class Server {
                     LOG.info("A new client has arrived. Starting a new thread and delegating work to a new servant...");
                     new Thread(new ServantWorker(clientSocket)).start();
                 } catch (IOException e) {
-                    e.printStackTrace();
                     LOG.warning("Error occurred on the Socket Client initialisation (server accept) : " + e.getMessage());
                 }
             }
@@ -85,8 +107,88 @@ public class Server {
                 this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));
                 this.out = new PrintWriter(clientSocket.getOutputStream());
             } catch (IOException e) {
-                e.printStackTrace();
                 LOG.warning("Error occurred on in / out buffer creation : " + e.getMessage());
+            }
+        }
+
+
+        @Override
+        public void run() {
+            String line;
+            boolean shouldRun = true;
+
+            try {
+                LOG.info("Reading until client sends BYE or close connection ...");
+                while((shouldRun && (line = in.readLine()) != null)){
+                    // Client ask for calculation
+                    if(line.equalsIgnoreCase(INIT_MSG)){
+                        out.println(SERVER_READY_MSG);
+                        out.flush();
+                        // Loop through all calculation the client want to do
+                        while(shouldRun && (line = in.readLine()) != null){
+                            // Client ask to quit
+                            if(line.equalsIgnoreCase(EXIT_MSG)){
+                                shouldRun = false;
+                            }
+                            // Otherwise client may ask for a calculation
+                            else{
+                                String result = calculate(line);
+                                if(!result.equals("invalid")){
+                                    out.println(result);
+                                }else{
+                                    out.println(SERVER_ERROR_MSG);
+                                }
+                                out.flush();
+                            }
+                        }
+                    }
+
+                    // Client ask to quit
+                    if(line.equalsIgnoreCase(EXIT_MSG)){
+                        break;
+                    }
+
+                    // Unknown keyword -> error
+                    out.println(SERVER_ERROR_MSG);
+                    out.flush();
+                }
+
+                LOG.info("Cleaning up resources...");
+                clientSocket.close();
+                in.close();
+                out.close();
+
+            } catch (IOException e) {
+                cleanUp();
+                LOG.warning("Error occurred on read line : " + e.getMessage());
+            }
+        }
+
+        /**
+         * Cleanup all our opened resources
+         */
+        private void cleanUp(){
+            // Correctly close the BufferedReader
+            if(in != null){
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    LOG.warning("Error occurred on cleaning resource : " + e.getMessage());
+                }
+            }
+
+            // Correctly close the PrintWriter
+            if(out != null){
+                out.close();
+            }
+
+            // Correctly close the Socket
+            if(clientSocket != null) {
+                try {
+                    clientSocket.close();
+                } catch (IOException e) {
+                    LOG.warning("Error occurred on cleaning resource : " + e.getMessage());
+                }
             }
         }
 
@@ -146,91 +248,6 @@ public class Server {
             }
 
             return error ? "invalid" : String.valueOf(answer);
-        }
-
-
-
-        @Override
-        public void run() {
-            String line;
-            boolean shouldRun = true;
-
-            try {
-                LOG.info("Reading until client sends BYE or close connection ...");
-                while((shouldRun && (line = in.readLine()) != null)){
-                    // Client ask for calculation
-                    if(line.equalsIgnoreCase(INIT_MSG)){
-                        out.println(SERVER_READY_MSG);
-                        out.flush();
-                        // Loop through all calculation the client want to do
-                        while(shouldRun && (line = in.readLine()) != null){
-                            // Client ask to quit
-                            if(line.equalsIgnoreCase(EXIT_MSG)){
-                                shouldRun = false;
-                            }
-                            // Otherwise client may ask for a calculation
-                            else{
-                                String result = calculate(line);
-                                if(!result.equals("invalid")){
-                                    out.println(result);
-                                }else{
-                                    out.println(SERVER_ERROR_MSG);
-                                }
-                                out.flush();
-                            }
-                        }
-                    }
-
-                    // Client ask to quit
-                    if(line.equalsIgnoreCase(EXIT_MSG)){
-                        break;
-                    }
-
-                    // Unknown keyword -> error
-                    out.println(SERVER_ERROR_MSG);
-                    out.flush();
-                }
-
-                LOG.info("Cleaning up resources...");
-                clientSocket.close();
-                in.close();
-                out.close();
-
-            } catch (IOException e) {
-
-                cleanUp();
-
-                e.printStackTrace();
-                LOG.warning("Error occurred on read line : " + e.getMessage());
-            }
-        }
-
-        /**
-         * Cleanup all our opened resources
-         */
-        private void cleanUp(){
-            // Correctly close the BufferedReader
-            if(in != null){
-                try {
-                    in.close();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-
-            // Correctly close the PrintWriter
-            if(out != null){
-                out.close();
-            }
-
-            // Correctly close the Socket
-            if(clientSocket != null) {
-                try {
-                    clientSocket.close();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
         }
 
     }
