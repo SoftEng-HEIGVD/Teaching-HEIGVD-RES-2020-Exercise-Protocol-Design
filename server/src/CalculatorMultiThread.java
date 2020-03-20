@@ -93,13 +93,11 @@ public class CalculatorMultiThread  {
                 String line;
                 boolean shouldRun = true;
 
-                out.println("Welcome to the Multi-Threaded Server.\nSend me text lines and conclude with the BYE command.");
+                out.println("Welcome to the Multi-Threaded Calculator Server.\nWhat operation would you like to do ? (quit with END line)");
                 out.flush();
                 try {
-                    LOG.info("Reading until client sends BYE or closes the connection...");
-
                     while ((shouldRun) && (line = in.readLine()) != null) {
-                        if (line.equalsIgnoreCase("bye")) {
+                        if (line.equalsIgnoreCase("end")) {
                             shouldRun = false;
                         }
 
