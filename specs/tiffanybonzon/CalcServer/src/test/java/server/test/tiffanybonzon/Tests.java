@@ -4,11 +4,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import server.impl.tiffanybonzon.Server;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class Tests {
     @BeforeAll
@@ -68,6 +67,66 @@ public class Tests {
      *****************************************/
     @Test
     void theServerShouldSendOPListWhenReceivingHello() {
-        assertTrue(true);
+        Socket client = null;
+        String expectedResponse = "> Available operations: ADD SUB MUL DIV POW";
+        BufferedWriter clientRequest = null;
+        BufferedReader serverResponse = null;
+
+        try {
+            client = new Socket("localhost", 2112);
+            clientRequest = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
+            serverResponse = new BufferedReader(new InputStreamReader(client.getInputStream()));
+
+            clientRequest.write("HELLO\n");
+            clientRequest.flush();
+
+            assertEquals(expectedResponse, serverResponse.readLine());
+
+        } catch(IOException e) {
+            fail();
+        } finally {
+            try {
+                clientRequest.close();
+                serverResponse.close();
+                client.close();
+            } catch(Exception e1) {
+                System.out.println(e1.getMessage());
+            }
+        }
+    }
+
+    @Test
+    void theServerShouldSendOPListWhenReceivingMultipleHello() {
+        Socket client = null;
+        String expectedResponse = "> Available operations: ADD SUB MUL DIV POW";
+        BufferedWriter clientRequest = null;
+        BufferedReader serverResponse = null;
+
+        try {
+            client = new Socket("localhost", 2112);
+            clientRequest = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
+            serverResponse = new BufferedReader(new InputStreamReader(client.getInputStream()));
+
+            clientRequest.write("HELLO\n");
+            clientRequest.flush();
+            if(serverResponse.readLine().equals(expectedResponse)) {
+                clientRequest.write("HELLO\n");
+                clientRequest.flush();
+                assertEquals(expectedResponse, serverResponse.readLine());
+            } else {
+                fail();
+            }
+
+        } catch(IOException e) {
+            fail();
+        } finally {
+            try {
+                clientRequest.close();
+                serverResponse.close();
+                client.close();
+            } catch(Exception e1) {
+                System.out.println(e1.getMessage());
+            }
+        }
     }
 }
