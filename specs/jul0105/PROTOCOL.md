@@ -75,16 +75,16 @@ CALC SERVER;ADD SUB MUL DIV
 **send operation :**
 
 ```
-<OPERATION> <OPERAND 1> <OPERAND 2>
+<OPERAND 1> <OPERATION> >OPERAND 2>
 ```
 
 Example :
 
 ```
-ADD 6 4
-SUB 5 1
-MUL 2 4
-DIV 10 0
+6 + 4
+5 - 1
+2 * 4
+10 / 0
 ```
 
 

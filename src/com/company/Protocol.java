@@ -1,7 +1,7 @@
 package com.company;
 
 public class Protocol {
-    public static final int DEFAULT_PORT = 9907;
+    public static final int DEFAULT_PORT = 25566;
     public static final char OP_ADD = '+';
     public static final char OP_SUB = '-';
     public static final char OP_MUL = '*';

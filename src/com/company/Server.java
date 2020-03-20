@@ -47,17 +47,6 @@ public class Server implements Runnable {
 
     }
 
-    private void disconnectConnectedWorkers() {
-
-        synchronized (connectedWorkers) {
-            LOG.info("Disconnecting workers");
-            for(Worker worker : connectedWorkers) {
-                worker.disconnect();
-            }
-        }
-        LOG.info("Workers disconnected");
-    }
-
     @Override
     public void run() {
 
@@ -67,9 +56,12 @@ public class Server implements Runnable {
             while (this.shouldRun) {
 
                 Socket clientSocket = serverSocket.accept();
-                //NOTIFY
+
+                Server.this.notifyConnectedWorkers("Someone has arrived...");
+
                 Worker newWorker = new Worker(clientSocket);
                 registerWorker(newWorker);
+
                 new Thread(newWorker).start();
             }
 
@@ -78,19 +70,6 @@ public class Server implements Runnable {
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, ex.getMessage(), ex);
             System.exit(-1);
-        }
-    }
-
-    private void shutdown() {
-        this.shouldRun = false;
-
-        try {
-
-            serverSocket.close();
-
-        } catch (IOException ex) {
-
-            LOG.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -124,13 +103,14 @@ public class Server implements Runnable {
             String calcul;
             double result = 0;
             Server.this.notifyConnectedWorkers("Welcome !");
-            Server.this.notifyConnectedWorkers("Give me your calc !");
+            sendNotification("Send an operation: [op1] [+,-,*,/] [op2]");
+
 
             try {
 
                 while (connected && ((calcul = in.readLine()) != null)) {
 
-                    String strOp[] = calcul.split(" ");
+                    String[] strOp = calcul.split(" ");
 
                     double op1 = Double.parseDouble(strOp[0]);
                     double op2 = Double.parseDouble(strOp[2]);
@@ -138,31 +118,76 @@ public class Server implements Runnable {
                     switch (strOp[1].toCharArray()[0]) {
 
                         case (Protocol.OP_ADD):
-                            result = op1 + op2;
+                            sendNotification("RES " + (op1 + op2));
                             break;
                         case (Protocol.OP_SUB):
-                            result = op1 - op2;
+                            sendNotification("RES " + (op1 - op2));
                             break;
                         case (Protocol.OP_MUL):
-                            result = op1 * op2;
+                            sendNotification("RES " + (op1 * op2));
                             break;
                         case (Protocol.OP_DIV):
-                            result = op1 / op2;
+
+                            if(op2 != 0){
+
+                                sendNotification("RES " + (op1 / op2));
+                            } else {
+
+                                sendNotification("ERR cannot divide by 0");
+                            }
+
                             break;
                         default:
-                            sendNotification("I don't new this operation ! I only understand +, -, *, /");
+                            sendNotification("ERR unknown : " + strOp[1] + ", use only : [+, -, *, /]");
                     }
 
-                    sendNotification("Your resultats is " + result);
+
                 }
 
             } catch (IOException ex) {
                 LOG.log(Level.SEVERE, ex.getMessage(), ex);
+            } finally {
+                unregisterWorker(this);
+                Server.this.notifyConnectedWorkers("Someone left...");
+                cleanup();
             }
         }
 
         private void cleanup() {
 
+            LOG.log(Level.INFO, "Cleaning up worker");
+
+            LOG.log(Level.INFO, "Closing clientSocked");
+            try {
+                clientSocket.close();
+            } catch (IOException ex) {
+                LOG.log(Level.SEVERE, ex.getMessage(), ex);
+            }
+
+            LOG.log(Level.INFO, "Closing in");
+            try {
+                in.close();
+            } catch (IOException ex) {
+                LOG.log(Level.SEVERE, ex.getMessage(), ex);
+            }
+
+            LOG.log(Level.INFO, "Closing out");
+            if(out != null){
+                out.close();
+            }
+
+            LOG.log(Level.INFO, "Clean up done");
+        }
+
+        public void sendNotification(String message) {
+            out.println(message);
+            out.flush();
+        }
+
+        private void disconnect() {
+            LOG.log(Level.INFO , "Disconnecting worker");
+            connected = false;
+            cleanup();
         }
     }
 }
