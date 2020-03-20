@@ -5,6 +5,9 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 /**
  * This is not really an HTTP client, but rather a very simple program that
  * establishes a TCP connection with a real HTTP server. Once connected, the 
@@ -14,9 +17,9 @@ import java.util.Scanner;
  * 
  * @author Olivier Liechti
  */
-public class DumbHttpClient {
+public class calcClient {
 
-	static final Logger LOG = Logger.getLogger(DumbHttpClient.class.getName());
+	static final Logger LOG = Logger.getLogger(calcClient.class.getName());
 
 	final static int BUFFER_SIZE = 1024;
 
@@ -25,52 +28,44 @@ public class DumbHttpClient {
 	 */
 	public void sendWrongHttpRequest() {
 		Socket clientSocket = null;
-		OutputStream os = null;
-		InputStream is = null;
+		BufferedReader in = null;
+		PrintWriter out = null;
 		Scanner sc = new Scanner(System.in);
 
 		
 		try {
 			clientSocket = new Socket("localhost", 31415);
-			os = clientSocket.getOutputStream();
-			is = clientSocket.getInputStream();
+			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			out = new PrintWriter(clientSocket.getOutputStream());
 
 
 			ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream();
-			byte[] buffer = new byte[BUFFER_SIZE];
-			int newBytes =0;
 
-			os.write(sc.nextLine().concat("\n").getBytes());
-			while ((newBytes = is.read(buffer)) != -1) {
-				responseBuffer.write(buffer, 0, newBytes);
-				if (buffer[newBytes-1]==10)
-					LOG.log(Level.INFO, responseBuffer.toString());
-					if( responseBuffer.toString().contains("BYE"))
-						break;
-
-				os.write(sc.nextLine().getBytes());
-
-				responseBuffer.reset();
+			String str;
+			out.println(sc.nextLine());
+			out.flush();
+			while ((str = in.readLine()) != null ) {
+				LOG.log(Level.INFO, str);
+				if( str.contains("bye"))
+					break;
+				out.println(sc.nextLine());
+				out.flush();
 			}
 
-			LOG.log(Level.INFO, responseBuffer.toString());
+			LOG.log(Level.INFO, str);
 		} catch (IOException ex) {
 			LOG.log(Level.SEVERE, null, ex);
 		} finally {
 			try {
-				is.close();
+				in.close();
 			} catch (IOException ex) {
-				Logger.getLogger(DumbHttpClient.class.getName()).log(Level.SEVERE, null, ex);
+				Logger.getLogger(calcClient.class.getName()).log(Level.SEVERE, null, ex);
 			}
-			try {
-				os.close();
-			} catch (IOException ex) {
-				Logger.getLogger(DumbHttpClient.class.getName()).log(Level.SEVERE, null, ex);
-			}
+			out.close();
 			try {
 				clientSocket.close();
 			} catch (IOException ex) {
-				Logger.getLogger(DumbHttpClient.class.getName()).log(Level.SEVERE, null, ex);
+				Logger.getLogger(calcClient.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
 	}
@@ -81,7 +76,7 @@ public class DumbHttpClient {
 	public static void main(String[] args) {
 		System.setProperty("java.util.logging.SimpleFormatter.format", "%5$s %n");
 
-		DumbHttpClient client = new DumbHttpClient();
+		calcClient client = new calcClient();
 		client.sendWrongHttpRequest();
 
 	}
