@@ -12,8 +12,8 @@ public class BasicClient {
 
     private final static int BUFFER_SIZE = 1024;
 
-    private final int serverPort = 6942;
-    private final String serverIp = "10.192.104.13";
+    private final int serverPort = 6842;
+    private final String serverIp = "10.192.19.20";
 
     private Socket clientSocket;
     private InputStream is;
@@ -43,6 +43,7 @@ public class BasicClient {
             int newBytes;
 
             while ((newBytes = is.read(buffer)) != -1) {
+
                 responseBuffer.write(buffer, 0, newBytes);
             }
 
@@ -107,6 +108,7 @@ public class BasicClient {
         stringBuilder.append(n1);
         stringBuilder.append(';');
         stringBuilder.append(n2);
+        stringBuilder.append('\n');
 
         return stringBuilder.toString();
     }
@@ -140,15 +142,19 @@ public class BasicClient {
 
     public static void main(String[] args) {
 
+        LOG.log(Level.INFO, "Hello");
+
         BasicClient client = new BasicClient();
 
         client.connect();
         Double response = client.calc(3, 4, '*');
 
         if (response != null) {
+
             LOG.log(Level.INFO, "Result = " + response);
         }
         else {
+
             LOG.log(Level.INFO, "Couldn't calculate");
         }
 
