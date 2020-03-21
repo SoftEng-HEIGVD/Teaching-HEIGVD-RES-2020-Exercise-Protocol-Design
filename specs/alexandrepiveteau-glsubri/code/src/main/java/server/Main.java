@@ -8,7 +8,7 @@ public class Main {
   private static final Logger LOG = Logger.getLogger(Main.class.getName());
 
   public static void main(String[] args) throws IOException {
-    Server server = new Server();
+    CalculatorServer server = new CalculatorServer();
     server.start();
   }
 }

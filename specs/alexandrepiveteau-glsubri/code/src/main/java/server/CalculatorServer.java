@@ -10,9 +10,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import protocol.Protocol;
 
-public class Server {
+public class CalculatorServer {
 
-  private static final Logger LOG = Logger.getLogger(Server.class.getName());
+  private static final Logger LOG = Logger.getLogger(CalculatorServer.class.getName());
 
   private static final int HOST_BACKLOG = 50;
 

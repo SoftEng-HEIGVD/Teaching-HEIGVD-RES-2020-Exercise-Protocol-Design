@@ -41,7 +41,7 @@ public class CalculatorRequestRunnable implements Runnable {
   public void run() {
     try {
       int a, b;
-      Operation op;
+      CalculatorOperation op;
 
       Reader streamReader = new InputStreamReader(socket.getInputStream(), Protocol.CHARSET);
       Writer streamWriter = new OutputStreamWriter(socket.getOutputStream(), Protocol.CHARSET);
@@ -77,7 +77,7 @@ public class CalculatorRequestRunnable implements Runnable {
       // Message 5 <- Read the operator.
       try {
         String line = reader.readLine();
-        op = Operation.fromMessage(line);
+        op = CalculatorOperation.fromMessage(line);
       } catch (MalformedMessageException mme) {
         wrongMessage(socket, writer, mme.getMalformedMessage());
         return;

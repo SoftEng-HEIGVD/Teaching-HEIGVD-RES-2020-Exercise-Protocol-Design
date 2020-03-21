@@ -2,7 +2,7 @@ package server;
 
 import java.util.function.BiFunction;
 
-public enum Operation {
+public enum CalculatorOperation {
   ADD(Integer::sum),
   SUB((a, b) -> a - b),
   MUL((a, b) -> a * b),
@@ -10,28 +10,28 @@ public enum Operation {
 
   private BiFunction<Integer, Integer, Integer> behavior;
 
-  /* private */ Operation(BiFunction<Integer, Integer, Integer> function) {
+  /* private */ CalculatorOperation(BiFunction<Integer, Integer, Integer> function) {
     this.behavior = function;
   }
 
   /**
-   * Returns the {@link Operation} corresponding to a certain String message. Messages should be
-   * encoded to UTF-8. The messages are considered from the server perspective.
+   * Returns the {@link CalculatorOperation} corresponding to a certain String message. Messages
+   * should be encoded to UTF-8. The messages are considered from the server perspective.
    *
    * @param message The message that was received.
-   * @return The corresponding {@link Operation} for the message.
+   * @return The corresponding {@link CalculatorOperation} for the message.
    * @throws MalformedMessageException If the message is not valid.
    */
-  public static Operation fromMessage(String message) throws MalformedMessageException {
+  public static CalculatorOperation fromMessage(String message) throws MalformedMessageException {
     switch (message) {
       case "O ADD":
-        return Operation.ADD;
+        return CalculatorOperation.ADD;
       case "O SUB":
-        return Operation.SUB;
+        return CalculatorOperation.SUB;
       case "O MUL":
-        return Operation.MUL;
+        return CalculatorOperation.MUL;
       case "O DIV":
-        return Operation.DIV;
+        return CalculatorOperation.DIV;
       default:
         throw new MalformedMessageException(message);
     }
