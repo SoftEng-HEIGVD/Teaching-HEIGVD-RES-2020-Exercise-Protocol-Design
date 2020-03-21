@@ -30,7 +30,7 @@ public class ApplicationServer
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		while (true) {
+		while (listenThread.isAlive()) {
 			;
 		}
 

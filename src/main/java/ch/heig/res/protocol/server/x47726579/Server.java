@@ -84,7 +84,7 @@ public class Server implements Runnable
 	public void run()
 	{
 		try {
-			LOG.log(Level.INFO, "Starting Presence Server on port {0}", DEFAULT_PORT);
+			LOG.log(Level.FINE, "Starting Presence Server on port {0}", DEFAULT_PORT);
 			serverSocket = new ServerSocket(DEFAULT_PORT);
 			while (shouldRun) {
 				Socket clientSocket = serverSocket.accept();
