@@ -20,24 +20,12 @@ import java.util.logging.Logger;
 public class Server {
 
     final static Logger LOG = Logger.getLogger(Server.class.getName());
-
-    int port;
-    String serverAddress;
-    ServerSocket serverSocket;
+    ServerSocket serverSocket = null;
     Socket clientSocket = null;
     BufferedReader in = null;
     PrintWriter out = null;
     boolean shouldRun;
     boolean connected;
-
-    /**
-     * Constructor
-     * @param port the port to listen on
-     */
-    public Server(String serverAddress, int port) {
-        this.serverAddress = serverAddress;
-        this.port = port;
-    }
 
     /**
      * This method initiates the process. The server creates a socket and binds
@@ -46,128 +34,127 @@ public class Server {
      * and send back the data converted to uppercase. This will continue until
      * the client sends the "FIN" command.
      */
-    public void serveClients() {
 
-        clientSocket = null;
-        in = null;
-        out = null;
+    /**
+     * This method does the entire processing.
+     */
+    public void start() {
+        LOG.info("Starting server...");
 
+            LOG.log(Level.INFO, "Creating a server socket and binding it on any of the available network interfaces and on port {8080}", new Object[]{Integer.toString(Protocol.CALCULATOR_DEFAULT_PORT)});
         try {
-            serverSocket = new ServerSocket(port);
-        } catch (IOException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-            return;
+            serverSocket = new ServerSocket(Protocol.CALCULATOR_DEFAULT_PORT);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        while (true) {
-            try {
-                LOG.log(Level.INFO, "Waiting (blocking) for a new client on port {1000}", port);
-                clientSocket = serverSocket.accept();
-                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                out = new PrintWriter(clientSocket.getOutputStream());
-                String line;
+            while (true) {
+                try {
+                    LOG.log(Level.INFO, "Waiting (blocking) for a new client on port {8080}", Protocol.CALCULATOR_DEFAULT_PORT);
+                    clientSocket = serverSocket.accept();
+                    in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                    out = new PrintWriter(clientSocket.getOutputStream());
+                    String line;
 
-                shouldRun = true;
-                connected = false;
+                    shouldRun = true;
+                    connected = false;
 
-                out.println("Welcome to the Single-Threaded Server.\nSend me text lines and conclude with the FIN command.");
-                out.flush();
-                LOG.info("Reading until client sends FIN or closes the connection...");
-                while ( (shouldRun) && (line = in.readLine()) != null ) {
-                    String[] tokens = line.split(" ");
-                    switch(tokens[0].toUpperCase()){
-                        case (Protocol.CMD_SYN):
-                            sendNotification(Protocol.CMD_SYN_ACK);
-                            break;
-                        case (Protocol.CMD_ACK):
-                            if (!connected)
-                                connected = true;
-                            break;
-                        case (Protocol.CMD_FIN):
-                            if (connected) {
+                    LOG.info("Reading until client sends FIN or closes the connection...");
+                    while (shouldRun) {
+                        //Reading the message sent by the client via the socket
+                        line = in.readLine();
+                        System.out.println(line);
+
+                        //Answering the message appropriately to the server
+                        //depending on which type of request the client is asking for
+                        String[] tokens = line.split(" ");
+                        switch (tokens[0].toUpperCase()) {
+                            case (Protocol.CMD_SYN):
+                                sendNotification(Protocol.CMD_SYN_ACK);
+                                break;
+                            case (Protocol.CMD_ACK):
+                                System.out.println(Protocol.CMD_ACK);
+                                break;
+                            case (Protocol.CMD_FIN):
                                 sendNotification(Protocol.CMD_ACK);
-                                connected = false;
-                            }
-                            break;
-                        case (Protocol.CMD_KILL):
-                            sendNotification("KILL command received. Bringing server down...");
-                            shutdown();
-                            break;
-                        case (Protocol.CMD_ADD):
-                            if(tokens.length == 3 && connected) {
-                                int result = Integer.parseInt(tokens[1]) + Integer.parseInt(tokens[2]);
-                                sendNotification(Integer.toString(result));
-                            }
-                            else {
-                                sendNotification("Invalid operation");
-                            }
-                            break;
-                        case (Protocol.CMD_SUB):
-                            if(tokens.length == 3 && connected){
-                                int result = Integer.parseInt(tokens[1]) - Integer.parseInt(tokens[2]);
-                                sendNotification(Integer.toString(result));
-                            }
-                            else {
-                                sendNotification("Invalid operation");
-                            }
-                            break;
-                        case (Protocol.CMD_MULT):
-                            if(tokens.length == 3 && connected){
-                                int result = Integer.parseInt(tokens[1]) * Integer.parseInt(tokens[2]);
-                                sendNotification(Integer.toString(result));
-                            }
-                            else {
-                                sendNotification("Invalid operation");
-                            }
-                            break;
-                        case (Protocol.CMD_DIV):
-                            if(tokens.length == 3 && connected){
-                                int result = Integer.parseInt(tokens[1]) / Integer.parseInt(tokens[2]);
-                                sendNotification(Integer.toString(result));
-                            }
-                            else {
-                                sendNotification("Invalid operation");
-                            }
-                            break;
-                        default:
-                            sendNotification("What? I only understand SYN, ACK, FIN, KILL, ADD, SUB, MULT, DIV");
+                                break;
+                            case (Protocol.CMD_KILL):
+                                sendNotification("KILL command received. Bringing server down...");
+                                break;
+                            case (Protocol.CMD_ADD):
+                                if (tokens.length == 3) {
+                                    int result = Integer.parseInt(tokens[1]) + Integer.parseInt(tokens[2]);
+                                    sendNotification(Integer.toString(result));
+                                } else {
+                                    sendNotification("Invalid operation");
+                                }
+                                break;
+                            case (Protocol.CMD_SUB):
+                                if (tokens.length == 3) {
+                                    int result = Integer.parseInt(tokens[1]) - Integer.parseInt(tokens[2]);
+                                    sendNotification(Integer.toString(result));
+                                } else {
+                                    sendNotification("Invalid operation");
+                                }
+                                break;
+                            case (Protocol.CMD_MULT):
+                                if (tokens.length == 3) {
+                                    int result = Integer.parseInt(tokens[1]) * Integer.parseInt(tokens[2]);
+                                    sendNotification(Integer.toString(result));
+                                } else {
+                                    sendNotification("Invalid operation");
+                                }
+                                break;
+                            case (Protocol.CMD_DIV):
+                                if (tokens.length == 3) {
+                                    int result = Integer.parseInt(tokens[1]) / Integer.parseInt(tokens[2]);
+                                    sendNotification(Integer.toString(result));
+                                } else {
+                                    sendNotification("Invalid operation");
+                                }
+                                break;
+                            default:
+                                sendNotification("What? I only understand SYN, ACK, FIN, KILL, ADD, SUB, MULT, DIV");
+                                break;
+                        }
                     }
 
-                }
-
-                LOG.info("Cleaning up resources...");
-                clientSocket.close();
-                in.close();
-                out.close();
-
-            } catch (IOException ex) {
-                if (in != null) {
-                    try {
-                        in.close();
-                    } catch (IOException ex1) {
-                        LOG.log(Level.SEVERE, ex1.getMessage(), ex1);
-                    }
-                }
-                if (out != null) {
+                    LOG.info("Cleaning up resources...");
+                    clientSocket.close();
+                    in.close();
                     out.close();
-                }
-                if (clientSocket != null) {
-                    try {
-                        clientSocket.close();
-                    } catch (IOException ex1) {
-                        LOG.log(Level.SEVERE, ex1.getMessage(), ex1);
+                    serverSocket.close();
+
+                } catch (IOException ex) {
+                    if (in != null) {
+                        try {
+                            in.close();
+                        } catch (IOException ex1) {
+                            LOG.log(Level.SEVERE, ex1.getMessage(), ex1);
+                        }
                     }
+                    if (out != null) {
+                        out.close();
+                    }
+                    if (clientSocket != null) {
+                        try {
+                            clientSocket.close();
+                        } catch (IOException ex1) {
+                            LOG.log(Level.SEVERE, ex1.getMessage(), ex1);
+                        }
+                    }
+                    LOG.log(Level.SEVERE, ex.getMessage(), ex);
                 }
-                LOG.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
-    }
+
 
     /**
      * This method prints messages to the standard output when the client has a request.
      */
 
     private void sendNotification(String message) {
+        System.out.println(message);
         out.println(message);
         out.flush();
     }
@@ -190,9 +177,8 @@ public class Server {
      */
     public static void main(String[] args) {
         System.setProperty("java.util.logging.SimpleFormatter.format", "%5$s %n");
-
-        Server server = new Server(Protocol.CALCULATOR_DEFAULT_ADDRESS, Protocol.CALCULATOR_DEFAULT_PORT);
-        server.serveClients();
+        Server server = new Server();
+        server.start();
     }
 
 }
