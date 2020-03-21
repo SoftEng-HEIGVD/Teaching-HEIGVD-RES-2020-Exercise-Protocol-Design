@@ -6,7 +6,7 @@ package main.java.ch.heig.res.protocol.protocol.x47726579;
  */
 public class Protocol
 {
-	public static final int    DEFAULT_PORT = 3333;
+	public static final int    DEFAULT_PORT = 3300;
 	public static final String CMD_GREET    = "Greetings";
 	public static final String CMD_ADD      = "ADD";
 	public static final String CMD_SUB      = "SUB";
