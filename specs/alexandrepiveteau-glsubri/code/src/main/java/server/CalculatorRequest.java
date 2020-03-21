@@ -1,6 +1,7 @@
 package server;
 
 import static protocol.Protocol.Messages.MSG_OK_O;
+import static protocol.Protocol.Messages.MSG_PERFORM;
 import static protocol.Protocol.Messages.withNewLine;
 
 import java.io.BufferedReader;
@@ -53,17 +54,11 @@ public class CalculatorRequest implements Runnable {
       reader = new BufferedReader(streamReader);
       writer = new BufferedWriter(streamWriter);
 
-      String greeting = reader.readLine();
-
       // Message 1 <- Receive a greeting message.
-      if (!greeting.equals(Messages.MSG_START)) {
-        wrongMessage(socket, writer, greeting);
-        return;
-      }
+      requireMessage(Messages.MSG_START);
 
       // Message 2 -> Tell that we are ready.
-      writer.write(withNewLine(Messages.MSG_GO_AHEAD));
-      writer.flush();
+      writeMessageNow(withNewLine(Messages.MSG_GO_AHEAD));
 
       // Message 3 <- Read the number (if it exists).
       try {
@@ -75,8 +70,7 @@ public class CalculatorRequest implements Runnable {
       }
 
       // Message 4 -> Notify we read the number.
-      writer.write(withNewLine(Messages.MSG_OK_N));
-      writer.flush();
+      writeMessageNow(withNewLine(Messages.MSG_OK_N));
 
       // Message 5 <- Read the operator.
       try {
@@ -88,8 +82,7 @@ public class CalculatorRequest implements Runnable {
       }
 
       // Message 6 -> Notify we read the operator.
-      writer.write(withNewLine(MSG_OK_O + " " + op));
-      writer.flush();
+      writeMessageNow(withNewLine(MSG_OK_O + " " + op));
 
       // Message 7 <- Read the number (if it exists).
       try {
@@ -101,15 +94,10 @@ public class CalculatorRequest implements Runnable {
       }
 
       // Message 8 -> Notify we read the number.
-      writer.write(withNewLine(Messages.MSG_OK_N));
-      writer.flush();
+      writeMessageNow(withNewLine(Messages.MSG_OK_N));
 
       // Message 9 <- Are we asked to perform the operation ?
-      String perform = reader.readLine();
-      if (!perform.equals(Messages.MSG_PERFORM)) {
-        wrongMessage(socket, writer, perform);
-        return;
-      }
+      requireMessage(MSG_PERFORM);
 
       // Message 10 -> compute and send the result.
       try {
@@ -119,8 +107,10 @@ public class CalculatorRequest implements Runnable {
         wrongMessage(socket, writer, String.format("%d %s %d", a, op, b));
       }
 
-    } catch (IOException ioexception) {
-      LOG.log(Level.SEVERE, ioexception.getMessage());
+    } catch (MalformedMessageException mex) {
+      LOG.log(Level.WARNING, "Received incorrect message : \"{0}\".", mex.getMalformedMessage());
+    } catch (IOException ioex) {
+      LOG.log(Level.SEVERE, ioex.getMessage());
     } finally {
 
       // Close the socket after the connection is over.
@@ -134,9 +124,32 @@ public class CalculatorRequest implements Runnable {
     }
   }
 
+  /**
+   * Requires that a certain message is now received, or throws an exception.
+   *
+   * @throws IOException Thrown if the expected message is not received now.
+   */
+  private void requireMessage(String expected) throws IOException {
+    String message = reader.readLine();
+    if (!expected.equals(message)) {
+      wrongMessage(socket, writer, message);
+      throw new MalformedMessageException(message);
+    }
+  }
+
+  /**
+   * Writes a certain protocol message now, and ensures it is sent fully now.
+   *
+   * @param message The message to send.
+   * @throws IOException Thrown if the message could not be sent.
+   */
+  private void writeMessageNow(String message) throws IOException {
+    writer.write(message);
+    writer.flush();
+  }
+
   private void wrongMessage(Socket socket, BufferedWriter socketWriter, String message)
       throws IOException {
-    LOG.log(Level.WARNING, "Received incorrect message : \"{0}\".", message);
     socketWriter.write("ERR\n");
     socketWriter.flush();
     socket.close();
