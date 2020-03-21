@@ -37,6 +37,7 @@ public class client {
             String clientIn = protocol.CMD_CLIENTIN + NEW_LINE;
             os.write(clientIn.getBytes());
 
+
             //buffers
             ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -48,17 +49,17 @@ public class client {
                 throw new UnknownFormatConversionException("Server not reachable");
 
             responseBuffer.write(buffer, 0, newBytes);
-            if(responseBuffer.toString() != protocol.CMD_SERVERIN)
+            if(!responseBuffer.toString().equals(protocol.CMD_SERVERIN))
                 throw new UnknownFormatConversionException("Server not reachable");
 
             //do the calculations
             while (true) {
                 //ask calculation in
                 LOG.log(Level.INFO, "Enter a calculation <number> <op> <number>: ");
-                String op = reader.readLine();
+                String op = reader.readLine() + NEW_LINE;
 
                 //check if quit
-                if(op == protocol.CMD_CLIENTOUT) {
+                if(op.equals(protocol.CMD_CLIENTOUT)) {
                     os.write(op.getBytes());
                     break;
                 }

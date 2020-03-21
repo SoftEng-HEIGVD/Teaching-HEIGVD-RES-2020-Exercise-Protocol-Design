@@ -107,18 +107,25 @@ public class multiThreadedServer {
 
                 try {
 
-                    String clientIn = in.readLine();
-                    if(clientIn.equals(protocol.CMD_CLIENTIN))
-                        throw new UnknownFormatConversionException("Client bugged");
+                    //String clientIn = in.readLine();
+                    //if(clientIn.equals(protocol.CMD_CLIENTIN))
+                        //throw new UnknownFormatConversionException("Client bugged");
 
                     out.print(protocol.CMD_SERVERIN);
+                    out.flush();
 
                     while(true){
 
-                        clientIn = in.readLine();
+                        String clientIn = in.readLine();
                         if(clientIn.equals(protocol.CMD_CLIENTOUT))
                             break;
 
+
+                        if(clientIn.equals(protocol.CMD_CLIENTIN)){
+                            continue;
+                        }
+
+                        // TODO: Pose problème !
                         if(!protocol.checkSyntax(clientIn)) {
                             out.print(protocol.CMD_SERVERNOOP);
                             continue;
@@ -128,7 +135,7 @@ public class multiThreadedServer {
                         int n2 = Character.getNumericValue(clientIn.charAt(4));
                         int res;
 
-                        switch(Character.getNumericValue(clientIn.charAt(2))){
+                        switch(clientIn.charAt(2)){
                             case '+' :
                                 res = n1 + n2;
                                 break;
@@ -147,6 +154,7 @@ public class multiThreadedServer {
                         }
 
                         out.print(res + " " + protocol.CMD_SERVERCALC);
+                        out.flush();
 
                     }
 
