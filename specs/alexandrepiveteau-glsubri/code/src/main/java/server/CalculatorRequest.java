@@ -22,9 +22,9 @@ import protocol.Protocol;
  * @author Alexandre Piveteau
  * @author Guy-Laurent Subri
  */
-public class CalculatorRequestRunnable implements Runnable {
+public class CalculatorRequest implements Runnable {
 
-  private static Logger LOG = Logger.getLogger(CalculatorRequestRunnable.class.getName());
+  private static Logger LOG = Logger.getLogger(CalculatorRequest.class.getName());
 
   // I/O streams used in the app.
   private BufferedReader reader;
@@ -33,7 +33,7 @@ public class CalculatorRequestRunnable implements Runnable {
   // Socket for one connection.
   private Socket socket;
 
-  public CalculatorRequestRunnable(Socket socket) {
+  public CalculatorRequest(Socket socket) {
     this.socket = socket;
   }
 

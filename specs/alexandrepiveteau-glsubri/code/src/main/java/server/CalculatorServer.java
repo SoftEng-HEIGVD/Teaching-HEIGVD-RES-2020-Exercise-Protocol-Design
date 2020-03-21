@@ -28,7 +28,7 @@ public class CalculatorServer {
 
     while (true) {
       Socket socket = serverSocket.accept();
-      service.submit(new CalculatorRequestRunnable(socket));
+      service.submit(new CalculatorRequest(socket));
     }
   }
 }
