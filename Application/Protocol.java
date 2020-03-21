@@ -6,7 +6,7 @@
 public class Protocol {
 
     public static final int CALCULATOR_DEFAULT_PORT = 8080;
-    public static final String CALCULATOR_DEFAULT_ADDRESS = "197.195.10.2";
+    public static final String CALCULATOR_DEFAULT_ADDRESS = "127.0.0.1";
 
     public static final String CMD_SYN = "SYN";
     public static final String CMD_SYN_ACK = "SYN-ACK";

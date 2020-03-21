@@ -25,7 +25,8 @@ public class Server {
     BufferedReader in = null;
     PrintWriter out = null;
     boolean shouldRun;
-    boolean connected;
+    boolean connected= false;
+    int three_way_handshake = 0;
 
     /**
      * This method initiates the process. The server creates a socket and binds
@@ -57,73 +58,113 @@ public class Server {
                     String line;
 
                     shouldRun = true;
-                    connected = false;
 
-                    LOG.info("Reading until client sends FIN or closes the connection...");
+                    LOG.info("Reading until client sends FIN or closes the connection...\nAll the request made by the client are going to be printed below...\n");
                     while (shouldRun) {
                         //Reading the message sent by the client via the socket
                         line = in.readLine();
                         System.out.println(line);
 
-                        //Answering the message appropriately to the server
-                        //depending on which type of request the client is asking for
+                        //Answering the message appropriately to the server depending on which type of request the client is asking for
                         String[] tokens = line.split(" ");
                         switch (tokens[0].toUpperCase()) {
                             case (Protocol.CMD_SYN):
-                                sendNotification(Protocol.CMD_SYN_ACK);
+                                if(three_way_handshake == 0 && !connected) {
+                                    sendNotification(Protocol.CMD_SYN_ACK);
+                                    three_way_handshake ++;
+                                }
+                                else if (connected) {
+                                    sendNotification("You already handshaked...");
+                                }
+                                else {
+                                    handshakeError();
+                                }
                                 break;
-                            case (Protocol.CMD_ACK):
-                                System.out.println(Protocol.CMD_ACK);
-                                break;
+
                             case (Protocol.CMD_FIN):
-                                sendNotification(Protocol.CMD_ACK);
+                                    sendNotification(Protocol.CMD_ACK);
+                                    connected = false;
+                                    shouldRun = false;
                                 break;
-                            case (Protocol.CMD_KILL):
-                                sendNotification("KILL command received. Bringing server down...");
-                                break;
+
                             case (Protocol.CMD_ADD):
-                                if (tokens.length == 3) {
-                                    int result = Integer.parseInt(tokens[1]) + Integer.parseInt(tokens[2]);
-                                    sendNotification(Integer.toString(result));
-                                } else {
-                                    sendNotification("Invalid operation");
+                                if(connected) {
+                                    if (tokens.length == 3) {
+                                        int result = Integer.parseInt(tokens[1]) + Integer.parseInt(tokens[2]);
+                                        sendNotification(Integer.toString(result));
+                                    } else {
+                                        sendNotification("Invalid operation");
+                                    }
+                                }else{
+                                    handshakeError();
                                 }
                                 break;
                             case (Protocol.CMD_SUB):
-                                if (tokens.length == 3) {
-                                    int result = Integer.parseInt(tokens[1]) - Integer.parseInt(tokens[2]);
-                                    sendNotification(Integer.toString(result));
-                                } else {
-                                    sendNotification("Invalid operation");
+                                if(connected) {
+                                    if (tokens.length == 3) {
+                                        int result = Integer.parseInt(tokens[1]) - Integer.parseInt(tokens[2]);
+                                        sendNotification(Integer.toString(result));
+                                    } else {
+                                        sendNotification("Invalid operation...");
+                                    }
+                                }else{
+                                    handshakeError();
                                 }
                                 break;
                             case (Protocol.CMD_MULT):
-                                if (tokens.length == 3) {
-                                    int result = Integer.parseInt(tokens[1]) * Integer.parseInt(tokens[2]);
-                                    sendNotification(Integer.toString(result));
-                                } else {
-                                    sendNotification("Invalid operation");
+                                if(connected) {
+                                    if (tokens.length == 3) {
+                                        int result = Integer.parseInt(tokens[1]) * Integer.parseInt(tokens[2]);
+                                        sendNotification(Integer.toString(result));
+                                    } else {
+                                        sendNotification("Invalid operation...");
+                                    }
+                                }else{
+                                    handshakeError();
                                 }
                                 break;
                             case (Protocol.CMD_DIV):
-                                if (tokens.length == 3) {
-                                    int result = Integer.parseInt(tokens[1]) / Integer.parseInt(tokens[2]);
-                                    sendNotification(Integer.toString(result));
-                                } else {
-                                    sendNotification("Invalid operation");
+                                if(connected) {
+                                    if (tokens.length == 3) {
+                                        int result = Integer.parseInt(tokens[1]) / Integer.parseInt(tokens[2]);
+                                        sendNotification(Integer.toString(result));
+                                    } else {
+                                        sendNotification("Invalid operation...");
+                                    }
+                                }else{
+                                    handshakeError();
                                 }
                                 break;
+
+                            case (Protocol.CMD_ACK):
+                                if(three_way_handshake == 1 &&!connected) {
+                                    sendNotification("You are now connected to the server...");
+                                    connected = true;
+                                }
+                                else if (connected){
+                                    sendNotification("You are already connected to the server...");
+                                }
+                                else{
+                                    handshakeError();
+                                }
+                                break;
+
                             default:
-                                sendNotification("What? I only understand SYN, ACK, FIN, KILL, ADD, SUB, MULT, DIV");
+                                if(connected)
+                                    sendNotification("What? I only understand SYN, ACK, FIN, ADD, SUB, MULT, DIV...");
+                                else{
+                                    handshakeError();
+                                }
                                 break;
                         }
+
                     }
 
                     LOG.info("Cleaning up resources...");
+                    three_way_handshake = 0;
                     clientSocket.close();
                     in.close();
                     out.close();
-                    serverSocket.close();
 
                 } catch (IOException ex) {
                     if (in != null) {
@@ -146,32 +187,28 @@ public class Server {
                     LOG.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
+
+
         }
+
+    /**
+     * This method prints a handshake error message.
+     */
+    private void handshakeError(){
+        sendNotification("Please handshake before using this application...");
+        three_way_handshake = 0;
+    }
 
 
     /**
-     * This method prints messages to the standard output when the client has a request.
+     * This method sends notifications to the client.
      */
-
     private void sendNotification(String message) {
-        System.out.println(message);
         out.println(message);
         out.flush();
     }
 
-    /**
-     * This private method shuts down the server.
-     */
-    public void shutdown() {
-        LOG.info("Shutting down server...");
-        shouldRun = false;
-        connected = false;
-        try {
-            serverSocket.close();
-        } catch (IOException ex) {
-            LOG.log(Level.SEVERE, ex.getMessage(), ex);
-        }
-    }
+
     /**
      * @param args the command line arguments
      */

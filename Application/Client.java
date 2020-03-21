@@ -34,15 +34,15 @@ public class Client {
      */
     public void connect() {
         try {
-            LOG.log(Level.INFO, "I am a new client on port {1000}", Protocol.CALCULATOR_DEFAULT_PORT);
+            LOG.log(Level.INFO, "I am a new client on port {8080}", Protocol.CALCULATOR_DEFAULT_PORT);
 
-            clientSocket = new Socket("127.0.0.1", Protocol.CALCULATOR_DEFAULT_PORT);
+            clientSocket = new Socket(Protocol.CALCULATOR_DEFAULT_ADDRESS, Protocol.CALCULATOR_DEFAULT_PORT);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             out = new PrintWriter(clientSocket.getOutputStream());
             connected = true;
             LOG.info("Enter something please...");
 
-            while  (connected) {
+            while (connected) {
                 //Writing a message
                 BufferedReader msgInput = new BufferedReader(new InputStreamReader(System.in));
                 String msg = msgInput.readLine();
@@ -52,7 +52,11 @@ public class Client {
                 //Reading the response of the server
                 line = in.readLine();
                 System.out.println(line);
-
+                //If the message sent by the client was FIN, disconnect the client
+                if(msg.equals("FIN")) {
+                    connected = false;
+                    LOG.info("Disconnecting the client...");
+                }
             }
             clientSocket.close();
             in.close();
