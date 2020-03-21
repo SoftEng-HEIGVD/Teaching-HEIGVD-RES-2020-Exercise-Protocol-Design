@@ -1,24 +1,14 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * A very simple example of TCP server. When the server starts, it binds a
- * server socket on any of the available network interfaces and on port 2205. It
- * then waits until one (only one!) client makes a connection request. When the
- * client arrives, the server does not even check if the client sends data. It
- * simply writes the current time, every second, during 15 seconds.
- *
- * To test the server, simply open a terminal, do a "telnet localhost 2205" and
- * see what you get back. Use Wireshark to have a look at the transmitted TCP
- * segments.
- *
- * @author Olivier Liechti
+ * This servers has to goal to calculate some operations
+ * @author Potet Bastien
  */
 public class CalculateServer {
 
@@ -47,6 +37,9 @@ public class CalculateServer {
 
             while (true) {
                 clientSocket = serverSocket.accept();
+
+                logSocketAddress(clientSocket);
+
                 reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 writer = new PrintWriter(clientSocket.getOutputStream());
 
