@@ -62,7 +62,7 @@ public class Client {
     sendReq(MSG_PERFORM);
     String line = reader.readLine();
 
-    if (line.length() < 3 || line.substring(0, 3).equals(MSG_ERR))
+    if (line.length() < 3 || ! line.substring(0, 3).equals(MSG_RES))
       reset();
 
     return Integer.parseInt(line.substring(4));
