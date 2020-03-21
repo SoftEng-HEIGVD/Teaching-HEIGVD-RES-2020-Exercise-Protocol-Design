@@ -1,6 +1,8 @@
 package server;
 
 import java.util.function.BiFunction;
+import server.exceptions.MalformedOperationException;
+import server.exceptions.MalformedMessageException;
 
 public enum CalculatorOperation {
   ADD(Integer::sum),
@@ -37,11 +39,11 @@ public enum CalculatorOperation {
     }
   }
 
-  public int perform(int a, int b) throws IllegalArgumentException {
+  public int perform(int a, int b) throws MalformedOperationException {
     try {
       return this.behavior.apply(a, b);
-    } catch (Throwable any) {
-      throw new IllegalArgumentException(any);
+    } catch (Throwable ignored) {
+      throw new MalformedOperationException(this, a, b);
     }
   }
 }

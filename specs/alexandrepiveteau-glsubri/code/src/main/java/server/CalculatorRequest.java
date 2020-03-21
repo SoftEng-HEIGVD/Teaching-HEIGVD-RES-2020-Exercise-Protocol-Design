@@ -16,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import protocol.Protocol;
 import protocol.Protocol.Messages;
+import server.exceptions.MalformedMessageException;
 
 /**
  * An implementation of a {@link Runnable} that will implement the notion of a session of calculator
@@ -74,14 +75,10 @@ public class CalculatorRequest implements Runnable {
       // Message 9 <- Are we asked to perform the operation ?
       // Message 10 -> compute and send the result.
       requireMessage(MSG_PERFORM);
-      try {
-        writer.write(withNewLine(Messages.MSG_RES + " " + op.perform(a, b)));
-        writer.flush();
-      } catch (IllegalArgumentException iae) {
-        writeWrongMessageNow();
-      }
+      writeMessageNow(withNewLine(Messages.MSG_RES + " " + op.perform(a, b)));
 
     } catch (MalformedMessageException mex) {
+
       try {
         LOG.log(Level.WARNING, "Received incorrect message : \"{0}\".", mex.getMalformedMessage());
         writeWrongMessageNow();

@@ -1,4 +1,4 @@
-package server;
+package server.exceptions;
 
 public class MalformedMessageException extends IllegalArgumentException {
 
