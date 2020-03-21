@@ -5,9 +5,9 @@ successfully between the server and the client. Indeed, TCP is a reliable data t
 
 # How does the client find the server ?
 
-+ IP address of the server is given by default: 192.196.200.1 
++ IP address of the server is given by default: 127.0.0.1 
 
-+ The server listens to port 1000 (port also chosen by default)
++ The server listens to port 8080 (port also chosen by default)
 
 # Who speaks first ?
 
