@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 import protocol.Protocol;
 
@@ -63,12 +62,13 @@ public class Client {
     sendReq(MSG_PERFORM);
     String line = reader.readLine();
 
-    if (line.length() < 3 || line.substring(0, 3).equals(MSG_ERR)) reset();
+    if (line.length() < 3 || line.substring(0, 3).equals(MSG_ERR))
+      reset();
 
     return Integer.parseInt(line.substring(4));
   }
 
-  public void start() throws IOException {
+  public void start() {
     int f = 0;
     int s = 0;
     Op op = Op.ADD;
@@ -87,8 +87,7 @@ public class Client {
       }
     }
 
-    Socket server = new Socket(host, Protocol.HOST_PORT);
-    try {
+    try (Socket server = new Socket(host, Protocol.HOST_PORT)) {
       OutputStream os = server.getOutputStream();
       InputStream is = server.getInputStream();
 
@@ -99,29 +98,6 @@ public class Client {
       System.out.println(INFO_RES + res);
     } catch (Throwable e) {
       System.out.println(ERROR_COMM);
-    } finally {
-      server.close();
-    }
-  }
-
-  private enum Op {
-    ADD("+"),
-    SUB("-"),
-    MUL("*"),
-    DIV("/");
-
-    private String op;
-
-    Op(String op) {
-      this.op = op;
-    }
-
-    public static Op fromToken(String token) throws InputMismatchException {
-      for (Op operator : values()) {
-        if (operator.op.equals(token))
-          return operator;
-      }
-      throw new InputMismatchException();
     }
   }
 }
