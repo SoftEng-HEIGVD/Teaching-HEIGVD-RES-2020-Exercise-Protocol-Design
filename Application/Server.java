@@ -85,6 +85,7 @@ public class Server {
                                     sendNotification(Protocol.CMD_ACK);
                                     connected = false;
                                     shouldRun = false;
+                                    LOG.info("Disconnecting the client...");
                                 break;
 
                             case (Protocol.CMD_ADD):
