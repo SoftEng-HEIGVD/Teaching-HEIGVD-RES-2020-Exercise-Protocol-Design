@@ -38,7 +38,7 @@ public class RoroClient {
 
         try {
 
-            clientSocket = new Socket("localhost", 49500);
+           clientSocket = new Socket("10.192.19.159", 49500);
 
             reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             writer = new PrintWriter(clientSocket.getOutputStream());
@@ -101,34 +101,47 @@ public class RoroClient {
         writer.flush();
     }
 
-    public boolean isSymbolOperator(char c){
+    public boolean isSymbolOperator(String str){
+
+        if(str.length() != 1)
+            return false;
 
         for (char symbolOperator : SYMBOL_OPERATORS) {
-            if (c == symbolOperator)
+            if (str.charAt(0) == symbolOperator)
                 return true;
         }
 
         return false;
     }
 
+    public boolean isNumber(String str){
+        for(int i = 0;  i < str.length(); i++){
+            if(!Character.isDigit(str.charAt(i)))
+                return false;
+        }
+        return true;
+    }
+
     public boolean isCorrect(String str) {
-        str = str.replaceAll("\\s+",""); // Remove whitespace from input user
+        // Split string into tokens
+        String[] strSplited = str.split("\\s+");
+
         // Check if the input user is an operation (at least 2 operands and 1 operator)
-        if (str.length() >= 3) {
+        if (strSplited.length >= 3) {
             // Check first, second and final symbol
-            if (!Character.isDigit(str.charAt(0)) ||
-                    !Character.isDigit(str.charAt(1)) ||
-                    !isSymbolOperator(str.charAt(str.length() - 1))) {
+            if (!isNumber(strSplited[0]) ||
+                !isNumber(strSplited[1]) ||
+                    !isSymbolOperator(strSplited[strSplited.length - 1])) {
                 return false;
 
-            } else if (str.length() != 3) {
+            } else if (strSplited.length != 3) {
                 // Check the rest (between)
-                for (int i = 2; i < str.length() - 1; i++) {
-                    if (i % 2 == 0) { // if even, it should be a digit
-                        if (!isSymbolOperator(str.charAt(i)))
+                for (int i = 2; i < strSplited.length - 1; i++) {
+                    if (i % 2 == 0) { // if index is even, it should be an operator
+                        if (!isSymbolOperator(strSplited[i]))
                             return false;
-                    } else { // if odd, it should be an operator
-                        if (!Character.isDigit(str.charAt(i)))
+                    } else { // if index is odd, it should be an number
+                        if (!isNumber(strSplited[i]))
                             return false;
                     }
                 }
