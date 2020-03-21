@@ -21,7 +21,9 @@ public class Protocol {
   public static class Messages {
 
     public static final String MSG_START = "START";
-    public static final String MSG_GO_AHEAD = "GO_AHEAD";
+    public static final String MSG_GO_AHEAD = "GO AHEAD";
+    public static final String MSG_N = "N";
+    public static final String MSG_O = "O";
     public static final String MSG_OK_N = "OK N";
     public static final String MSG_OK_O = "OK O";
     public static final String MSG_PERFORM = "PERFORM";
