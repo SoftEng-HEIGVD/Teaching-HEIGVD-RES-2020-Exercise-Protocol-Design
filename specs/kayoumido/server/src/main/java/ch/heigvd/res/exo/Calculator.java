@@ -2,12 +2,20 @@ package ch.heigvd.res.exo;
 
 public class Calculator {
 
-    public int calculate(String op, String rhs, String lhs) {
-
-        switch (op) {
+    public Double calculate(String op, String rhs, String lhs) throws Exception {
+        switch(op) {
             case "ADD":
-                return Integer.parseInt(rhs) + Integer.parseInt(lhs);
+                return Double.parseDouble(rhs) + Double.parseDouble(lhs);
+            case "SUB":
+                return Double.parseDouble(rhs) - Double.parseDouble(lhs);
+            case "MUL":
+                return Double.parseDouble(rhs) * Double.parseDouble(lhs);
+            case "DIV":
+                return Double.parseDouble(rhs) / Double.parseDouble(lhs);
+            case "MOD":
+                return Double.parseDouble(rhs) % Double.parseDouble(lhs);
+            default:
+                throw new Exception("Unknown operator");
         }
-        return 0;
     }
 }

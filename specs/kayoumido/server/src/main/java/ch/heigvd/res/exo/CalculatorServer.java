@@ -32,19 +32,19 @@ public class CalculatorServer {
 
             try {
                 server = new ServerSocket(LISTEN_PORT);
-            } catch (IOException ex) {
+            } catch(IOException ex) {
                 LOG.log(Level.SEVERE, null, ex);
                 return;
             }
 
-            while (true) {
+            while(true) {
                 LOG.info("Waiting (blocking) for a new client...");
                 try {
                     // accept the new client and start a new thread to handle it
                     Socket client = server.accept();
                     new Thread(new Worker(client)).start();
 
-                } catch (IOException e) {
+                } catch(IOException e) {
                     // something bad happened
                     LOG.log(Level.SEVERE, e.getMessage(), e);
                 }
@@ -68,7 +68,7 @@ public class CalculatorServer {
                 this.client = client;
                 this.reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
                 this.writer = new PrintWriter(client.getOutputStream());
-            } catch (IOException e) {
+            } catch(IOException e) {
                 LOG.log(Level.SEVERE, e.getMessage());
             }
         }
@@ -85,18 +85,33 @@ public class CalculatorServer {
                     // Splits the input and performs the calculation
                     String[] operation = cmd.split(" ");
 
-                    int res = calculator.calculate(operation[0], operation[1], operation[2]);
+                    // Check the well-formedness of the calculation recieved from the client
+                    if(operation[0].length() != 3 || operation.length != 3) {
+                        LOG.log(Level.SEVERE, "Badly formatted calculation");
+                        this.writer.println("Badly formatted calculation, please try again");
+                        this.writer.flush();
+                        continue;
+                    }
+                    Double res;
+                    try {
+                        res = calculator.calculate(operation[0], operation[1], operation[2]);
+                    } catch(Exception e) { // Catches unknown parameter exception
+                        LOG.log(Level.SEVERE, e.getMessage());
+                        this.writer.println("Unknown operator, please try again");
+                        this.writer.flush();
+                        continue;
+                    }
                     this.writer.println("> " + cmd.toUpperCase() + " = " + res);
                     this.writer.flush();
                 }
-            } catch (IOException e) {
+            } catch(IOException e) {
                 LOG.log(Level.SEVERE, e.getMessage());
             } finally {
                 // current client is finished,
                 // we can cleanup the resources
                 try {
                     this.reader.close();
-                } catch (IOException e) {
+                } catch(IOException e) {
                     Logger.getLogger(CalculatorServer.class.getName()).log(Level.SEVERE, null, e);
                 }
 
@@ -104,7 +119,7 @@ public class CalculatorServer {
 
                 try {
                     this.client.close();
-                } catch (IOException e) {
+                } catch(IOException e) {
                     Logger.getLogger(CalculatorServer.class.getName()).log(Level.SEVERE, null, e);
                 }
             }
