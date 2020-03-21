@@ -123,7 +123,6 @@ public class Server implements Runnable{
                     String[] tokens = commandLine.split(" ");
                     if (tokens[0].toUpperCase().equals(Protocol.CMD_BYE)) {
                         connected = false;
-                        shutdown();
                     } else if (tokens[0].toUpperCase().equals(Protocol.CMD_HELLO)) {
                         sendNotification("HELLO, GIVE CALCULATIONS(supported operators : + - * /)");
                     } else {
