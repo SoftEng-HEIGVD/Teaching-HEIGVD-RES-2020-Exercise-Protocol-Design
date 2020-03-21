@@ -13,12 +13,17 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 import protocol.Protocol;
 
+import static protocol.Protocol.Messages.*;
+
 public class Client {
   private static final String ERROR_FORMAT =
       "Error in format. Must be 'a <op> b'\n"
           + "a and b must be integers\n"
           + "<op> must be +, -, * or /\n";
+
   private static final String ERROR_COMM = "Error while talking with server.\n";
+  private static final String INFO_USAGE = "Enter a simple calculation to be made:";
+  private static final String INFO_RES = "Result is: ";
   private final InetAddress host;
   private BufferedWriter writer;
   private BufferedReader reader;
@@ -27,13 +32,13 @@ public class Client {
   }
 
   private void sendReq(String req) throws IOException {
-    writer.write(req + "\n");
+    writer.write(withNewLine(req));
     writer.flush();
   }
 
   private void checkAnswer(String ans) throws IOException {
     if (!reader.readLine().equals(ans)) {
-      sendReq("ERR");
+      sendReq(MSG_ERR);
       reset();
     }
   }
@@ -43,35 +48,34 @@ public class Client {
   }
 
   private int askServer(int f, Op op, int s) throws IOException {
-    sendReq("START");
-    checkAnswer("GO AHEAD");
+    sendReq(MSG_START);
+    checkAnswer(MSG_GO_AHEAD);
 
-    sendReq("N " + f);
-    checkAnswer("OK N");
+    sendReq(MSG_N + " " + f);
+    checkAnswer(MSG_OK_N);
 
-    sendReq("O " + op);
-    checkAnswer("OK O " + op);
+    sendReq(MSG_O + " " + op);
+    checkAnswer(MSG_OK_O + " " + op);
 
-    sendReq("N " + s);
-    checkAnswer("OK N");
+    sendReq(MSG_N + " " + s);
+    checkAnswer(MSG_OK_N);
 
-    sendReq("PERFORM");
+    sendReq(MSG_PERFORM);
     String line = reader.readLine();
 
-    if (line.length() < 3 || line.substring(0, 3).equals("ERR")) reset();
+    if (line.length() < 3 || line.substring(0, 3).equals(MSG_ERR)) reset();
 
     return Integer.parseInt(line.substring(4));
   }
 
   public void start() throws IOException {
-    Socket server = new Socket(host, Protocol.HOST_PORT);
     int f = 0;
     int s = 0;
     Op op = Op.ADD;
 
     boolean incorrectInput = true;
     while (incorrectInput) {
-      System.out.println("Enter a simple calculation to be made:");
+      System.out.println(INFO_USAGE);
       Scanner in = new Scanner(System.in);
       try {
         f = in.nextInt();
@@ -99,6 +103,7 @@ public class Client {
       }
     }
 
+    Socket server = new Socket(host, Protocol.HOST_PORT);
     try {
       OutputStream os = server.getOutputStream();
       InputStream is = server.getInputStream();
@@ -107,7 +112,7 @@ public class Client {
       reader = new BufferedReader(new InputStreamReader(is, Protocol.CHARSET));
 
       int res = askServer(f, op, s);
-      System.out.println("Result is: " + res);
+      System.out.println(INFO_RES + res);
     } catch (Throwable e) {
       System.out.println(ERROR_COMM);
     } finally {
