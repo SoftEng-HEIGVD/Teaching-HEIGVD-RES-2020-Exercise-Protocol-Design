@@ -75,23 +75,7 @@ public class Client {
       Scanner in = new Scanner(System.in);
       try {
         f = in.nextInt();
-        switch (in.next("[+*/\\-]")) {
-          case "+":
-            op = Op.ADD;
-            break;
-          case "-":
-            op = Op.SUB;
-            break;
-          case "*":
-            op = Op.MUL;
-            break;
-          case "/":
-            op = Op.DIV;
-            break;
-          default:
-            throw new InputMismatchException("Wrong operator");
-        }
-
+        op = Op.fromToken(in.next());
         s = in.nextInt();
         incorrectInput = false;
       } catch (Throwable e) {
@@ -116,9 +100,23 @@ public class Client {
   }
 
   private enum Op {
-    ADD,
-    SUB,
-    MUL,
-    DIV
+    ADD("+"),
+    SUB("-"),
+    MUL("*"),
+    DIV("/");
+
+    private String op;
+
+    Op(String op) {
+      this.op = op;
+    }
+
+    public static Op fromToken(String token) throws InputMismatchException {
+      for (Op operator : values()) {
+        if (operator.op.equals(token))
+          return operator;
+      }
+      throw new InputMismatchException();
+    }
   }
 }
