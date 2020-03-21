@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
@@ -27,11 +24,10 @@ public class CalculateServer {
 
     static final Logger LOG = Logger.getLogger(CalculateServer.class.getName());
 
-    private final int TEST_DURATION = 15000;
-    private final int PAUSE_DURATION = 1000;
-    private final int NUMBER_OF_ITERATIONS = TEST_DURATION / PAUSE_DURATION;
-    private final int LISTEN_PORT = 2205;
-    private final int NB_CHARS = 50;
+    private final int LISTEN_PORT = 49500;
+    private final static int BUFFER_SIZE = 1024;
+    private final String GOOD_BYE_MSG = "GOOD BYE";
+    private char[] buffer = new char[BUFFER_SIZE];
 
     /**
      * This method does the entire processing.
@@ -51,59 +47,72 @@ public class CalculateServer {
 
             while (true) {
                 clientSocket = serverSocket.accept();
-
-                logSocketAddress(clientSocket);
-
                 reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 writer = new PrintWriter(clientSocket.getOutputStream());
 
-                char[] buffer = new char[NB_CHARS];
+                // Get the message "Hello"
 
-                int length = reader.read(buffer, 0, NB_CHARS);
+                int sizeMsg = reader.read(buffer, 0, BUFFER_SIZE);
 
-                String calculateAsked = new String(buffer, 0, length);
+                LOG.info(new String(buffer,0,sizeMsg));
 
-                calculateAsked = calculateAsked.replaceAll("(\\n|\\r)","");
-                String[] calculSplited = calculateAsked.split(" ");
-
-                Queue<Integer> numbers = new LinkedList<>();
-
-                for(String current : calculSplited){
-
-                    System.out.println(numbers);
-
-                    if(current.matches("^([+*/\\-])$")) {
-                        Integer fstOperand = numbers.poll();
-                        Integer sndOperand = numbers.poll();
-                        int tmp = 0;
-                        switch (current.charAt(0)){
-                            case '+':
-                                tmp = fstOperand + sndOperand;
-                                break;
-                            case '-':
-                                tmp = fstOperand - sndOperand;
-                                break;
-                            case '*':
-                                tmp = fstOperand * sndOperand;
-                                break;
-                            case '/':
-                                tmp = fstOperand / sndOperand;
-                                break;
-                            default:
-                                break;
-                        }
-                        numbers.add(tmp);
-                    }
-                    else{
-                        numbers.add(Integer.valueOf(current));
-                    }
-                }
-
-                writer.println(String.format("Result : %d", numbers.poll()));
+                writer.println("Hello I'm a Bastien server");
                 writer.flush();
 
-                clientSocket.close();
+                // Get the operation to do
+                // e.g. : 2 5 + 8 + => 15
 
+                sizeMsg = reader.read(buffer,0,BUFFER_SIZE);
+
+                String calculateAsked = new String(buffer,0,sizeMsg);
+                calculateAsked = calculateAsked.replaceAll("(\\n|\\r)", "");
+
+                while (!calculateAsked.equals(GOOD_BYE_MSG)) {
+
+                    LOG.info(String.format("Calcul to do : %s", calculateAsked));
+
+                    String[] calculSplited = calculateAsked.split(" ");
+
+                    Queue<Integer> numbers = new LinkedList<>();
+
+                    for (String current : calculSplited) {
+
+                        if (current.matches("^([+*/\\-])$")) {
+                            Integer fstOperand = numbers.poll();
+                            Integer sndOperand = numbers.poll();
+                            int tmp = 0;
+                            switch (current.charAt(0)) {
+                                case '+':
+                                    tmp = fstOperand + sndOperand;
+                                    break;
+                                case '-':
+                                    tmp = fstOperand - sndOperand;
+                                    break;
+                                case '*':
+                                    tmp = fstOperand * sndOperand;
+                                    break;
+                                case '/':
+                                    tmp = fstOperand / sndOperand;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            numbers.add(tmp);
+                        } else {
+                            numbers.add(Integer.valueOf(current));
+                        }
+                    }
+
+                    writer.println(String.format("Result : %d", numbers.poll()));
+                    writer.flush();
+
+                    sizeMsg = reader.read(buffer,0,BUFFER_SIZE);
+
+                    calculateAsked = new String(buffer,0,sizeMsg);
+                    calculateAsked = calculateAsked.replaceAll("(\\n|\\r)", "");
+                }
+
+                clientSocket.close();
 
             }
 
