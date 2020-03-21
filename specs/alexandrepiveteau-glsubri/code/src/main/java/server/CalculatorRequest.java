@@ -52,33 +52,28 @@ public class CalculatorRequest implements Runnable {
       writer = new BufferedWriter(streamWriter);
 
       // Message 1 <- Receive a greeting message.
-      requireMessage(Messages.MSG_START);
-
       // Message 2 -> Tell that we are ready.
+      requireMessage(Messages.MSG_START);
       writeMessageNow(withNewLine(Messages.MSG_GO_AHEAD));
 
       // Message 3 <- Read the number (if it exists).
-      int a = readAndParseInteger(reader.readLine());
-
       // Message 4 -> Notify we read the number.
+      int a = requireInteger(reader.readLine());
       writeMessageNow(withNewLine(Messages.MSG_OK_N));
 
       // Message 5 <- Read the operator.
-      CalculatorOperation op = CalculatorOperation.fromMessage(reader.readLine());
-
       // Message 6 -> Notify we read the operator.
+      CalculatorOperation op = CalculatorOperation.fromMessage(reader.readLine());
       writeMessageNow(withNewLine(MSG_OK_O + " " + op));
 
       // Message 7 <- Read the number (if it exists).
-      int b = readAndParseInteger(reader.readLine());
-
       // Message 8 -> Notify we read the number.
+      int b = requireInteger(reader.readLine());
       writeMessageNow(withNewLine(Messages.MSG_OK_N));
 
       // Message 9 <- Are we asked to perform the operation ?
-      requireMessage(MSG_PERFORM);
-
       // Message 10 -> compute and send the result.
+      requireMessage(MSG_PERFORM);
       try {
         writer.write(withNewLine(Messages.MSG_RES + " " + op.perform(a, b)));
         writer.flush();
@@ -121,27 +116,13 @@ public class CalculatorRequest implements Runnable {
   }
 
   /**
-   * Writes a certain protocol message now, and ensures it is sent fully now.
+   * Requires that a certain message contains a number, and parses it.
    *
-   * @param message The message to send.
-   * @throws IOException Thrown if the message could not be sent.
+   * @param message The message to parse and retrieve a number from.
+   * @return The retrieved integer, if it exists. Might be positive or negative.
+   * @throws MalformedMessageException Thrown if the message is not properly formatted.
    */
-  private void writeMessageNow(String message) throws IOException {
-    writer.write(message);
-    writer.flush();
-  }
-
-  /**
-   * Writes that an error occurred on the protocol, and closes the communication now.
-   *
-   * @throws IOException If something went wrong while writing the message.
-   */
-  private void writeWrongMessageNow() throws IOException {
-    writeMessageNow(withNewLine(Messages.MSG_ERR));
-    socket.close();
-  }
-
-  private int readAndParseInteger(String message) throws MalformedMessageException {
+  private int requireInteger(String message) throws MalformedMessageException {
 
     // Preconditions.
     if (message.length() <= 2) {
@@ -161,5 +142,26 @@ public class CalculatorRequest implements Runnable {
     }
 
     return value;
+  }
+
+  /**
+   * Writes a certain protocol message now, and ensures it is sent fully now.
+   *
+   * @param message The message to send.
+   * @throws IOException Thrown if the message could not be sent.
+   */
+  private void writeMessageNow(String message) throws IOException {
+    writer.write(message);
+    writer.flush();
+  }
+
+  /**
+   * Writes that an error occurred on the protocol, and closes the communication now.
+   *
+   * @throws IOException If something went wrong while writing the message.
+   */
+  private void writeWrongMessageNow() throws IOException {
+    writeMessageNow(withNewLine(Messages.MSG_ERR));
+    socket.close();
   }
 }
