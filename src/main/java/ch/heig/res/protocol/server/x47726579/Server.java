@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static main.java.ch.heig.res.protocol.protocol.x47726579.Protocol.*;
+
+
 /**
  * This class is a multi-threaded server of the custom presence protocol. The
  * server binds a socket on the specified port and waits for incoming connection
@@ -23,13 +26,6 @@ import java.util.logging.Logger;
  */
 public class Server implements Runnable
 {
-
-	private static final int    DEFAULT_PORT = 3300;
-	private static final String CMD_GREET    = "Greetings";
-	private static final String CMD_ADD      = "ADD";
-	private static final String CMD_SUB      = "SUB";
-	private static final String CMD_MUL      = "MUL";
-	private static final String CMD_EXT      = "EXT";
 
 	final static Logger LOG = Logger.getLogger(Server.class.getName());
 
@@ -143,10 +139,10 @@ public class Server implements Runnable
 		public void run()
 		{
 			String commandLine;
-			Server.this.notifyConnectedWorkers("Welcome to the Presence Server");
-			Server.this.notifyConnectedWorkers("  Tell me who you are with 'HELLO name'");
-			Server.this.notifyConnectedWorkers(
-				"  Say something to other users with 'SAY message'");
+			Server.this.notifyConnectedWorkers("\t\tWelcome");
+			Server.this.notifyConnectedWorkers("I am a Math server, you can query me with the following keywords :");
+			Server.this.notifyConnectedWorkers("- To add two numbers : \t ADD number1 number2 ");
+			Server.this.notifyConnectedWorkers("- Add a number to the previous result : \tADD number");
 			Server.this.notifyConnectedWorkers("  Ask me who is connected with 'WHO'");
 			Server.this.notifyConnectedWorkers("  Leave with 'BYE'");
 			Server.this.notifyConnectedWorkers("  Shutdown server with 'KILL'");
