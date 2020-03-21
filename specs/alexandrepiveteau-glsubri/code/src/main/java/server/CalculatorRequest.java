@@ -1,5 +1,8 @@
 package server;
 
+import static protocol.Protocol.Messages.MSG_OK_O;
+import static protocol.Protocol.Messages.withNewLine;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -11,6 +14,7 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import protocol.Protocol;
+import protocol.Protocol.Messages;
 
 /**
  * An implementation of a {@link Runnable} that will implement the notion of a session of calculator
@@ -52,13 +56,13 @@ public class CalculatorRequest implements Runnable {
       String greeting = reader.readLine();
 
       // Message 1 <- Receive a greeting message.
-      if (!greeting.equals("START")) {
+      if (!greeting.equals(Messages.MSG_START)) {
         wrongMessage(socket, writer, greeting);
         return;
       }
 
       // Message 2 -> Tell that we are ready.
-      writer.write("GO AHEAD\n");
+      writer.write(withNewLine(Messages.MSG_GO_AHEAD));
       writer.flush();
 
       // Message 3 <- Read the number (if it exists).
@@ -71,7 +75,7 @@ public class CalculatorRequest implements Runnable {
       }
 
       // Message 4 -> Notify we read the number.
-      writer.write("OK N\n");
+      writer.write(withNewLine(Messages.MSG_OK_N));
       writer.flush();
 
       // Message 5 <- Read the operator.
@@ -84,7 +88,7 @@ public class CalculatorRequest implements Runnable {
       }
 
       // Message 6 -> Notify we read the operator.
-      writer.write(String.format("OK O %s\n", op));
+      writer.write(withNewLine(MSG_OK_O + " " + op));
       writer.flush();
 
       // Message 7 <- Read the number (if it exists).
@@ -97,19 +101,19 @@ public class CalculatorRequest implements Runnable {
       }
 
       // Message 8 -> Notify we read the number.
-      writer.write("OK N\n");
+      writer.write(withNewLine(Messages.MSG_OK_N));
       writer.flush();
 
       // Message 9 <- Are we asked to perform the operation ?
       String perform = reader.readLine();
-      if (!perform.equals("PERFORM")) {
+      if (!perform.equals(Messages.MSG_PERFORM)) {
         wrongMessage(socket, writer, perform);
         return;
       }
 
       // Message 10 -> compute and send the result.
       try {
-        writer.write(String.format("RES %d\n", op.perform(a, b)));
+        writer.write(withNewLine(Messages.MSG_RES + " " + op.perform(a, b)));
         writer.flush();
       } catch (IllegalArgumentException iae) {
         wrongMessage(socket, writer, String.format("%d %s %d", a, op, b));
