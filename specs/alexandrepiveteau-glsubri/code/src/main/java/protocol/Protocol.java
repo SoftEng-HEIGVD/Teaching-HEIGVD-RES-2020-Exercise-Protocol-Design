@@ -10,15 +10,10 @@ import java.nio.charset.StandardCharsets;
  * @author Guy-Laurent Subri
  */
 public class Protocol {
-  private Protocol() {}
-
-  /**
-   * The port that is defined in the protocol spec.
-   */
+  /** The port that is defined in the protocol spec. */
   public static final int HOST_PORT = 8080;
-
-  /**
-   * The {@link Charset} encoding for communicating text content over the protocol.
-   */
+  /** The {@link Charset} encoding for communicating text content over the protocol. */
   public static Charset CHARSET = StandardCharsets.UTF_8;
+
+  private Protocol() {}
 }

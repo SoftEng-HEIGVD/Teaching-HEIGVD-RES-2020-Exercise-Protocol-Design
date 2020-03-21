@@ -1,6 +1,12 @@
 package client;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.InputMismatchException;
@@ -8,109 +14,111 @@ import java.util.Scanner;
 import protocol.Protocol;
 
 public class Client {
-    private enum Op { ADD, SUB, MUL, DIV }
+  private static final String ERROR_FORMAT =
+      "Error in format. Must be 'a <op> b'\n"
+          + "a and b must be integers\n"
+          + "<op> must be +, -, * or /\n";
+  private static final String ERROR_COMM = "Error while talking with server.\n";
+  private final InetAddress host;
+  private BufferedWriter writer;
+  private BufferedReader reader;
+  public Client(InetAddress host) {
+    this.host = host;
+  }
 
-    private static final String ERROR_FORMAT = "Error in format. Must be 'a <op> b'\n" +
-            "a and b must be integers\n" +
-            "<op> must be +, -, * or /\n";
-    private static final String ERROR_COMM = "Error while talking with server.\n";
+  private void sendReq(String req) throws IOException {
+    writer.write(req + "\n");
+    writer.flush();
+  }
 
-    private final InetAddress host;
-
-    private BufferedWriter writer;
-    private BufferedReader reader;
-
-    public Client(InetAddress host) {
-        this.host = host;
+  private void checkAnswer(String ans) throws IOException {
+    if (!reader.readLine().equals(ans)) {
+      sendReq("ERR");
+      reset();
     }
+  }
 
-    private void sendReq(String req) throws IOException {
-        writer.write(req + "\n");
-        writer.flush();
-    }
+  private void reset() throws IOException {
+    throw new IOException(ERROR_COMM);
+  }
 
-    private void checkAnswer(String ans) throws IOException {
-        if (! reader.readLine().equals(ans)) {
-            sendReq("ERR");
-            reset();
-        }
-    }
+  private int askServer(int f, Op op, int s) throws IOException {
+    sendReq("START");
+    checkAnswer("GO AHEAD");
 
-    private void reset() throws IOException {
-        throw new IOException(ERROR_COMM);
-    }
+    sendReq("N " + f);
+    checkAnswer("OK N");
 
-    private int askServer(int f, Op op, int s) throws IOException {
-        sendReq("START");
-        checkAnswer("GO AHEAD");
+    sendReq("O " + op);
+    checkAnswer("OK O " + op);
 
-        sendReq("N " + f);
-        checkAnswer("OK N");
+    sendReq("N " + s);
+    checkAnswer("OK N");
 
-        sendReq("O " + op);
-        checkAnswer("OK O " + op);
+    sendReq("PERFORM");
+    String line = reader.readLine();
 
-        sendReq("N " + s);
-        checkAnswer("OK N");
+    if (line.length() < 3 || line.substring(0, 3).equals("ERR")) reset();
 
-        sendReq("PERFORM");
-        String line = reader.readLine();
+    return Integer.parseInt(line.substring(4));
+  }
 
-        if (line.length() < 3 || line.substring(0, 3).equals("ERR"))
-            reset();
+  public void start() throws IOException {
+    Socket server = new Socket(host, Protocol.HOST_PORT);
+    int f = 0;
+    int s = 0;
+    Op op = Op.ADD;
 
-        return Integer.parseInt(line.substring(4));
-    }
-
-    public void start() throws IOException {
-        Socket server = new Socket(host, Protocol.HOST_PORT);
-        int f = 0;
-        int s = 0;
-        Op op = Op.ADD;
-
-        boolean incorrectInput = true;
-        while (incorrectInput) {
-            System.out.println("Enter a simple calculation to be made:");
-            Scanner in = new Scanner(System.in);
-            try {
-                f = in.nextInt();
-                switch (in.next("[+*/\\-]")) {
-                    case "+":
-                        op = Op.ADD;
-                        break;
-                    case "-":
-                        op = Op.SUB;
-                        break;
-                    case "*":
-                        op = Op.MUL;
-                        break;
-                    case "/":
-                        op = Op.DIV;
-                        break;
-                    default:
-                        throw new InputMismatchException("Wrong operator");
-                }
-
-                s = in.nextInt();
-                incorrectInput = false;
-            } catch (Throwable e) {
-                System.out.println(ERROR_FORMAT);
-            }
+    boolean incorrectInput = true;
+    while (incorrectInput) {
+      System.out.println("Enter a simple calculation to be made:");
+      Scanner in = new Scanner(System.in);
+      try {
+        f = in.nextInt();
+        switch (in.next("[+*/\\-]")) {
+          case "+":
+            op = Op.ADD;
+            break;
+          case "-":
+            op = Op.SUB;
+            break;
+          case "*":
+            op = Op.MUL;
+            break;
+          case "/":
+            op = Op.DIV;
+            break;
+          default:
+            throw new InputMismatchException("Wrong operator");
         }
 
-        try {
-            OutputStream os = server.getOutputStream();
-            InputStream is = server.getInputStream();
-
-            writer = new BufferedWriter(new OutputStreamWriter(os, Protocol.CHARSET));
-            reader = new BufferedReader(new InputStreamReader(is, Protocol.CHARSET));
-
-            int res = askServer(f, op, s);
-            System.out.println("Result is: " + res);
-        } catch (Throwable e) {
-            System.out.println(ERROR_COMM);
-        }finally {
-            server.close();
-        }
+        s = in.nextInt();
+        incorrectInput = false;
+      } catch (Throwable e) {
+        System.out.println(ERROR_FORMAT);
+      }
     }
+
+    try {
+      OutputStream os = server.getOutputStream();
+      InputStream is = server.getInputStream();
+
+      writer = new BufferedWriter(new OutputStreamWriter(os, Protocol.CHARSET));
+      reader = new BufferedReader(new InputStreamReader(is, Protocol.CHARSET));
+
+      int res = askServer(f, op, s);
+      System.out.println("Result is: " + res);
+    } catch (Throwable e) {
+      System.out.println(ERROR_COMM);
+    } finally {
+      server.close();
+    }
+  }
+
+  private enum Op {
+    ADD,
+    SUB,
+    MUL,
+    DIV
+  }
 }
