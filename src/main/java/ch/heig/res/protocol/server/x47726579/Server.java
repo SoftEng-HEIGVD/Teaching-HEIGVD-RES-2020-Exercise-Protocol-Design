@@ -29,6 +29,9 @@ public class Server implements Runnable
 
 	final static Logger LOG = Logger.getLogger(Server.class.getName());
 
+	static {
+		System.setProperty("java.util.logging.SimpleFormatter.format", "[%1$tF %1$tT] [%4$-7s] %5$s %n");
+	}
 
 	boolean      shouldRun;
 	ServerSocket serverSocket;
@@ -39,6 +42,7 @@ public class Server implements Runnable
 		this.shouldRun = true;
 		this.connectedWorkers = Collections.synchronizedList(new LinkedList<Worker>());
 	}
+
 
 	private void registerWorker(Worker worker)
 	{
@@ -88,10 +92,10 @@ public class Server implements Runnable
 			serverSocket = new ServerSocket(DEFAULT_PORT);
 			while (shouldRun) {
 				Socket clientSocket = serverSocket.accept();
-				Server.this.notifyConnectedWorkers("Someone has arrived...");
-				Worker newWorker = new Worker(clientSocket);
+				Worker newWorker    = new Worker(clientSocket);
 				registerWorker(newWorker);
 				new Thread(newWorker).start();
+
 			}
 			serverSocket.close();
 			LOG.info("shouldRun is false... server going down");
@@ -120,75 +124,98 @@ public class Server implements Runnable
 		BufferedReader in;
 		PrintWriter    out;
 		boolean        connected;
-		String         userName = "An anonymous user";
+		String         userName;
+		int            result = 0;
+
 
 		public Worker(Socket clientSocket)
 		{
 			this.clientSocket = clientSocket;
 			try {
-				in =
-					new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+				in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 				out = new PrintWriter(clientSocket.getOutputStream());
 				connected = true;
+				if (!in.readLine().equals(CMD_GREET)) {disconnect();}
+				userName = "user" + connectedWorkers.size();
+				sendNotification("\t================= Welcome =================");
+				stdMessage();
 			} catch (IOException ex) {
 				LOG.log(Level.SEVERE, ex.getMessage(), ex);
 			}
+		}
+
+		private void stdMessage()
+		{
+			sendNotification("I am a Math server, you can query me with the following keywords :");
+			sendNotification("- To add two numbers                       : ADD number1 number2 ");
+			sendNotification("- Add a number to the previous result      : ADD number");
+			sendNotification("- To subtract two numbers                  : SUB number1 number2 ");
+			sendNotification("- Subtract a number to the previous result : SUB number");
+			sendNotification("- To multiply two numbers                  : MUL number1 number2 ");
+			sendNotification("- Multiply a number to the previous result : MUL number");
+			sendNotification("- Exit the server with EXT");
+			sendNotification("- Kill me with KILL");
 		}
 
 		@Override
 		public void run()
 		{
 			String commandLine;
-			Server.this.notifyConnectedWorkers("\t\tWelcome");
-			Server.this.notifyConnectedWorkers("I am a Math server, you can query me with the following keywords :");
-			Server.this.notifyConnectedWorkers("- To add two numbers : \t ADD number1 number2 ");
-			Server.this.notifyConnectedWorkers("- Add a number to the previous result : \tADD number");
-			Server.this.notifyConnectedWorkers("  Ask me who is connected with 'WHO'");
-			Server.this.notifyConnectedWorkers("  Leave with 'BYE'");
-			Server.this.notifyConnectedWorkers("  Shutdown server with 'KILL'");
+
 			try {
 				while (connected && ((commandLine = in.readLine()) != null)) {
 					String[] tokens = commandLine.split(" ");
 					switch (tokens[0].toUpperCase()) {
-						case (CMD_GREET):
-							userName = tokens.length >= 2 ? tokens[1] : "An anonymous user";
-							Server.this.notifyConnectedWorkers(userName + " is in the room.");
-							break;
 						case (CMD_MUL):
-							String message =
-								tokens.length >= 2 ? commandLine.substring(4) : "nothing...";
-							Server.this.notifyConnectedWorkers(userName + " says: " + message);
+							if (tokens.length == 2) {
+								result *= Integer.parseInt(tokens[1]);
+							} else if (tokens.length == 3) {
+								result = Integer.parseInt(tokens[1]) * Integer.parseInt(tokens[2]);
+							} else {
+								sendNotification("Not a valid MUL command.");
+								break;
+							}
+							sendNotification(String.valueOf(result));
 							break;
 						case (CMD_ADD):
-							StringBuilder sb = new StringBuilder(
-								"Currently connected users:\r\n");
-							for (Worker w : connectedWorkers) {
-								sb.append(" - ");
-								sb.append(w.userName);
-								sb.append("\n");
+							if (tokens.length == 2) {
+								result += Integer.parseInt(tokens[1]);
+							} else if (tokens.length == 3) {
+								result = Integer.parseInt(tokens[1]) + Integer.parseInt(tokens[2]);
+							} else {
+								sendNotification("Not a valid ADD command.");
+								break;
 							}
-							sendNotification(sb.toString());
+							sendNotification(String.valueOf(result));
 							break;
 						case (CMD_SUB):
-							Server.this.notifyConnectedWorkers(
-								userName + " is about to leave the room.");
-							connected = false;
+							if (tokens.length == 2) {
+								result -= Integer.parseInt(tokens[1]);
+							} else if (tokens.length == 3) {
+								result = Integer.parseInt(tokens[1]) - Integer.parseInt(tokens[2]);
+							} else {
+								sendNotification("Not a valid ADD command.");
+								break;
+							}
+							sendNotification(String.valueOf(result));
 							break;
 						case (CMD_EXT):
+							Server.this.notifyConnectedWorkers(userName + " is about to leave the room.");
+							connected = false;
+							break;
+						case (CMD_KILL):
 							sendNotification("KILL command received. Bringing server down...");
 							shutdown();
 							break;
 						default:
-							sendNotification(
-								"What? I only understand HELLO, SAY, WHO, BYE and KILL " +
-								"commands");
+							sendNotification("What? I only understand ADD, SUB, MUL, EXT and KILL commands");
 					}
+
 				}
 			} catch (IOException ex) {
 				LOG.log(Level.SEVERE, ex.getMessage(), ex);
 			} finally {
 				unregisterWorker(this);
-				Server.this.notifyConnectedWorkers(userName + " has left the room.");
 				cleanup();
 			}
 		}

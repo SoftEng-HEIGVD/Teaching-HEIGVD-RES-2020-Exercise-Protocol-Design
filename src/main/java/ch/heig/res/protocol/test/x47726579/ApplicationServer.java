@@ -12,16 +12,13 @@ import java.awt.desktop.SystemSleepEvent;
  * - BYE: the client is disconnected and the others are notified
  *
  * @author Olivier Liechti
+ * @modified_by Laurent Scherer
  */
 public class ApplicationServer
 {
-
-	/**
-	 * @param args the command line arguments
-	 */
 	public static void main(String[] args)
 	{
-		System.setProperty("java.util.logging.SimpleFormatter.format", "%5$s %n");
+//		System.setProperty("java.util.logging.SimpleFormatter.format", "%5$s %n");
 
 		Thread listenThread = new Thread(new Server());
 		listenThread.start();
@@ -30,9 +27,7 @@ public class ApplicationServer
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		while (listenThread.isAlive()) {
-			;
-		}
+		while (listenThread.isAlive()) ;
 
 
 	}
