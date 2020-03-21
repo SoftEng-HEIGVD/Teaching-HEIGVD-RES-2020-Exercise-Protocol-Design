@@ -65,7 +65,7 @@ public class CalculateServer {
                 sizeMsg = reader.read(buffer,0,BUFFER_SIZE);
 
                 String calculateAsked = new String(buffer,0,sizeMsg);
-                calculateAsked = calculateAsked.replaceAll("(\\n|\\r)", "");
+                calculateAsked = calculateAsked.replaceAll("([\\n\\r])", "");
 
                 while (!calculateAsked.equals(GOOD_BYE_MSG)) {
 
@@ -112,7 +112,11 @@ public class CalculateServer {
                     calculateAsked = calculateAsked.replaceAll("(\\n|\\r)", "");
                 }
 
+                writer.close();
+                reader.close();
                 clientSocket.close();
+
+                LOG.info("The client finished the connection");
 
             }
 

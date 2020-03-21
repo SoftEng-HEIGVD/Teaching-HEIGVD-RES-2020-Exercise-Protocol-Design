@@ -23,8 +23,7 @@ public class RoroClient {
 
     static final char[] SYMBOL_OPERATORS = {'+','*','-','/'}; // used to check input user
 
-    private byte[] buffer = new byte[BUFFER_SIZE];
-    private int newBytes;
+    private char[] buffer = new char[BUFFER_SIZE];
 
     /**
      * This method does the whole processing :
@@ -34,28 +33,27 @@ public class RoroClient {
     public void sendRequest() {
 
         Socket clientSocket = null;
-        OutputStream os = null;
-        InputStream is = null;
+        BufferedReader reader = null;
+        PrintWriter writer = null;
 
         try {
 
-            /*
+            clientSocket = new Socket("localhost", 49500);
+
+            reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            writer = new PrintWriter(clientSocket.getOutputStream());
+
             // Client starts connection
-            writeToServer(os, "Hello, I am Roro client\r\n\r\n");
+            writeToServer(writer, "Hello I'm a Roro client");
 
             // Waits for Server to answer
-            readServerAnswer(is);
-                    // ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream(); no need
-                    // buffer et tout -> déplacé dans attributs privés ?
-            */
+
+            int sizeMsg = reader.read(buffer, 0, BUFFER_SIZE);
+            LOG.info(new String(buffer,0,sizeMsg));
 
             // While the user hasn't entered 'Q' (to quit), ask again to do an operation
             String myString = "";
             do{
-
-                clientSocket = new Socket("localhost", 2205);
-                os = clientSocket.getOutputStream();
-                is = clientSocket.getInputStream();
 
                  // Get input client user
                 Scanner input = new Scanner(System.in);
@@ -64,42 +62,32 @@ public class RoroClient {
 
                 if(isCorrect(myString)){ // If user input is valid
                     // Send to server the operation user
-                    writeToServer(os, myString);
+                    writeToServer(writer, myString);
 
                     // Waits for Server to answer
-                    ByteArrayOutputStream responseBuffer = readServerAnswer(is);
 
-                    System.out.println(responseBuffer.toString());
+                    sizeMsg = reader.read(buffer,0,BUFFER_SIZE);
+                    String result = new String(buffer,0,sizeMsg);
 
-                    // Send to server confirmation
-                    writeToServer(os, "I got the answer\n");
+                    System.out.println(result);
 
-                } else { // If user input is not valid
-                    // Error msg
-                    System.out.println("INPUT OPERATION NOT VALID");
+
                 }
 
             } while(!myString.equals("Q")); // User client wants to quit the application client
 
-            // Waits for Server to answer
-            readServerAnswer(is);
-
             // Send goodbye
-            writeToServer(os, "Goodbye, Bastien server :D\n");
+            writeToServer(writer, "GOOD BYE");
 
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, null, ex);
         } finally {
             try {
-                is.close();
+                reader.close();
             } catch (IOException ex) {
                 Logger.getLogger(RoroClient.class.getName()).log(Level.SEVERE, null, ex);
             }
-            try {
-                os.close();
-            } catch (IOException ex) {
-                Logger.getLogger(RoroClient.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            writer.close();
             try {
                 clientSocket.close();
             } catch (IOException ex) {
@@ -108,18 +96,9 @@ public class RoroClient {
         }
     }
 
-    public void writeToServer(OutputStream os, String message) throws IOException {
-        os.write(message.getBytes());
-    }
-
-    public ByteArrayOutputStream readServerAnswer(InputStream is) throws IOException {
-        ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream();
-
-        while ((newBytes = is.read(buffer)) != -1) {
-            responseBuffer.write(buffer, 0, newBytes);
-        }
-
-        return responseBuffer;
+    public void writeToServer(PrintWriter writer, String myString){
+        writer.println(myString);
+        writer.flush();
     }
 
     public boolean isSymbolOperator(char c){
