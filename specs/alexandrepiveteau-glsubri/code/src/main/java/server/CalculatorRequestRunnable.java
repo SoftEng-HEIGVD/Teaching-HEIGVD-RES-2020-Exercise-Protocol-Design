@@ -5,11 +5,12 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.Socket;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import protocol.Protocol;
 
 /**
  * An implementation of a {@link Runnable} that will implement the notion of a session of calculator
@@ -24,8 +25,6 @@ import java.util.logging.Logger;
 public class CalculatorRequestRunnable implements Runnable {
 
   private static Logger LOG = Logger.getLogger(CalculatorRequestRunnable.class.getName());
-
-  private static Charset CHARSET = StandardCharsets.UTF_8;
 
   // I/O streams used in the app.
   private BufferedReader reader;
@@ -43,8 +42,12 @@ public class CalculatorRequestRunnable implements Runnable {
     try {
       int a, b;
       Operation op;
-      reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), CHARSET));
-      writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), CHARSET));
+
+      Reader streamReader = new InputStreamReader(socket.getInputStream(), Protocol.CHARSET);
+      Writer streamWriter = new OutputStreamWriter(socket.getOutputStream(), Protocol.CHARSET);
+
+      reader = new BufferedReader(streamReader);
+      writer = new BufferedWriter(streamWriter);
 
       String greeting = reader.readLine();
 

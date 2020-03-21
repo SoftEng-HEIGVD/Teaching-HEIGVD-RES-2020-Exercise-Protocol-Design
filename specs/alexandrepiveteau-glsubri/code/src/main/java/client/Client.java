@@ -3,9 +3,9 @@ package client;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import protocol.Protocol;
 
 public class Client {
     private enum Op { ADD, SUB, MUL, DIV }
@@ -14,7 +14,6 @@ public class Client {
             "a and b must be integers\n" +
             "<op> must be +, -, * or /\n";
     private static final String ERROR_COMM = "Error while talking with server.\n";
-    private static final int PORT = 8080;
 
     private final InetAddress host;
 
@@ -64,7 +63,7 @@ public class Client {
     }
 
     public void start() throws IOException {
-        Socket server = new Socket(host, PORT);
+        Socket server = new Socket(host, Protocol.HOST_PORT);
         int f = 0;
         int s = 0;
         Op op = Op.ADD;
@@ -103,8 +102,8 @@ public class Client {
             OutputStream os = server.getOutputStream();
             InputStream is = server.getInputStream();
 
-            writer = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
-            reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+            writer = new BufferedWriter(new OutputStreamWriter(os, Protocol.CHARSET));
+            reader = new BufferedReader(new InputStreamReader(is, Protocol.CHARSET));
 
             int res = askServer(f, op, s);
             System.out.println("Result is: " + res);
