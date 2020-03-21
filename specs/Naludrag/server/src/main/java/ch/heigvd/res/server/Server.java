@@ -30,6 +30,7 @@ public class Server implements Runnable{
     boolean shouldRun;
     ServerSocket serverSocket;
     final List<Worker> connectedWorkers;
+    int nbWorker = 0;
 
     public Server() {
         this.shouldRun = true;
@@ -37,14 +38,14 @@ public class Server implements Runnable{
     }
 
     private void registerWorker(Worker worker) {
-        LOG.log(Level.INFO, ">> Waiting for lock before registring worker");
+        LOG.log(Level.INFO, ">> Waiting for lock before registring a worker {0}", nbWorker);
         connectedWorkers.add(worker);
         //Add message to the worker
         LOG.log(Level.INFO, "<< Worker registered.");
     }
 
-    private void unregisterWorker(Worker worker) {
-        LOG.log(Level.INFO, ">> Waiting for lock before unregistring worker");
+    private void unregisterWorker(Worker worker, int idWorker) {
+        LOG.log(Level.INFO, ">> Waiting for lock before unregistring a worker {0}", idWorker);
         connectedWorkers.remove(worker);
         LOG.log(Level.INFO, "<< Worker unregistered.");
     }
@@ -100,6 +101,7 @@ public class Server implements Runnable{
         BufferedReader in;
         PrintWriter out;
         boolean connected;
+        int idWorker;
 
         public Worker(Socket clientSocket) {
             this.clientSocket = clientSocket;
@@ -107,6 +109,7 @@ public class Server implements Runnable{
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(),Protocol.CHARSET));
                 out = new PrintWriter(clientSocket.getOutputStream());
                 connected = true;
+                idWorker = ++nbWorker;
             } catch (IOException ex) {
                 LOG.log(Level.SEVERE, ex.getMessage(), ex);
             }
@@ -120,6 +123,7 @@ public class Server implements Runnable{
                     String[] tokens = commandLine.split(" ");
                     if (tokens[0].toUpperCase().equals(Protocol.CMD_BYE)) {
                         connected = false;
+                        shutdown();
                     } else if (tokens[0].toUpperCase().equals(Protocol.CMD_HELLO)) {
                         sendNotification("HELLO, GIVE CALCULATIONS(supported operators : + - * /)");
                     } else {
@@ -135,15 +139,15 @@ public class Server implements Runnable{
                     System.exit(-1);
                 }
             } finally {
-                unregisterWorker(this);
+                unregisterWorker(this, idWorker);
                 cleanup();
             }
         }
 
         private void cleanup() {
-            LOG.log(Level.INFO, "Cleaning up worker used by worker");
+            LOG.log(Level.INFO, "Cleaning up worker used by worker {0}", idWorker);
 
-            LOG.log(Level.INFO, "Closing clientSocket used by worker");
+            LOG.log(Level.INFO, "Closing clientSocket used by worker {0}", idWorker);
             try {
                 if (clientSocket != null) {
                     clientSocket.close();
@@ -152,7 +156,7 @@ public class Server implements Runnable{
                 LOG.log(Level.SEVERE, ex.getMessage(), ex);
             }
 
-            LOG.log(Level.INFO, "Closing in used by worker");
+            LOG.log(Level.INFO, "Closing in used by worker {0}", idWorker);
             try {
                 if (in != null) {
                     in.close();
@@ -161,12 +165,12 @@ public class Server implements Runnable{
                 LOG.log(Level.SEVERE, ex.getMessage(), ex);
             }
 
-            LOG.log(Level.INFO, "Closing out used by a worker");
+            LOG.log(Level.INFO, "Closing out used by worker {0}", idWorker);
             if (out != null) {
                 out.close();
             }
 
-            LOG.log(Level.INFO, "Clean up done for worker");
+            LOG.log(Level.INFO, "Clean up done for worker {0}", idWorker);
         }
 
         public void sendNotification(String message) {
@@ -175,20 +179,20 @@ public class Server implements Runnable{
         }
 
         private void disconnect() {
-            LOG.log(Level.INFO, "Disconnecting worker");
+            LOG.log(Level.INFO, "Disconnecting worker {0}", idWorker);
             connected = false;
             cleanup();
         }
 
         class Calculator implements Runnable {
             String[] tokens;
-            int result;
+            double result;
             int operand1;
             int operand2;
 
             public Calculator(String[] tokens) {
                 this.tokens = tokens;
-                result = 0;
+                result = 0.0;
                 operand1 = 0;
                 operand2 = 0;
             }
@@ -203,14 +207,14 @@ public class Server implements Runnable{
                         operand1 = Integer.parseInt(tokens[0]);
                         operand2 = Integer.parseInt(tokens[2]);
                     } catch (NumberFormatException e) {
-                        sendNotification("Please send another calcul number incorrect");
+                        sendNotification("Please send another calcul numbers for the operation incorrect");
                     } finally {
                         //Search in the operators if the one passed is in the list
                         Operator op = Operator.getOperator(tokens[1]);
                         if (op == null) {
                             sendNotification("Unknown operator");
                         } else {
-                            result = op.eval(operand1, operand2);
+                            result = op.eval(operand1,operand2);
                             sendNotification(operand1 + " " + op.toString() + " " + operand2 + " = " + result);
                         }
                     }

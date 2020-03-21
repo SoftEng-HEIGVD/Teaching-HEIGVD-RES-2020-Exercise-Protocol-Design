@@ -3,7 +3,7 @@ package ch.heigvd.res.common;
 public enum Operator {
     ADD {
         @Override
-        public int eval(int a, int b) {
+        public double eval(int a, int b) {
             return a + b;
         }
 
@@ -14,7 +14,7 @@ public enum Operator {
     },
     SUB {
         @Override
-        public int eval(int a, int b) {
+        public double eval(int a, int b) {
             return a - b;
         }
 
@@ -25,7 +25,7 @@ public enum Operator {
     },
     MULTIPLY {
         @Override
-        public int eval(int a, int b) {
+        public double eval(int a, int b) {
             return a * b;
         }
 
@@ -36,8 +36,8 @@ public enum Operator {
     },
     DIVIDE {
         @Override
-        public int eval(int a, int b) {
-            return a / b;
+        public double eval(int a, int b) {
+            return (double)a / (double)b;
         }
 
         @Override
@@ -52,7 +52,7 @@ public enum Operator {
      * @param b second operand
      * @return a Operator b
      */
-    public abstract int eval(int a, int b);
+    public abstract double eval(int a, int b);
 
     /**
      * Find the matching Operator from a symbol

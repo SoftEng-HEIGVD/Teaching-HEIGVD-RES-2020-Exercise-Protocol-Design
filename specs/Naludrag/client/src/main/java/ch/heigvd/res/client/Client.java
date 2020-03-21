@@ -13,11 +13,13 @@ import java.util.logging.Logger;
 
 public class Client {
     final static Logger LOG = Logger.getLogger(Client.class.getName());
+    static int nbClient = 0;
 
     Socket clientSocket;
     BufferedReader in;
     PrintWriter out;
     boolean connected = false;
+    private int idClient = ++nbClient;
 
     /**
      * This method is used to connect to the server on the default port.
@@ -35,6 +37,7 @@ public class Client {
      * @param serverPort the port used by the Presence Server
      */
     public void connect(String serverAddress, int serverPort) {
+        LOG.log(Level.INFO, "Client {0} trying to connect", idClient);
         try {
             clientSocket = new Socket(serverAddress, serverPort);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(),Protocol.CHARSET));
@@ -60,8 +63,14 @@ public class Client {
     public void disconnect() {
         LOG.log(Level.INFO, "Attempting to disconnect");
         connected = false;
-        out.println(Protocol.CMD_BYE);
-        cleanup();
+        //If the client didn't succeeded the connection out is null
+        if(out != null) {
+            out.println(Protocol.CMD_BYE);
+            cleanup();
+        }
+        else{
+            LOG.log(Level.INFO, "Client not connected impossible to disconnect");
+        }
     }
 
     private void cleanup() {
@@ -87,6 +96,7 @@ public class Client {
     }
 
     public String getCalculationResult(int a, int b, Operator op) {
+        LOG.log(Level.INFO, "Client {0} trying to calculate", idClient);
         if (!connected) {
             LOG.log(Level.SEVERE, "Attempting to run getCalculationResult when not connected");
             return "";
