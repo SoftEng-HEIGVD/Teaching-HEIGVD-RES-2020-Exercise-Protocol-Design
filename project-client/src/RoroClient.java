@@ -39,10 +39,7 @@ public class RoroClient {
 
         try {
 
-            clientSocket = new Socket("www.google.ch", 80);
-            os = clientSocket.getOutputStream();
-            is = clientSocket.getInputStream();
-
+            /*
             // Client starts connection
             writeToServer(os, "Hello, I am Roro client\r\n\r\n");
 
@@ -50,40 +47,45 @@ public class RoroClient {
             readServerAnswer(is);
                     // ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream(); no need
                     // buffer et tout -> déplacé dans attributs privés ?
+            */
 
             // While the user hasn't entered 'Q' (to quit), ask again to do an operation
             String myString = "";
             do{
+
+                clientSocket = new Socket("localhost", 2205);
+                os = clientSocket.getOutputStream();
+                is = clientSocket.getInputStream();
+
                  // Get input client user
                 Scanner input = new Scanner(System.in);
                 System.out.print("Enter the operation you want to do : (enter 'Q' to quit)");
                 myString = input.nextLine();
-                myString = myString.replaceAll("\\s+",""); // Remove whitespace from input user
 
                 if(isCorrect(myString)){ // If user input is valid
                     // Send to server the operation user
                     writeToServer(os, myString);
 
                     // Waits for Server to answer
-                    readServerAnswer(is);
+                    ByteArrayOutputStream responseBuffer = readServerAnswer(is);
+
+                    System.out.println(responseBuffer.toString());
 
                     // Send to server confirmation
-                    writeToServer(os, "I got the answer\r\n\r\n");
+                    writeToServer(os, "I got the answer\n");
 
                 } else { // If user input is not valid
                     // Error msg
                     System.out.println("INPUT OPERATION NOT VALID");
                 }
+
             } while(!myString.equals("Q")); // User client wants to quit the application client
 
             // Waits for Server to answer
             readServerAnswer(is);
 
             // Send goodbye
-            writeToServer(os, "Goodbye, Bastien server :D\r\n\r\n");
-
-            LOG.log(Level.INFO, "Response sent by the server: ");
-            // LOG.log(Level.INFO, responseBuffer.toString());
+            writeToServer(os, "Goodbye, Bastien server :D\n");
 
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, null, ex);
@@ -110,10 +112,14 @@ public class RoroClient {
         os.write(message.getBytes());
     }
 
-    public void readServerAnswer(InputStream is) throws IOException {
+    public ByteArrayOutputStream readServerAnswer(InputStream is) throws IOException {
+        ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream();
+
         while ((newBytes = is.read(buffer)) != -1) {
-            //responseBuffer.write(buffer, 0, newBytes); no need
+            responseBuffer.write(buffer, 0, newBytes);
         }
+
+        return responseBuffer;
     }
 
     public boolean isSymbolOperator(char c){
@@ -127,6 +133,7 @@ public class RoroClient {
     }
 
     public boolean isCorrect(String str) {
+        str = str.replaceAll("\\s+",""); // Remove whitespace from input user
         // Check if the input user is an operation (at least 2 operands and 1 operator)
         if (str.length() >= 3) {
             // Check first, second and final symbol
