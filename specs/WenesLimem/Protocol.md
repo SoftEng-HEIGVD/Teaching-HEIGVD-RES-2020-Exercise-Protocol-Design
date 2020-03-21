@@ -6,7 +6,7 @@
    __We opt toward using TCP/IP.__ 
 * How does the client find the server (addresses and ports)?
 
- __Using the IP address given by Docker, and port number is given and fixed : 2205__    
+ __Using the IP address given by Docker, and port number is given and fixed : 2342__    
 * Who speaks first?
 
   __The client starts contacting the server with a request.__
