@@ -1,7 +1,7 @@
 package ch.heigvd.res.client;
 
-import ch.heigvd.res.server.common.Operator;
-import ch.heigvd.res.server.common.Protocol;
+import ch.heigvd.res.common.Operator;
+import ch.heigvd.res.common.Protocol;
 
 import java.io.BufferedReader;
 import java.io.IOException;
