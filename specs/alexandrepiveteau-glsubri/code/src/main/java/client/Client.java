@@ -26,15 +26,28 @@ public class Client {
   private final InetAddress host;
   private BufferedWriter writer;
   private BufferedReader reader;
+
   public Client(InetAddress host) {
     this.host = host;
   }
 
+  /**
+   * Helper method to send a request to the server. Makes sure that there is a '\n' at the end
+   * of the request string. Also forces immediate write with flush
+   * @param req The string representing the request to the server
+   * @throws IOException If an exception is thrown when using the socket
+   */
   private void sendReq(String req) throws IOException {
     writer.write(withNewLine(req));
     writer.flush();
   }
 
+  /**
+   * Helper method to check if the server gave us the expected answer.
+   * @param ans The expected answer from the server
+   * @throws IOException If the server didn't answer us what we expected or if there is an error
+   * using the reader
+   */
   private void checkAnswer(String ans) throws IOException {
     if (!reader.readLine().equals(ans)) {
       sendReq(MSG_ERR);
@@ -42,10 +55,22 @@ public class Client {
     }
   }
 
+  /**
+   * Helper method to simply throw an error when communicating with the server
+   * @throws IOException Automatically thrown when this method is called
+   */
   private void reset() throws IOException {
     throw new IOException(ERROR_COMM);
   }
 
+  /**
+   * Starts the sequence with the server. Returns the result of the execution.
+   * @param f The First integer
+   * @param op The operation
+   * @param s The Second integer
+   * @return The result of f `op` s
+   * @throws IOException If there is a problem communicating with the server
+   */
   private int askServer(int f, Op op, int s) throws IOException {
     sendReq(MSG_START);
     checkAnswer(MSG_GO_AHEAD);
@@ -68,6 +93,9 @@ public class Client {
     return Integer.parseInt(line.substring(4));
   }
 
+  /**
+   * Main entry point for this class. Starts by asking the user for input and sends it to the server
+   */
   public void start() {
     int f = 0;
     int s = 0;
