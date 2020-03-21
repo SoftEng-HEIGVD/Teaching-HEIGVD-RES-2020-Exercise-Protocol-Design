@@ -42,7 +42,9 @@ public class Client
             throw new IOException("Invalid request format");
         }
         if(r.matches("^[0-9]*$")){
+            os.write("RECEIVED");
             System.out.println(r);
+            return;
         }
         throw new IOException("Error while receiving from server");
     }
