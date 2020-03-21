@@ -45,9 +45,6 @@ public class CalculatorRequest implements Runnable {
   @Override
   public void run() {
     try {
-      int a, b;
-      CalculatorOperation op;
-
       Reader streamReader = new InputStreamReader(socket.getInputStream(), Protocol.CHARSET);
       Writer streamWriter = new OutputStreamWriter(socket.getOutputStream(), Protocol.CHARSET);
 
@@ -61,37 +58,19 @@ public class CalculatorRequest implements Runnable {
       writeMessageNow(withNewLine(Messages.MSG_GO_AHEAD));
 
       // Message 3 <- Read the number (if it exists).
-      try {
-        String line = reader.readLine();
-        a = readAndParseInteger(line);
-      } catch (MalformedMessageException mme) {
-        wrongMessage(socket, writer, mme.getMalformedMessage());
-        return;
-      }
+      int a = readAndParseInteger(reader.readLine());
 
       // Message 4 -> Notify we read the number.
       writeMessageNow(withNewLine(Messages.MSG_OK_N));
 
       // Message 5 <- Read the operator.
-      try {
-        String line = reader.readLine();
-        op = CalculatorOperation.fromMessage(line);
-      } catch (MalformedMessageException mme) {
-        wrongMessage(socket, writer, mme.getMalformedMessage());
-        return;
-      }
+      CalculatorOperation op = CalculatorOperation.fromMessage(reader.readLine());
 
       // Message 6 -> Notify we read the operator.
       writeMessageNow(withNewLine(MSG_OK_O + " " + op));
 
       // Message 7 <- Read the number (if it exists).
-      try {
-        String line = reader.readLine();
-        b = readAndParseInteger(line);
-      } catch (MalformedMessageException mme) {
-        wrongMessage(socket, writer, mme.getMalformedMessage());
-        return;
-      }
+      int b = readAndParseInteger(reader.readLine());
 
       // Message 8 -> Notify we read the number.
       writeMessageNow(withNewLine(Messages.MSG_OK_N));
@@ -104,11 +83,16 @@ public class CalculatorRequest implements Runnable {
         writer.write(withNewLine(Messages.MSG_RES + " " + op.perform(a, b)));
         writer.flush();
       } catch (IllegalArgumentException iae) {
-        wrongMessage(socket, writer, String.format("%d %s %d", a, op, b));
+        writeWrongMessageNow();
       }
 
     } catch (MalformedMessageException mex) {
-      LOG.log(Level.WARNING, "Received incorrect message : \"{0}\".", mex.getMalformedMessage());
+      try {
+        LOG.log(Level.WARNING, "Received incorrect message : \"{0}\".", mex.getMalformedMessage());
+        writeWrongMessageNow();
+      } catch (IOException any) {
+        // Ignored. We can't write to the stream for some reason.
+      }
     } catch (IOException ioex) {
       LOG.log(Level.SEVERE, ioex.getMessage());
     } finally {
@@ -132,7 +116,6 @@ public class CalculatorRequest implements Runnable {
   private void requireMessage(String expected) throws IOException {
     String message = reader.readLine();
     if (!expected.equals(message)) {
-      wrongMessage(socket, writer, message);
       throw new MalformedMessageException(message);
     }
   }
@@ -148,10 +131,13 @@ public class CalculatorRequest implements Runnable {
     writer.flush();
   }
 
-  private void wrongMessage(Socket socket, BufferedWriter socketWriter, String message)
-      throws IOException {
-    socketWriter.write("ERR\n");
-    socketWriter.flush();
+  /**
+   * Writes that an error occurred on the protocol, and closes the communication now.
+   *
+   * @throws IOException If something went wrong while writing the message.
+   */
+  private void writeWrongMessageNow() throws IOException {
+    writeMessageNow(withNewLine(Messages.MSG_ERR));
     socket.close();
   }
 

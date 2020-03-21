@@ -26,6 +26,7 @@ public class Protocol {
     public static final String MSG_OK_O = "OK O";
     public static final String MSG_PERFORM = "PERFORM";
     public static final String MSG_RES = "RES";
+    public static final String MSG_ERR = "ERR";
 
     private Messages() {}
 
