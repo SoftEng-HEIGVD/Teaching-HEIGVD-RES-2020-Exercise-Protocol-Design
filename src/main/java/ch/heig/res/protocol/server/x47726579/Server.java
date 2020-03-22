@@ -83,22 +83,24 @@ public class Server implements Runnable
 	public void run()
 	{
 		try {
-			LOG.log(Level.INFO, "Starting Presence Server on port {0}", DEFAULT_PORT);
+			LOG.log(Level.INFO, "Starting Server on port {0}", DEFAULT_PORT);
 			serverSocket = new ServerSocket(DEFAULT_PORT);
 			while (running) {
 				Socket clientSocket = serverSocket.accept();
 				Worker newWorker    = new Worker(clientSocket);
 				registerWorker(newWorker);
 				new Thread(newWorker).start();
+			        LOG.info(">> Waiting for lock before disconnecting idle workers");
 				synchronized (connectedWorkers) {
-					LOG.info("Disconnecting workers");
 					// any worker idle for more than 60 seconds is disconnected
 					for (Worker worker : connectedWorkers) {
 						if (((System.nanoTime() - worker.lastActivity) >= minute)) {
+					                LOG.log(Level.INFO,"Disconnecting worker {0}",worker.userName);
 							worker.disconnect();
 						}
 					}
 				}
+				LOG.info("<< Idle workers disconnected");
 			}
 			serverSocket.close();
 			LOG.info("shouldRun is false... server going down");
