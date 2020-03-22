@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,18 +17,17 @@ public class ClientSide {
     //Setting server logger
     final static Logger LOG = Logger.getLogger(ServerSide.class.getName());
     //Port we are going to use to communicate with client application.
-    private final int LISTEN_PORT = 2342;
 
 
-    public void start(String ip_adress) {
+    public void start(String hostname, int port) {
         Socket clientSocket = null;
         BufferedReader reader = null;
         PrintWriter writer = null;
 
         LOG.info("I am a client... \n");
         try {
-            LOG.log(Level.INFO, "Creating server socket and binding " + LISTEN_PORT);
-            clientSocket = new Socket(ip_adress, LISTEN_PORT);
+            LOG.log(Level.INFO, "Creating server socket and binding " + port);
+            clientSocket = new Socket(hostname, port);
             //Logging server socket infos
             Utils.logSocketAddress(LOG, clientSocket);
 
@@ -37,6 +35,8 @@ public class ClientSide {
             writer = new PrintWriter(clientSocket.getOutputStream());
 
             writer.println("add 1 2");
+            writer.flush();
+            while (true) ;
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, null, ex);
         } finally {
@@ -44,7 +44,7 @@ public class ClientSide {
                 reader.close();
                 writer.close();
                 clientSocket.close();
-            } catch  (IOException ex) {
+            } catch (IOException ex) {
                 LOG.log(Level.SEVERE, null, ex);
             }
         }

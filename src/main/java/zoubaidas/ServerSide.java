@@ -14,11 +14,9 @@ import static java.util.logging.Level.INFO;
 public class ServerSide {
     //Setting server logger
     final static Logger LOG = Logger.getLogger(ServerSide.class.getName());
-    //Port we are going to use to communicate with client application.
-    private final int LISTEN_PORT = 2342;
 
 
-    public void start() {
+    public void start(int LISTEN_PORT) {
         LOG.info("Starting server ... \n");
 
         try {
@@ -97,8 +95,4 @@ public class ServerSide {
 
     }
 
-    public static void main(String[] args) {
-        ServerSide calc = new ServerSide();
-        calc.start();
-    }
 }
