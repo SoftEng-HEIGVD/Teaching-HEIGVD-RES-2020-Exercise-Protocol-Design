@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -80,8 +79,8 @@ public class Server implements Runnable{
     @Override
     public void run() {
         try {
-            LOG.log(Level.INFO, "Starting Presence Server on port {0}", Protocol.PRESENCE_DEFAULT_PORT);
-            serverSocket = new ServerSocket(Protocol.PRESENCE_DEFAULT_PORT);
+            LOG.log(Level.INFO, "Starting Presence Server on port {0}", Protocol.DEFAULT_PORT);
+            serverSocket = new ServerSocket(Protocol.DEFAULT_PORT);
             while (shouldRun) {
                 Socket clientSocket = serverSocket.accept();
                 Worker newWorker = new Worker(clientSocket);
