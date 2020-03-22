@@ -83,12 +83,6 @@ public class Client {
                 System.out.println("Résultat : " + result);
 
 //                LOG.log(Level.INFO, "Starting my job... sending current time to the client for {0} ms", TEST_DURATION);
-//                for (int i = 0; i < NUMBER_OF_ITERATIONS; i++) {
-//                    writer.println(String.format("{'time' : '%s'}", new Date()));
-//                    writer.flush();
-//                    LOG.log(Level.INFO, "Sent data to client, doing a pause...");
-//                    Thread.sleep(PAUSE_DURATION);
-//                }
 
                 reader.close();
                 writer.close();

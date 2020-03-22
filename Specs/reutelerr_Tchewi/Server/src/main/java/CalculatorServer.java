@@ -59,6 +59,7 @@ public class CalculatorServer {
                     result = DoOp(params[2].charAt(0), Double.parseDouble(params[1]), Double.parseDouble(params[3]));
                 }
                 writer.write("Result " + String.valueOf(result));
+                writer.flush();
 
                 reader.close();
                 writer.close();
