@@ -9,3 +9,7 @@ buildNumber.properties
 .mvn/timing.properties
 # https://github.com/takari/maven-wrapper#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
+alfavre-alfavre/client/.idea
+alfavre-alfavre/client/out
+alfavre-alfavre/server/.idea
+alfavre-alfavre/server/out
