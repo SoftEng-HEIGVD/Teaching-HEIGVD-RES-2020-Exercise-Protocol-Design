@@ -40,7 +40,6 @@ public class CalculatorClient {
                     request = consoleReader.readLine();
                     if(request.equals("CEND")){
                         out.println(request);
-                        //cliSocket.close();
                         stayConnected = false;
                         break;
                     }
@@ -63,7 +62,7 @@ public class CalculatorClient {
             out.close();
 
         } catch (IOException e) {
-
+            e.printStackTrace();
         }
 
 
