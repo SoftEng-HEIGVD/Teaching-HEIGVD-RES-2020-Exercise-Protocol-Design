@@ -24,67 +24,115 @@ public class Server {
     private BufferedWriter writer;
 
 
+    private void sendCustomDouble(double toSend) throws IOException {
+        if (toSend == Double.NaN) {
+            sendNOK("calculation, rightHand and/or " +
+                    "leftHand has not been initialised" +
+                    "\n(or the calculation was mathematically impossible)");
+        }
+        writer.write(Double.toString(toSend) + Protocol.EOL);
+        writer.flush();
+    }
+
+    private void sendNOK(String errorMsg) throws IOException {
+        writer.write(Protocol.NOK + Protocol.EOL);
+        writer.flush();
+        throw new IOException("failed " + errorMsg);
+    }
+
+    private void sendOK() throws IOException {
+        writer.write(Protocol.OK + Protocol.EOL);
+        writer.flush();
+    }
+
+    private static boolean opControl(String op) {
+        for (String s : Protocol.OP) {
+            if (op.equals(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void start() {
         try {
             shouldRun = true;
             LOG.log(Level.INFO, "Starting Calc Server on port {0}", Protocol.CALC_DEFAULT_PORT);
             serverSocket = new ServerSocket(Protocol.CALC_DEFAULT_PORT);
 
+            clientSocket = serverSocket.accept();
+
+            reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), CHARSET));
+            writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream(), CHARSET));
+
             while (shouldRun) {
-                clientSocket = serverSocket.accept();
+                //Get START instruction
+                String meeting = reader.readLine();
+                if (!meeting.equals(Protocol.START)) {
+                    sendNOK("meeting");
+                }
+                sendOK();
 
-                reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), CHARSET));
-                writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream(), CHARSET));
-
+                //Get operator instruction
                 String operation = reader.readLine();
+                if (!opControl(operation)) {
+                    sendNOK("operation");
+                }
+                sendOK();
 
-                writer.write(Protocol.OK + Protocol.EOL);
-                writer.flush();
 
-                double leftHand = Double.parseDouble(reader.readLine());
+                //Get leftHand number
+                //why NaN? https://www.youtube.com/watch?v=5TFDG-y-EHs
+                double leftHand = Double.NaN;
+                try {
+                    leftHand = Double.parseDouble(reader.readLine());
+                } catch (Throwable e) {
+                    sendNOK("lefthand: " + e);
+                }
+                sendOK();
 
-                writer.write(Protocol.OK + Protocol.EOL);
-                writer.flush();
 
-                double rightHand = Double.parseDouble(reader.readLine());
+                //Get rightHand number
+                double rightHand = Double.NaN;
+                try {
+                    rightHand = Double.parseDouble(reader.readLine());
+                } catch (Throwable e) {
+                    sendNOK("righthand: " + e);
+                }
+                sendOK();
 
-                writer.write(Protocol.OK + Protocol.EOL);
-                writer.flush();
-
+                //on calcul la réponse et on l'envoie
                 double answer;
                 switch (operation) {
                     case Protocol.ADD:
                         answer = leftHand + rightHand;
-                        writer.write(Double.toString(answer) + Protocol.EOL);
-                        writer.flush();
+                        sendCustomDouble(answer);
                         break;
                     case Protocol.SUB:
                         answer = leftHand - rightHand;
-                        writer.write(Double.toString(answer) + Protocol.EOL);
-                        writer.flush();
+                        sendCustomDouble(answer);
                         break;
                     case Protocol.MUL:
                         answer = leftHand * rightHand;
-                        writer.write(Double.toString(answer) + Protocol.EOL);
-                        writer.flush();
+                        sendCustomDouble(answer);
                         break;
                     case Protocol.DIV:
                         answer = leftHand / rightHand;
-                        writer.write(Double.toString(answer) + Protocol.EOL);
-                        writer.flush();
+                        sendCustomDouble(answer);
                         break;
                     default:
-                        writer.write(Protocol.NOK + Protocol.EOL);
-                        writer.flush();
+                        sendNOK("impossible operation (should be impossible to trigger)");
                         break;
                 }
 
+                //on verifie si on fini ou si on fait un nouveau calcul
                 String finished = reader.readLine();
                 if (finished.equals(Protocol.NOK)) {
+                    shouldRun = true;
+                } else if (finished.equals(Protocol.OK)) {
                     shouldRun = false;
-                    if (!finished.equals(Protocol.OK)) {
-                        throw new IOException("Calculation Failure");
-                    }
+                } else {
+                    throw new IOException("veryfing if over or new calc failed");
                 }
 
             }
