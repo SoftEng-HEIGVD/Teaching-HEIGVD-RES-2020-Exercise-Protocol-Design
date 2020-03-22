@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+    <output url="file://$MODULE_DIR$/../Teaching-HEIGVD-RES-2020-Exercise-Protocol-Design/specs/Naludrag/common/target/classes" />
+    <output-test url="file://$MODULE_DIR$/../Teaching-HEIGVD-RES-2020-Exercise-Protocol-Design/specs/Naludrag/common/target/test-classes" />
+    <content url="file://$MODULE_DIR$/../Teaching-HEIGVD-RES-2020-Exercise-Protocol-Design/specs/Naludrag/common">
+      <sourceFolder url="file://$MODULE_DIR$/../Teaching-HEIGVD-RES-2020-Exercise-Protocol-Design/specs/Naludrag/common/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../Teaching-HEIGVD-RES-2020-Exercise-Protocol-Design/specs/Naludrag/common/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../Teaching-HEIGVD-RES-2020-Exercise-Protocol-Design/specs/Naludrag/common/src/test/java" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/../Teaching-HEIGVD-RES-2020-Exercise-Protocol-Design/specs/Naludrag/common/target" />
+      <excludeFolder url="file://$MODULE_DIR$/target" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

@@ -45,4 +45,11 @@
             </plugin>
         </plugins>
     </build>
+    <dependencies>
+        <dependency>
+            <groupId>ch.heigvd.res</groupId>
+            <artifactId>RES-Protocol-Design-Common</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 </project>
