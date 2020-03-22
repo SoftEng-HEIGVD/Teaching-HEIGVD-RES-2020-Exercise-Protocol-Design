@@ -24,10 +24,10 @@ public class Client {
         BufferedReader reader = null;
         PrintWriter writer = null;
         Scanner userInput;
-
+        boolean shouldRun = true;
 
         try {
-            while(true){
+            while(shouldRun){
                 LOG.log(Level.INFO, "Client connect to the server");
                 clientSocket = new Socket("localhost", LISTEN_PORT);
 
@@ -37,12 +37,12 @@ public class Client {
                 userInput = new Scanner(System.in);
 
 
-                while(true){
+                while(shouldRun){
 
                     System.out.println(reader.readLine());
-                    String test = userInput.nextLine();
-                    System.out.println(test);
-                    writer.println(test);
+                    String input = userInput.nextLine();
+                    if(input.equals("exit")) shouldRun = false;
+                    writer.println(input);
                     writer.flush();
                 }
 
