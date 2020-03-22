@@ -60,17 +60,6 @@ public class Server implements Runnable
 		LOG.log(Level.INFO, "<< Worker {0} unregistered.", worker.userName);
 	}
 
-	private void notifyConnectedWorkers(String message)
-	{
-		LOG.info(">> Waiting for lock before notifying workers");
-		synchronized (connectedWorkers) {
-			LOG.info("Notifying workers");
-			for (Worker worker : connectedWorkers) {
-				worker.sendNotification(message);
-			}
-		}
-		LOG.info("<< Workers notified");
-	}
 
 	private void disconnectConnectedWorkers()
 	{
@@ -200,7 +189,6 @@ public class Server implements Runnable
 							sendNotification(String.valueOf(result));
 							break;
 						case (CMD_EXT):
-							Server.this.notifyConnectedWorkers(userName + " is about to leave the room.");
 							connected = false;
 							break;
 						case (CMD_KILL):
