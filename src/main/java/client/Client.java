@@ -42,7 +42,7 @@ public class Client {
                     System.out.println(reader.readLine());
                     String input = userInput.nextLine();
                     if(input.equals("exit")) shouldRun = false;
-                    writer.println(input);
+                    writer.write(input + "\n");
                     writer.flush();
                 }
 
