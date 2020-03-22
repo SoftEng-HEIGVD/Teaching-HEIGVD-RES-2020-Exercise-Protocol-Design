@@ -21,6 +21,11 @@ public class Client {
     boolean connected = false;
     private int idClient = ++nbClient;
 
+    public Client() {
+        // Ignore logs under WARNING level
+        LOG.setLevel(Level.WARNING);
+    }
+
     /**
      * This method is used to connect to the server on the default port.
      *
