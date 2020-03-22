@@ -1,6 +1,5 @@
 package calculatorServer;
 
-import calculatorServer.Processing.Calculator;
 import calculatorServer.Processing.Parser;
 import calculatorServer.Processing.SyntaxChecker;
 
@@ -50,8 +49,6 @@ public class CalculatorServer {
 
                 Parser p = new Parser();
                 double result = p.parseCalculationRequest(recievedLine);
-
-                System.out.println("los resultados estas : " + result);
 
                 //Renvoie le résultat au client
                 out.println(Double.toString(result));

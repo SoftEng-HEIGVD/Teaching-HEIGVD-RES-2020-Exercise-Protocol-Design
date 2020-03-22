@@ -17,21 +17,68 @@ public class CalculatorClient {
         Socket cliSocket = null;
         PrintWriter out = null;
         BufferedReader in = null;
-
+        boolean stayConnected;
 
         try{
-            cliSocket = new Socket(hostname, port);
-            out = new PrintWriter(cliSocket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(cliSocket.getInputStream()));
+            while(true) {
+                //Create connection and streams
+                cliSocket = new Socket(hostname, port);
+                stayConnected = true;
+                out = new PrintWriter(cliSocket.getOutputStream(), true);
+                in = new BufferedReader(new InputStreamReader(cliSocket.getInputStream()));
 
-            out.println("CALC 1 + 2");
-            System.out.println("sent message");
-            String answer = in.readLine();
-            System.out.println("Answer : " + answer);
+                //Read input from user until the syntax is correct
+                BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in));
+                String request = "";
+                SyntaxChecker checker = new SyntaxChecker();
+                do {
+                    if (!request.equals("")) System.out.println("Syntax error. please retry");
+                    request = consoleReader.readLine();
+                    if(request.equals("CEND")){
+                        cliSocket.close();
+                        stayConnected = false;
+                        break;
+                    }
+                } while (!checker.checkCalculationRequest(request));
 
-        }catch (IOException e){
+                //Leave loop if user asked to quit
+                if(!stayConnected) break;
+
+                //Send request
+                out.println(request);
+                out.flush();
+
+                //Wait for the answer
+                String answer = in.readLine();
+                System.out.println("Answer : " + answer);
+            }
+
+            cliSocket.close();
+            in.close();
+            out.close();
+
+        } catch (IOException e) {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+            if (out != null) {
+                out.close();
+            }
+            if (cliSocket != null) {
+                try {
+                    cliSocket.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
             e.printStackTrace();
         }
+
+
     }
 
 }

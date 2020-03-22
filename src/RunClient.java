@@ -1,5 +1,4 @@
-package calculatorClient;
-
+import calculatorClient.CalculatorClient;
 import calculatorServer.Processing.Calculator;
 
 public class RunClient {
