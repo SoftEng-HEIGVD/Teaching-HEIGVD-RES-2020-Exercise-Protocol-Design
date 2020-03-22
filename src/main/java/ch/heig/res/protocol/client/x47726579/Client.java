@@ -7,7 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-import static main.java.ch.heig.res.protocol.protocol.x47726579.Protocol.CMD_END;
+import static main.java.ch.heig.res.protocol.protocol.x47726579.Protocol.*;
 
 /**
  * This class implements a simple client for our custom presence protocol.
@@ -60,8 +60,18 @@ public class Client
 					System.out.println(info);
 				}
 				System.out.print(">");
-				commandLine = input.nextLine();
+
+				while ((commandLine = input.nextLine()).isBlank() && commandLine.length() < 3) { ; }
+				commandLine = commandLine.toUpperCase();
 				System.out.println("commandLine = " + commandLine);
+				if (commandLine.equals(CMD_EXT)) {
+					disconnect();
+					break;
+				} else if (commandLine.equals(CMD_KILL)) {
+					out.println(CMD_KILL);
+					cleanup();
+					break;
+				}
 				out.println(commandLine);
 				out.flush();
 			}
@@ -71,13 +81,14 @@ public class Client
 	public void disconnect()
 	{
 		connected = false;
-		out.println("EXT");
+		out.println(CMD_EXT);
 		cleanup();
 	}
 
 	private void cleanup()
 	{
-
+		out.flush();
+		connected = false;
 		if (in != null) {
 			try {
 				in.close();

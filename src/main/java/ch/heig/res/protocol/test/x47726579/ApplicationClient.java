@@ -1,4 +1,4 @@
-package x47726579;
+package main.java.ch.heig.res.protocol.test.x47726579;
 
 import main.java.ch.heig.res.protocol.client.x47726579.Client;
 

@@ -33,6 +33,7 @@ public class Server implements Runnable
 		System.setProperty("java.util.logging.SimpleFormatter.format", "[%1$tF %1$tT] [%4$-7s] %5$s %n");
 	}
 
+
 	boolean      shouldRun;
 	ServerSocket serverSocket;
 	final List<Worker> connectedWorkers;
@@ -40,9 +41,13 @@ public class Server implements Runnable
 	public Server()
 	{
 		this.shouldRun = true;
-		this.connectedWorkers = Collections.synchronizedList(new LinkedList<Worker>());
+		this.connectedWorkers = Collections.synchronizedList(new LinkedList<>());
 	}
 
+	public boolean isRunning()
+	{
+		return shouldRun;
+	}
 
 	private void registerWorker(Worker worker)
 	{
