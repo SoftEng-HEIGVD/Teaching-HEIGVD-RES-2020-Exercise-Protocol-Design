@@ -1,5 +1,9 @@
 package calculatorServer;
 
+import calculatorServer.Processing.Calculator;
+import calculatorServer.Processing.Parser;
+import calculatorServer.Processing.SyntaxChecker;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -38,15 +42,19 @@ public class CalculatorServer {
 
                 //Attend de recevoir une requête de calcul valide
                 String recievedLine;
+                SyntaxChecker checker = new SyntaxChecker();
                 do{
                     recievedLine = in.readLine();
                     System.out.println("read line : " + recievedLine);
-                }while(!recievedLine.equals("CALC 1 + 2"));
+                }while(!checker.checkCalculationRequest(recievedLine));
 
-                //TODO parsing et calcul
+                Parser p = new Parser();
+                double result = p.parseCalculationRequest(recievedLine);
+
+                System.out.println("los resultados estas : " + result);
 
                 //Renvoie le résultat au client
-                out.println("RSLT 3");
+                out.println(Double.toString(result));
 
             }catch(IOException e){
                 //TODO

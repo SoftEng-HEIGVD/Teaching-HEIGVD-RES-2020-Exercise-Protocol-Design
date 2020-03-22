@@ -1,14 +1,21 @@
 package calculatorServer.Processing;
 
+
+import java.util.Arrays;
+
 public class Parser {
 
-    private String numberRegex;
-
-    public Parser(String numberRegex){
-        this.numberRegex = "(+|-)?[0-9]";
+    public Parser(){
     }
 
-    public boolean checkNumber(String s){
-        return s.matches(numberRegex);
+    public double parseCalculationRequest(String s){
+        String[] parts = s.split(" ");
+        Calculator c = new Calculator();
+        return c.operate(parseNumber(parts[1]), parseNumber(parts[3]), parts[2]);
+    }
+
+    public double parseNumber(String s){
+        SyntaxChecker checker = new SyntaxChecker();
+        return Double.parseDouble(s);
     }
 }
