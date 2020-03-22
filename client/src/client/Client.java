@@ -10,8 +10,8 @@ public class Client {
     private int port;
     private InetAddress hostname;
     boolean isReading = false;
-    String userInput;
-    String serverAnswer;
+    private String userInput;
+    private String serverAnswer;
     static final Logger LOG = Logger.getLogger(Client.class.getName());
 
     public Client (int port, InetAddress hostname) {
@@ -20,7 +20,7 @@ public class Client {
     }
 
     public void phoneServer() {
-        Socket clientSocket;
+        Socket clientSocket = null;
         PrintWriter out = null;
         BufferedReader in = null;
 
@@ -30,9 +30,9 @@ public class Client {
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
 
-            isReading = true;
-            while (isReading) {
-                System.out.println("Tape ton instruction (genre 1 1 +) :");
+            // isReading = true;
+            while (true) {
+                System.out.println("Tape ton instruction (genre `plsdodat 1 1 +`) :");
                 userInput = inputReader.readLine();
 
                 out.println(userInput);
@@ -41,11 +41,23 @@ public class Client {
                 System.out.println("steuplé, tu peux m'faire ça ?");
                 serverAnswer = in.readLine();
                 System.out.println("Réponse : " + serverAnswer);
-                isReading = false;
+                // isReading = false;
             }
 
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                in.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            out.close();
+            try {
+                clientSocket.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }
