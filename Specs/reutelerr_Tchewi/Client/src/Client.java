@@ -28,6 +28,7 @@ public class Client {
     //private final int TEST_DURATION = 15000;
     //private final int PAUSE_DURATION = 1000;
     //private final int NUMBER_OF_ITERATIONS = TEST_DURATION / PAUSE_DURATION;
+    private final String REQUEST_HOST = "10.192.19.216";
     private final int REQUEST_PORT = 2000;
 
     /**
@@ -46,7 +47,7 @@ public class Client {
 
         try {
             LOG.log(Level.INFO, "Creating a client socket and binding it on any of the available network interfaces and on port {0}", new Object[]{Integer.toString(REQUEST_PORT)});
-            serverSocket = new Socket("127.0.0.1", REQUEST_PORT);
+            serverSocket = new Socket(REQUEST_HOST, REQUEST_PORT);
             logSocketAddress(serverSocket);
 
             //while (operation != "none") {
@@ -62,11 +63,13 @@ public class Client {
                 //InputStream fromServer = socket.getInputStream();
                 //OutputStream toServer = socket.getOutputStream();
 
-                LOG.log(Level.INFO, "Getting a Reader and a Writer connected to the client socket...");
+                LOG.log(Level.INFO, "Getting a Writer connected to the client socket...");
 
                 writer = new PrintWriter(serverSocket.getOutputStream());
 
+                LOG.log(Level.INFO, "Reader ....");
                 reader = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
+                LOG.log(Level.INFO, "After Reader ....");
 
 
 
@@ -77,12 +80,12 @@ public class Client {
                 writer.println(operation);
                 writer.flush();
 
-                //Le reader ne reçoit rien et je sais pas pourquoi
+                LOG.log(Level.INFO, "After Flush Writer ....");
                 result = reader.readLine();
 
                 System.out.println("Résultat : " + result);
 
-//                LOG.log(Level.INFO, "Starting my job... sending current time to the client for {0} ms", TEST_DURATION);
+                //LOG.log(Level.INFO, "Starting my job... sending current time to the client for {0} ms", TEST_DURATION);
 
                 reader.close();
                 writer.close();
