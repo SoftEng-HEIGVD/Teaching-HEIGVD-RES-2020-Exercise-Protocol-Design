@@ -35,6 +35,7 @@ public class CalculatorClient {
                     if (!request.equals("")) System.out.println("Syntax error. please retry");
                     request = consoleReader.readLine();
                     if(request.equals("CEND")){
+                        out.println(request);
                         cliSocket.close();
                         stayConnected = false;
                         break;
@@ -58,24 +59,7 @@ public class CalculatorClient {
             out.close();
 
         } catch (IOException e) {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-            if (out != null) {
-                out.close();
-            }
-            if (cliSocket != null) {
-                try {
-                    cliSocket.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-            e.printStackTrace();
+
         }
 
 

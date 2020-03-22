@@ -3,8 +3,6 @@ package calculatorServer.Processing;
 public class Calculator {
     public Calculator(){}
 
-    public static final String[] Operators = {"+", "-", "*", "/"};
-
     public double operate(double nb1, double nb2, String op){
         final int OPERATOR_LENGTH = 1;
         if(op.length() != OPERATOR_LENGTH) throw new RuntimeException("Operator length error");

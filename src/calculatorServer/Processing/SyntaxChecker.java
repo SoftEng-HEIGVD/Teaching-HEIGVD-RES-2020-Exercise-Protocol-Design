@@ -7,12 +7,14 @@ public class SyntaxChecker {
     private final int CALCULATION_REQUEST_NB_TOKENS;
     private final String CALCULATION_REQUEST_HEAD;
     private final int NUMBER_MAX_DIGITS;
+    private final String[] OPERATORS;
 
     public SyntaxChecker(){
-        NUMBER_REGEX = "(\\+|-)?[0-9](.[0-9]+)?";
+        NUMBER_REGEX = "(\\+|-)?[0-9]+(.[0-9]+)?";
         CALCULATION_REQUEST_HEAD = "CALC";
         CALCULATION_REQUEST_NB_TOKENS = 4;
         NUMBER_MAX_DIGITS = 10;
+        OPERATORS = new String[]{"+", "-", "*", "/"};
     }
 
     private boolean checkNumber(String s){
@@ -20,7 +22,7 @@ public class SyntaxChecker {
     }
 
     private boolean checkOperator(String s){
-        return Arrays.asList(Calculator.Operators).contains(s);
+        return Arrays.asList(OPERATORS).contains(s);
     }
 
     public boolean checkCalculationRequest(String s){

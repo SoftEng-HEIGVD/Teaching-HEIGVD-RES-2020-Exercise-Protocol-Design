@@ -22,6 +22,7 @@ public class CalculatorServer {
         Socket cliSocket = null;
         BufferedReader in = null;
         PrintWriter out = null;
+        boolean stayConnected;
 
         try{
             srvSocket = new ServerSocket(port);
@@ -35,6 +36,7 @@ public class CalculatorServer {
             try{
                 //Débute la connexion
                 cliSocket = srvSocket.accept();
+                stayConnected = true;
                 System.out.println("connected");
                 in = new BufferedReader(new InputStreamReader(cliSocket.getInputStream()));
                 out = new PrintWriter(cliSocket.getOutputStream(), true);
@@ -42,19 +44,44 @@ public class CalculatorServer {
                 //Attend de recevoir une requête de calcul valide
                 String recievedLine;
                 SyntaxChecker checker = new SyntaxChecker();
-                do{
-                    recievedLine = in.readLine();
-                    System.out.println("read line : " + recievedLine);
-                }while(!checker.checkCalculationRequest(recievedLine));
 
-                Parser p = new Parser();
-                double result = p.parseCalculationRequest(recievedLine);
+                while(stayConnected){
+                    do{
+                        recievedLine = in.readLine();
+                        if(recievedLine.equals("CEND")) stayConnected = false;
+                    }while(!checker.checkCalculationRequest(recievedLine) && stayConnected);
 
-                //Renvoie le résultat au client
-                out.println(Double.toString(result));
+                    if(stayConnected){
+                        Parser p = new Parser();
+                        double result = p.parseCalculationRequest(recievedLine);
+                        //Renvoie le résultat au client
+                        out.println(Double.toString(result));
+                    }
+                }
+
+                cliSocket.close();
+                in.close();
+                out.close();
 
             }catch(IOException e){
-                //TODO
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+                if (out != null) {
+                    out.close();
+                }
+                if (cliSocket != null) {
+                    try {
+                        cliSocket.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+                e.printStackTrace();
             }
 
         }
