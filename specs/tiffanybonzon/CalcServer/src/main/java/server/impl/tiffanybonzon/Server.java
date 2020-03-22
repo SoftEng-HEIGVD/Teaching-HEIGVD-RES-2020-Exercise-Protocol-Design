@@ -99,8 +99,11 @@ public class Server {
                             out.flush();
                         } else if(clientMessage.startsWith("END")) {
                             clientSentEND = true;
-                        } else {
+                        } else if(clientMessage.startsWith("ADD") || clientMessage.startsWith("SUB") || clientMessage.startsWith("MUL") || clientMessage.startsWith("DIV") || clientMessage.startsWith("POW")) {
                             out.println("> " + processCalc(clientMessage));
+                            out.flush();
+                        } else {
+                            out.println("> ERROR: Unknown command!");
                             out.flush();
                         }
                     }
