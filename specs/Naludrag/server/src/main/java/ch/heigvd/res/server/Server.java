@@ -256,7 +256,7 @@ public class Server implements Runnable{
             @Override
             public void run() {
                 //If tokens has more than 3 arguments error
-                if (tokens.length > 3) {
+                if (tokens.length != 3) {
                     sendNotification("Please send another calcul wrong number of arguments");
                 } else {
                     //Try to convert operands in the tokens as int
