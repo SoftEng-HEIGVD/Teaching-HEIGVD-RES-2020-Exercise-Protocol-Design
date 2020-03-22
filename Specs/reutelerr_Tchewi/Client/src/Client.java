@@ -2,33 +2,21 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * A very simple example of TCP server. When the server starts, it binds a
- * server socket on any of the available network interfaces and on port 2205. It
- * then waits until one (only one!) client makes a connection request. When the
- * client arrives, the server does not even check if the client sends data. It
- * simply writes the current time, every second, during 15 seconds.
+ * A very simple example of TCP client
  *
- * To test the server, simply open a terminal, do a "telnet localhost 2205" and
- * see what you get back. Use Wireshark to have a look at the transmitted TCP
- * segments.
- *
- * @author Olivier Liechti
+ * @author Olivier Liechti (Modified by Quentin Le Ray)
  */
 public class Client {
 
     static final Logger LOG = Logger.getLogger(Client.class.getName());
 
-    //private final int TEST_DURATION = 15000;
-    //private final int PAUSE_DURATION = 1000;
-    //private final int NUMBER_OF_ITERATIONS = TEST_DURATION / PAUSE_DURATION;
-    private final String REQUEST_HOST = "10.192.19.216";
+    //Change ip adress here
+    private final String REQUEST_HOST = "127.0.0.1";
     private final int REQUEST_PORT = 2000;
 
     /**
@@ -38,58 +26,46 @@ public class Client {
         LOG.info("Starting client...");
 
         Socket serverSocket = null;
-        //Socket clientSocket = null;
         BufferedReader reader = null;
         PrintWriter writer = null;
-        Scanner scan = new Scanner(System.in);
-        String operation = "";
+        String operation;
         String result;
 
         try {
-            LOG.log(Level.INFO, "Creating a client socket and binding it on any of the available network interfaces and on port {0}", new Object[]{Integer.toString(REQUEST_PORT)});
+            LOG.log(Level.INFO, "Creating a server socket and binding it on any of the available network interfaces and on port {0}", new Object[]{Integer.toString(REQUEST_PORT)});
             serverSocket = new Socket(REQUEST_HOST, REQUEST_PORT);
             logSocketAddress(serverSocket);
 
-            //while (operation != "none") {
+            //Quand on active il sort quand-même du while mais en plein milieu de la requête, ça n'a aucun sens
+            //while (operation.compareTo("none")) {
 
                 System.out.println("Quelle opération voulez-vous effectuer ? (DoOp x op y)");
                 reader = new BufferedReader(new InputStreamReader(System.in));
                 operation = reader.readLine();
                 reader.close();
 
-                //LOG.log(Level.INFO, "Waiting (blocking) for a connection request on {0} : {1}", new Object[]{serverSocket.getInetAddress(), Integer.toString(serverSocket.getLocalPort())});
-                //clientSocket = serverSocket.accept();
-
-                //InputStream fromServer = socket.getInputStream();
-                //OutputStream toServer = socket.getOutputStream();
-
-                LOG.log(Level.INFO, "Getting a Writer connected to the client socket...");
+                LOG.log(Level.INFO, "Getting a Writer and a Reader connected to the client socket...");
 
                 writer = new PrintWriter(serverSocket.getOutputStream());
-
-                LOG.log(Level.INFO, "Reader ....");
                 reader = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
-                LOG.log(Level.INFO, "After Reader ....");
 
+                LOG.log(Level.INFO, "Writing the operation into the stream");
 
-
-
-                //LOG.log(Level.INFO, "A client has arrived. We now have a client socket with following attributes:");
-                //logSocketAddress(clientSocket);
-
-                writer.println(operation);
+                //Test pour que ça fonctionne avec l'un ou l'autre
+                //writer.println(operation);
+                writer.write(operation);
                 writer.flush();
 
-                LOG.log(Level.INFO, "After Flush Writer ....");
+                LOG.log(Level.INFO, "Waiting the response from server ...");
+
                 result = reader.readLine();
 
                 System.out.println("Résultat : " + result);
 
-                //LOG.log(Level.INFO, "Starting my job... sending current time to the client for {0} ms", TEST_DURATION);
-
-                reader.close();
-                writer.close();
-                serverSocket.close();
+                //Pas besoin puisque le finally dans le try catch le fait tout le temps et que le wile marche po
+                //reader.close();
+                //writer.close();
+                //serverSocket.close();
 
 
             //}
@@ -116,17 +92,6 @@ public class Client {
             }
         }
 
-    }
-
-    /**
-     * A utility method to print server socket information
-     *
-     * @param serverSocket the socket that we want to log
-     */
-    private void logServerSocketAddress(ServerSocket serverSocket) {
-        LOG.log(Level.INFO, "       Local IP address: {0}", new Object[]{serverSocket.getLocalSocketAddress()});
-        LOG.log(Level.INFO, "             Local port: {0}", new Object[]{Integer.toString(serverSocket.getLocalPort())});
-        LOG.log(Level.INFO, "               is bound: {0}", new Object[]{serverSocket.isBound()});
     }
 
     /**
