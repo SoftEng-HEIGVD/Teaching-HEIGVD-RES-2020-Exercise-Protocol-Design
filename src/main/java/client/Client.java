@@ -1,5 +1,8 @@
+package client;
+
+import server.Server;
+
 import java.io.*;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -7,14 +10,15 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Client implements Runnable{
+
+
+public class Client {
 
     static final Logger LOG = Logger.getLogger(Server.class.getName());
 
     private final Charset encoding = StandardCharsets.UTF_8;
     private final int LISTEN_PORT = 2205;
 
-    @Override
     public void run() {
         Socket clientSocket = null;
         BufferedReader reader = null;
@@ -47,9 +51,5 @@ public class Client implements Runnable{
         }catch (IOException ex){
             LOG.log(Level.SEVERE, ex.getMessage());
         }
-    }
-    public static void main(String[] args){
-        Client client = new Client();
-        client.run();
     }
 }
