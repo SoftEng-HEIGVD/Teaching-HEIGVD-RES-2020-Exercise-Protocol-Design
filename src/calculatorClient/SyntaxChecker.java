@@ -8,15 +8,17 @@ public class SyntaxChecker {
     private final String NUMBER_REGEX;
     private final int CALCULATION_REQUEST_NB_TOKENS;
     private final String CALCULATION_REQUEST_HEAD;
+    private final int NUMBER_MAX_DIGITS;
 
     public SyntaxChecker(){
-        this.NUMBER_REGEX = "(\\+|-)?[0-9]";
-        this.CALCULATION_REQUEST_HEAD = "CALC";
-        this.CALCULATION_REQUEST_NB_TOKENS = 4;
+        NUMBER_REGEX = "(\\+|-)?[0-9](.[0-9]+)?";
+        CALCULATION_REQUEST_HEAD = "CALC";
+        CALCULATION_REQUEST_NB_TOKENS = 4;
+        NUMBER_MAX_DIGITS = 10;
     }
 
     private boolean checkNumber(String s){
-        return s.matches(NUMBER_REGEX);
+        return s.matches(NUMBER_REGEX) && s.length() <= NUMBER_MAX_DIGITS;
     }
 
     private boolean checkOperator(String s){
