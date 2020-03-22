@@ -1,14 +1,15 @@
 # Calculator Protocol
+This file explains how the protocol works to be able to have a client that will communicate a calculation
+to a server. Then, the server will calculate a result and send it back to the client. 
 
 ## Specs
 - Network protocol : TCP
-- Port : 12000
+- Port (default) : 12000
 - Encoding : StandardCharsets.UTF_8
+- Speaks first : client
 
 ## FLOW
 *All transmissions describe bellow are in the good order*
-
-Client speaks first.
 
 1. **Client** : Asks to begin a calculation by sending the keyword : **HELLO**
 
@@ -31,6 +32,7 @@ Client speaks first.
 - Calculations must formatted like so : "`operand1 operation operand2`" (space between each part)
 	- Example : 1 + 2
 - Available operation are : +, -, *, /
+- Available operand : all integer number positive or negative
 
 ## Example
 **Client** : HELLO  
