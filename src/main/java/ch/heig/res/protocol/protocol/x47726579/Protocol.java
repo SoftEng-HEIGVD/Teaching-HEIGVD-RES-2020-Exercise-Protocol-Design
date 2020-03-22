@@ -13,4 +13,6 @@ public class Protocol
 	public static final String CMD_MUL      = "MUL";
 	public static final String CMD_EXT      = "EXT";
 	public static final String CMD_KILL     = "KILL";
+	public static final String CMD_END      = "END MSG";
+
 }

@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Scanner;
+
+import static main.java.ch.heig.res.protocol.protocol.x47726579.Protocol.CMD_END;
 
 /**
  * This class implements a simple client for our custom presence protocol.
@@ -19,28 +22,9 @@ public class Client
 
 	Socket         clientSocket;
 	BufferedReader in;
-	BufferedReader cliIn;
 	PrintWriter    out;
 	boolean        connected = false;
 
-	class NotificationListener implements Runnable
-	{
-
-		@Override
-		public void run()
-		{
-			String notification;
-			try {
-				while ((connected && (notification = in.readLine()) != null)) {
-					System.out.println(notification);
-				}
-			} catch (IOException e) {
-				connected = false;
-			} finally {
-				cleanup();
-			}
-		}
-	}
 
 	/**
 	 * This method is used to connect to the server and to inform the server that
@@ -55,14 +39,12 @@ public class Client
 		try {
 			clientSocket = new Socket(serverAddress, serverPort);
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-			cliIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			out = new PrintWriter(clientSocket.getOutputStream());
 			connected = true;
 		} catch (IOException e) {
 			cleanup();
 			return;
 		}
-		new Thread(new NotificationListener()).start();
 		out.println("Greetings");
 		out.flush();
 		run();
@@ -70,9 +52,16 @@ public class Client
 
 	public void run()
 	{
+		Scanner input = new Scanner(System.in);
 		try {
-			String commandLine;
-			while (connected && ((commandLine = cliIn.readLine()) != null)) {
+			String commandLine, info;
+			while (connected) {
+				while ((info = in.readLine()) != null && !info.equals(CMD_END)) {
+					System.out.println(info);
+				}
+				System.out.print(">");
+				commandLine = input.nextLine();
+				System.out.println("commandLine = " + commandLine);
 				out.println(commandLine);
 				out.flush();
 			}
@@ -82,7 +71,7 @@ public class Client
 	public void disconnect()
 	{
 		connected = false;
-		out.println("BYE");
+		out.println("EXT");
 		cleanup();
 	}
 

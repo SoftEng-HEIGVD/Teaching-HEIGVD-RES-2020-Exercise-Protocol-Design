@@ -144,6 +144,7 @@ public class Server implements Runnable
 			sendNotification("- Multiply a number to the previous result : MUL number");
 			sendNotification("- Exit the server with EXT");
 			sendNotification("- Kill me with KILL");
+			sendNotification(CMD_END);
 		}
 
 		@Override
@@ -198,6 +199,7 @@ public class Server implements Runnable
 						default:
 							sendNotification("What? I only understand ADD, SUB, MUL, EXT and KILL commands");
 					}
+					sendNotification(CMD_END);
 
 				}
 			} catch (IOException ex) {
