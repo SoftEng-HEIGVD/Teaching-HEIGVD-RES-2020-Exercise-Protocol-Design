@@ -2,7 +2,7 @@
 
 ## Specs
 - Network protocol : TCP
-- Port : 22500
+- Port : 12000
 - Encoding : StandardCharsets.UTF_8
 
 ## FLOW

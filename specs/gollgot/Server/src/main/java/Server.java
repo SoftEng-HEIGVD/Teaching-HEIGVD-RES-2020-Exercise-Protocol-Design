@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 public class Server {
 
     final static Logger LOG = Logger.getLogger(Server.class.getName());
+    public final static int DEFAULT_PORT = 12000; // Can be used as the default port
     private int port;
 
 
