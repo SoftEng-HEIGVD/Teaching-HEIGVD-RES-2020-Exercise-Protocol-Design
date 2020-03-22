@@ -88,13 +88,17 @@ public class Client {
 
     }
 
-    private void communication() throws IOException {
+    private void meeting() throws IOException {
         writer.write(Protocol.START + Protocol.EOL);
         writer.flush();
 
         if (!reader.readLine().equals(Protocol.OK)) {
             throw new IOException("Failed meeting");
         }
+        System.out.println("Connection successful!");
+    }
+
+    private void communication() throws IOException {
 
         writer.write(op + Protocol.EOL);
         writer.flush();
@@ -161,6 +165,9 @@ public class Client {
             boolean isRunning=true;
 
             while(isRunning) {
+
+                meeting();
+
                 fillValue();
 
                 communication();

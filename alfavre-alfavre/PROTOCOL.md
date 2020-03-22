@@ -43,3 +43,6 @@ public class Protocol {
 }
 ```
 
+0/0 throws an error (not X/0 as this has at least some sense)
+
+the input verification is done in both the client and server for the time being ( making the server one redundant)

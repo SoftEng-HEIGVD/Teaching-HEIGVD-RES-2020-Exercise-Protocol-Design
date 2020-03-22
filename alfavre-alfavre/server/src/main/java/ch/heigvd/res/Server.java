@@ -8,39 +8,38 @@ import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * largely based on presence example form MrLiechti
- * https://github.com/SoftEng-HEIGVD/Teaching-HEIGVD-RES-2020/blob/master/examples/06-PresenceApplication/PresenceApplication/src/main/java/ch/heigvd/res/examples/PresenceServer.java
- */
+
 public class Server {
 
     final static Logger LOG = Logger.getLogger(Server.class.getName());
     private static Charset CHARSET = StandardCharsets.UTF_8;
     private ServerSocket serverSocket;
     private boolean shouldRun;
-
     private Socket clientSocket;
     private BufferedReader reader;
     private BufferedWriter writer;
 
 
     private void sendCustomDouble(double toSend) throws IOException {
-        if (toSend == Double.NaN) {
+        LOG.info("sending " + toSend);
+        if (Double.isNaN(toSend)) {
             sendNOK("calculation, rightHand and/or " +
                     "leftHand has not been initialised" +
-                    "\n(or the calculation was mathematically impossible)");
+                    "\n(or the calculation was mathematically impossible, don't do 0/0)");
         }
         writer.write(Double.toString(toSend) + Protocol.EOL);
         writer.flush();
     }
 
     private void sendNOK(String errorMsg) throws IOException {
+        LOG.info("sending NOK");
         writer.write(Protocol.NOK + Protocol.EOL);
         writer.flush();
         throw new IOException("failed " + errorMsg);
     }
 
     private void sendOK() throws IOException {
+        LOG.info("sending OK");
         writer.write(Protocol.OK + Protocol.EOL);
         writer.flush();
     }
@@ -68,13 +67,16 @@ public class Server {
             while (shouldRun) {
                 //Get START instruction
                 String meeting = reader.readLine();
+                LOG.info("received "+meeting);
                 if (!meeting.equals(Protocol.START)) {
                     sendNOK("meeting");
                 }
+
                 sendOK();
 
                 //Get operator instruction
                 String operation = reader.readLine();
+                LOG.info("received "+ operation);
                 if (!opControl(operation)) {
                     sendNOK("operation");
                 }
@@ -86,6 +88,7 @@ public class Server {
                 double leftHand = Double.NaN;
                 try {
                     leftHand = Double.parseDouble(reader.readLine());
+                    LOG.info("received "+leftHand);
                 } catch (Throwable e) {
                     sendNOK("lefthand: " + e);
                 }
@@ -96,6 +99,7 @@ public class Server {
                 double rightHand = Double.NaN;
                 try {
                     rightHand = Double.parseDouble(reader.readLine());
+                    LOG.info("received "+rightHand);
                 } catch (Throwable e) {
                     sendNOK("righthand: " + e);
                 }
@@ -134,6 +138,7 @@ public class Server {
                 } else {
                     throw new IOException("veryfing if over or new calc failed");
                 }
+                LOG.info("ok for continuing "+shouldRun);
 
             }
             serverSocket.close();
@@ -145,5 +150,6 @@ public class Server {
         }
     }
 
+    
 
 }
