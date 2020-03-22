@@ -11,33 +11,41 @@ public class Server
     private Socket commSocket;
     private BufferedReader fromClient;
     private BufferedWriter toClient;
-    private boolean connectionOpened=false;
+    private boolean connectionOpened = false;
     private Stack<Integer> numberStack;
     int result;
 
     public Server() throws IOException
     {
-        receptionistSocket = new ServerSocket(80);
-        commSocket = receptionistSocket.accept();
-        numberStack=new Stack<>();
-        result=0;
+        receptionistSocket = new ServerSocket(50000);
+        numberStack = new Stack<>();
+        System.out.println("Server created\n");
+        while (true)
+        {
+            commSocket = receptionistSocket.accept();
+            runActivity();
+        }
     }
+
 
     private void runActivity() throws IOException
     {
         fromClient = new BufferedReader(new InputStreamReader(commSocket.getInputStream()));
         toClient = new BufferedWriter(new PrintWriter(commSocket.getOutputStream()));
+        result = 0;
+        numberStack.clear();
 
-        if(!connectionOpened && fromClient.readLine().equals("OPEN"))
+        if (! connectionOpened && fromClient.readLine().equals("OPEN"))
         {
             sendToClient("ACK");
-            connectionOpened=true;
+            connectionOpened = true;
+            System.out.println("Connection established");
         }
-        else if(connectionOpened)
+        else if (connectionOpened)
         {
             try
             {
-                result=calculateRequest(fromClient.readLine());
+                result = calculateRequest(fromClient.readLine());
             }
             catch (Exception e)
             {
@@ -48,48 +56,57 @@ public class Server
         {
             throw new IOException("Invalid format");
         }
+
+        if (connectionOpened && fromClient.readLine().equals("RECEIVED"))
+        {
+            sendToClient("CLOSE");
+            connectionOpened = false;
+            fromClient.close();
+            toClient.close();
+        }
     }
 
     private Integer calculateRequest(String request)
     {
-        int firstOperand=0;
-        int secondOperand=0;
-        for(int x=0;x<request.length();++x)
+        int firstOperand = 0;
+        int secondOperand = 0;
+        for (int x = 0; x < request.length(); ++ x)
         {
-            char c=request.charAt(x);
-            if(Character.isDigit(c))
+            char c = request.charAt(x);
+            if (Character.isDigit(c))
             {
                 numberStack.push(Character.getNumericValue(c));
             }
-            else if(c=='+')
-            {
-                firstOperand=numberStack.pop();
-                secondOperand=numberStack.pop();
-                numberStack.push(firstOperand+secondOperand);
-            }
-            else if(c=='-')
-            {
-                firstOperand=numberStack.pop();
-                secondOperand=numberStack.pop();
-                numberStack.push(firstOperand-secondOperand);
-            }
-            else if(c=='*')
-            {
-                firstOperand=numberStack.pop();
-                secondOperand=numberStack.pop();
-                numberStack.push(firstOperand*secondOperand);
-            }
-            else if(c=='/')
-            {
-                firstOperand=numberStack.pop();
-                secondOperand=numberStack.pop();
-                numberStack.push(firstOperand/secondOperand);
-            }
             else
             {
-                throw new RuntimeException("Invalid format");
-            }
-        }
+                switch (c)
+                {
+                    case ('+'):
+                        firstOperand = numberStack.pop();
+                        secondOperand = numberStack.pop();
+                        numberStack.push(firstOperand + secondOperand);
+                        break;
+                    case ('-'):
+                        firstOperand = numberStack.pop();
+                        secondOperand = numberStack.pop();
+                        numberStack.push(firstOperand - secondOperand);
+                        break;
+                    case ('*'):
+                        firstOperand = numberStack.pop();
+                        secondOperand = numberStack.pop();
+                        numberStack.push(firstOperand * secondOperand);
+                        break;
+                    case ('/'):
+                        firstOperand = numberStack.pop();
+                        secondOperand = numberStack.pop();
+                        numberStack.push(firstOperand / secondOperand);
+                        break;
+                    default:
+                        throw new RuntimeException("Invalid format");
+                }//end switch
+            }//end if-else
+        }//end for
+        System.out.println("Calculation done, result is " + result + "\n");
         return numberStack.firstElement();
     }
 
