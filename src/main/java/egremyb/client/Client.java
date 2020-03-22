@@ -1,7 +1,6 @@
 package egremyb.client;
 
 import egremyb.common.Protocol;
-import egremyb.server.Server;
 
 import java.io.*;
 import java.net.Socket;
@@ -10,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Client {
-    final static Logger LOG = Logger.getLogger(Server.class.getName());
+    final static Logger LOG = Logger.getLogger(Client.class.getName());
 
     private final static String NO_CONNECTION_OPENED = "There is no connection opened to the server.";
     private final static String UNEXPECTED_RESPONSE  = "The response of the server was unexpected.";
