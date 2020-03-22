@@ -34,7 +34,7 @@ public class Client {
      * This method does the entire processing.
      */
     public void start() {
-        LOG.info("Starting server...");
+        LOG.info("Starting client...");
 
         Socket serverSocket = null;
         //Socket clientSocket = null;
@@ -49,7 +49,7 @@ public class Client {
             serverSocket = new Socket("127.0.0.1", REQUEST_PORT);
             logSocketAddress(serverSocket);
 
-            while (operation != "none") {
+            //while (operation != "none") {
 
                 System.out.println("Quelle opération voulez-vous effectuer ? (DoOp x op y)");
                 reader = new BufferedReader(new InputStreamReader(System.in));
@@ -77,7 +77,7 @@ public class Client {
                 writer.println(operation);
                 writer.flush();
 
-
+                //Le reader ne reçoit rien et je sais pas pourquoi
                 result = reader.readLine();
 
                 System.out.println("Résultat : " + result);
@@ -95,7 +95,7 @@ public class Client {
                 serverSocket.close();
 
 
-            }
+            //}
 
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, ex.getMessage());
