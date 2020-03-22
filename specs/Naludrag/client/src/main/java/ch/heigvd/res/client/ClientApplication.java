@@ -6,8 +6,8 @@ public class ClientApplication {
     public static void main(String[] args) {
         Client c1 = new Client();
         Client c2 = new Client();
-        c1.connect("localhost");
-        c2.connect("localhost");
+        System.out.println(c1.connect("localhost"));
+        System.out.println(c2.connect("localhost"));
 
         System.out.println("Sending 1 + 2 to the server");
         System.out.println(c1.getCalculationResult(1,2, Operator.ADD));

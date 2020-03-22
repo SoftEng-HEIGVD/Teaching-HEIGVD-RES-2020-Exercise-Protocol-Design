@@ -31,8 +31,8 @@ public class Client {
      *
      * @param serverAddress the IP address used by the Presence Server
      */
-    public void connect(String serverAddress) {
-        connect(serverAddress, Protocol.PRESENCE_DEFAULT_PORT);
+    public String connect(String serverAddress) {
+        return connect(serverAddress, Protocol.PRESENCE_DEFAULT_PORT);
     }
 
     /**
@@ -41,7 +41,8 @@ public class Client {
      * @param serverAddress the IP address used by the Presence Server
      * @param serverPort the port used by the Presence Server
      */
-    public void connect(String serverAddress, int serverPort) {
+    public String connect(String serverAddress, int serverPort) {
+        String response = "";
         LOG.log(Level.INFO, "Client {0} trying to connect", idClient);
         try {
             clientSocket = new Socket(serverAddress, serverPort);
@@ -49,9 +50,9 @@ public class Client {
             out = new PrintWriter(clientSocket.getOutputStream());
             connected = true;
         } catch (IOException e) {
-            LOG.log(Level.SEVERE, "Unable to connect to server: {0}", e.getMessage());
             cleanup();
-            return;
+            response = "Unable to connect to server: " + e.getMessage();
+            return response;
         }
 
         // Let us send the HELLO command to connect us to the server
@@ -59,10 +60,11 @@ public class Client {
         out.flush();
         try {
             //See what the server responded to us
-            LOG.log(Level.INFO, String.format("Server response: %s", in.readLine()));
+            response = "Server response: " + in.readLine();
         } catch (IOException ex) {
-            LOG.log(Level.SEVERE, ex.getMessage(), ex);
+            response = ex.getMessage();
         }
+        return response;
     }
 
     public void disconnect() {

@@ -152,7 +152,13 @@ public class Server implements Runnable{
                     if (tokens[0].toUpperCase().equals(Protocol.CMD_BYE)) {
                         connected = false;
                     } else if (tokens[0].toUpperCase().equals(Protocol.CMD_HELLO)) {
-                        sendNotification("HELLO, GIVE CALCULATIONS(supported operators : + - * /)");
+                        StringBuilder str = new StringBuilder("HELLO, GIVE CALCULATIONS(supported operators : ");
+                        for(Operator op : Operator.values()){
+                            str.append(op.toString());
+                            str.append(" ");
+                        }
+                        str.append(")");
+                        sendNotification(str.toString());
                     } else {
                         //Creation of a new object calculator that permits to do a operation with a String array
                         Calculator calculator = new Calculator(tokens);
