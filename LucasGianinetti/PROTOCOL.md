@@ -26,6 +26,7 @@ The client initiate the conversation.
 10. Client -> Server : "**Operand**".
 11. Server -> Client : "Received **Operand**".
 12. Server -> Client : "**Operand** **Operator** **Operand** = **Result**"
+13. Client -> Server : "Done".
 
 #### What happens when a message is received from the other party ?
 
@@ -38,7 +39,7 @@ The client initiate the conversation.
 - Server response to client's initiation is "**Welcome!**"
 - **Operator** has to be *ADD*, *SUB*, *MUL* or *DIV*
 - **Operands** can be any number.
-
+- See Protocol.java
 #### Who closes the connection and when ?
 
-The server closes the connection after sending the result to the client.
+The server closes the connection after sending the result to the client and receive ACK from client.
