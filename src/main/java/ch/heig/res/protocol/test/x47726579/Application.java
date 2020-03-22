@@ -77,6 +77,7 @@ public class Application
 				// again, just having some fun counting the minutes
 				if (((System.nanoTime() - start) > minute * counter)) {
 					System.out.println("Every sixty seconds a minute passes...");
+					System.out.flush();
 					counter++;
 				}
 			}

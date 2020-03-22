@@ -43,6 +43,20 @@ public class Server implements Runnable
 	{
 		this.running = true;
 		this.connectedWorkers = Collections.synchronizedList(new LinkedList<>());
+		new Thread(() -> {
+			while (Server.this.running) {
+				// any worker idle for more than 60 seconds is disconnected
+				synchronized (this.connectedWorkers) {
+					for (Worker worker : Server.this.connectedWorkers) {
+						if (((System.nanoTime() - worker.lastActivity) >= minute)) {
+							System.out.println(".");
+							worker.disconnect();
+							Server.this.unregisterWorker(worker);
+						}
+					}
+				}
+			}
+		}).start();
 	}
 
 	public boolean isRunning()
@@ -90,20 +104,9 @@ public class Server implements Runnable
 				Worker newWorker    = new Worker(clientSocket);
 				registerWorker(newWorker);
 				new Thread(newWorker).start();
-			        LOG.info(">> Waiting for lock before disconnecting idle workers");
-				synchronized (connectedWorkers) {
-					// any worker idle for more than 60 seconds is disconnected
-					for (Worker worker : connectedWorkers) {
-						if (((System.nanoTime() - worker.lastActivity) >= minute)) {
-					                LOG.log(Level.INFO,"Disconnecting worker {0}",worker.userName);
-							worker.disconnect();
-						}
-					}
-				}
-				LOG.info("<< Idle workers disconnected");
 			}
 			serverSocket.close();
-			LOG.info("shouldRun is false... server going down");
+			LOG.info("server going down");
 		} catch (IOException ex) {
 			LOG.log(Level.SEVERE, ex.getMessage(), ex);
 			System.exit(-1);
@@ -218,7 +221,6 @@ public class Server implements Runnable
 							sendNotification("What? I only understand ADD, SUB, MUL, EXT and KILL commands");
 					}
 					sendNotification(CMD_END);
-
 				}
 			} catch (IOException ex) {
 				LOG.log(Level.SEVERE, ex.getMessage(), ex);
@@ -231,7 +233,6 @@ public class Server implements Runnable
 		private void cleanup()
 		{
 			LOG.log(Level.INFO, "Cleaning up worker used by {0}", userName);
-
 			LOG.log(Level.INFO, "Closing clientSocket used by {0}", userName);
 			try {
 				if (clientSocket != null) {
