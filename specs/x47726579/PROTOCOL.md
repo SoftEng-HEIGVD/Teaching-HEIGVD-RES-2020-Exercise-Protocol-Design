@@ -14,14 +14,14 @@ TCP will be our protocol of choice.
 For the scope of this project there will be no network discovery from the client; our
  server will not declare itself and it will only have one IPv4 and port defined :
  
-  * The client gets the server's IP at launch
+  * The client gets the server's IP at launch, a default IP exists, which is my laptop's on my LAN
   * The client knows on which port the server is listening (we'll use 3300)
 
 ### Who speaks first?
 
 The client will speak first.
 The way we're modelling our client-server protocol we wish to have our server talking as little as possible : it will
- only talk when talked to, and only answer one client at a time.
+ only talk when talked to, and only answer one client at a time (no broadcast to all its clients).
 
 ### What is the sequence of messages exchanged by the client and the server? (flow)
 
