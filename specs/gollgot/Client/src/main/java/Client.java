@@ -18,7 +18,7 @@ public class Client {
     private boolean connected = false;
 
     public final static String DEFAULT_SERVER_ADDRESS = "localhost";
-    public final static int DEFAULT_PORT = 12500;
+    public final static int DEFAULT_PORT = 12000;
 
     private final static String INIT_MSG = "HELLO";
     private final static String SERVER_READY_MSG = "READY";
@@ -65,8 +65,12 @@ public class Client {
                 return;
             }
 
+            // Send request
             out.println(calculation);
             out.flush();
+            LOG.info("Asking for " + calculation);
+
+            // Get response from server
 
             String message = in.readLine();
             if(message.equalsIgnoreCase(SERVER_ERROR_MSG)) {
