@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="CalculatorSyntaxChecker-1.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/CalculatorSyntaxChecker-1.0-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="jar://$PROJECT_DIR$/lib/CalculatorSyntaxChecker-1.0-SNAPSHOT.jar!/" recursive="false" />
+  </library>
+</component>
