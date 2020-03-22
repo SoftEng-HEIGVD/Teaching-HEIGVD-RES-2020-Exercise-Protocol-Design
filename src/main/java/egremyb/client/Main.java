@@ -32,10 +32,12 @@ public class Main {
         System.out.println(FORMAT);
 
         while (true) {
-            // get user input and split it in token(s)
+            // get user input
             System.out.print("Enter an equation : ");
             input = in.nextLine();
-            token = input.split(" ");
+            // replace comma by point, trim white spaces and split it in token(s)
+            token = input.replaceAll(",", ".").
+                    trim().replaceAll(" +", " ").split(" ");
             // if three tokens -> input of an equation
             if (token.length == 3) {
                 try {
@@ -47,8 +49,12 @@ public class Main {
                 }
                 // send equation
                 result = client.sendCalculationToCompute(op1, token[1], op2);
-                // print result
-                System.out.println(token[0] + " " + token[1] + " " + token[2] + " = " + result);
+                // print result if different from null
+                if (result != null) {
+                    System.out.println(token[0] + " " + token[1] + " " + token[2] + " = " + result);
+                } else {
+                    System.out.println(FORMAT_ERR);
+                }
             }
             // if one token -> leaving the app
             else if (token.length == 1 &&

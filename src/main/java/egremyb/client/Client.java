@@ -12,9 +12,9 @@ import java.util.logging.Logger;
 public class Client {
     final static Logger LOG = Logger.getLogger(Server.class.getName());
 
-    private final static String NO_CONNECTION_OPENED = "There is no connection opened to the server.\n";
-    private final static String UNEXPECTED_RESPONSE  = "The response of the server was unexpected.\n";
-    private final static String BAD_REQUEST          = "The operation must have been badly written.\n";
+    private final static String NO_CONNECTION_OPENED = "There is no connection opened to the server.";
+    private final static String UNEXPECTED_RESPONSE  = "The response of the server was unexpected.";
+    private final static String BAD_REQUEST          = "The operation must have been badly written.";
     private final static String UNABLE_TO_CONNECT    = "Unable to connect to server";
 
     private Socket       clientSocket;
@@ -103,7 +103,6 @@ public class Client {
         if (connected) {
             LOG.info("Closing old connection and opening a new connection");
             closeConnection();
-            return 0;
         }
         // try to connect to the server
         try {
@@ -122,7 +121,6 @@ public class Client {
             }
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, UNABLE_TO_CONNECT + " : {0}", ex.getMessage());
-            System.out.println(UNABLE_TO_CONNECT + ".");
             closeConnection();
             return -1;
         }
@@ -182,21 +180,17 @@ public class Client {
                 // check the response of the server
                 response = getResponse();
                 if (response.equals(Protocol.CMD_WRONG)) {
-                    System.out.println(BAD_REQUEST);
-
                     LOG.info(BAD_REQUEST);
                     return null;
                 }
                 // return the response as an int
-                return Integer.parseInt(response);
+                return Double.parseDouble(response);
             } catch (IOException | NumberFormatException ex) {
-                System.out.println(ex.getMessage());
+                LOG.log(Level.SEVERE, ex.getMessage(), ex);
             }
         } else {
-            System.out.println(NO_CONNECTION_OPENED);
             LOG.info(NO_CONNECTION_OPENED);
         }
-
-        return 0;
+        return null;
     }
 }

@@ -52,6 +52,12 @@ public class ClientTest {
     }
 
     @Test
+    public void SendingAnEquationShouldReturnNullIfNoConnectionOpened() {
+        Client client = new Client();
+        assertNull(client.sendCalculationToCompute(14d, Protocol.ADD_OPERATOR, 3d));
+    }
+
+    @Test
     public void shouldSendTheEquationCorrectlyAndReceiveSolution() throws IOException {
         final Double OPERAND1 = 10d;
         final Double OPERAND2 = 4d;

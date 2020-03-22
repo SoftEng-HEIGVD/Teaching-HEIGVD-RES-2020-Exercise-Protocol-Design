@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.io.*;
 import java.net.Socket;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 
 import static org.junit.Assert.*;
@@ -173,7 +174,9 @@ public class ServerTest {
         Socket clientSocket = null;
         BufferedWriter toServer = null;
         BufferedReader fromServer = null;
-        NumberFormat formater = new DecimalFormat(Protocol.NUMBER_FORMAT);
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+        NumberFormat formater = new DecimalFormat(Protocol.NUMBER_FORMAT, symbols);
 
         server.serveClients();
         try {
@@ -208,7 +211,9 @@ public class ServerTest {
         Socket clientSocket = null;
         BufferedWriter toServer = null;
         BufferedReader fromServer = null;
-        NumberFormat formater = new DecimalFormat(Protocol.NUMBER_FORMAT);
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+        NumberFormat formater = new DecimalFormat(Protocol.NUMBER_FORMAT, symbols);
 
         server.serveClients();
         try {
@@ -243,7 +248,9 @@ public class ServerTest {
         Socket clientSocket = null;
         BufferedWriter toServer = null;
         BufferedReader fromServer = null;
-        NumberFormat formater = new DecimalFormat(Protocol.NUMBER_FORMAT);
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+        NumberFormat formater = new DecimalFormat(Protocol.NUMBER_FORMAT, symbols);
 
         server.serveClients();
         try {
@@ -278,7 +285,9 @@ public class ServerTest {
         Socket clientSocket = null;
         BufferedWriter toServer = null;
         BufferedReader fromServer = null;
-        NumberFormat formater = new DecimalFormat(Protocol.NUMBER_FORMAT);
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+        NumberFormat formater = new DecimalFormat(Protocol.NUMBER_FORMAT, symbols);
 
         server.serveClients();
         try {
@@ -313,7 +322,9 @@ public class ServerTest {
         Socket clientSocket = null;
         BufferedWriter toServer = null;
         BufferedReader fromServer = null;
-        NumberFormat formater = new DecimalFormat(Protocol.NUMBER_FORMAT);
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+        NumberFormat formater = new DecimalFormat(Protocol.NUMBER_FORMAT, symbols);
 
         server.serveClients();
         try {

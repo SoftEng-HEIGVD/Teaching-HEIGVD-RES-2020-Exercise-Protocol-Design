@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -195,16 +196,19 @@ public class Server {
 
                 if(tokens.length == 3){
                     try{
-                        double firstOperand = Double.parseDouble(tokens[0]);
+                        double firstOperand  = Double.parseDouble(tokens[0]);
                         double secondOperand = Double.parseDouble(tokens[2]);
                         double solution;
-                        NumberFormat formater = new DecimalFormat(Protocol.NUMBER_FORMAT);
+                        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+                        symbols.setDecimalSeparator('.');
+                        NumberFormat formater = new DecimalFormat(Protocol.NUMBER_FORMAT, symbols);
 
                         switch (tokens[1]){
                             case Protocol.ADD_OPERATOR:
                                 solution = firstOperand + secondOperand;
                                 LOG.log(Level.INFO, "Processing : {0} {1} {2} = {3}", new Object[]{firstOperand, Protocol.ADD_OPERATOR,secondOperand, solution});
-                                return formater.format(solution);
+                                String tmp = formater.format(solution);
+                                return tmp;
                             case Protocol.SUB_OPERATOR:
                                 solution = firstOperand - secondOperand;
                                 LOG.log(Level.INFO, "Processing : {0} {1} {2} = {3}", new Object[]{firstOperand, Protocol.SUB_OPERATOR,secondOperand, solution});
