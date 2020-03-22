@@ -81,6 +81,7 @@ public class Client {
         //If the client didn't succeeded the connection out(outputStream) is null
         if(out != null) {
             out.println(Protocol.CMD_BYE);
+            out.flush();
             cleanup();
         }
         else{
