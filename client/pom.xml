@@ -22,7 +22,7 @@
                             <shadedClassifierName>standalone</shadedClassifierName> <!-- Can be any name that makes sense -->
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>client.Client</mainClass>
+                                    <mainClass>client.App</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

@@ -13,6 +13,7 @@ public class Server {
     static final Logger LOG = Logger.getLogger(Server.class.getName());
 
     private final int LISTEN_PORT;
+    private final String STOP_CONNECTION = "kthx";
 
     public Server (int port) {
         LISTEN_PORT = port;
@@ -31,43 +32,69 @@ public class Server {
             serverSocket = new ServerSocket(LISTEN_PORT);
             logServerSocketAddress(serverSocket);
 
-            while (true) {
-                LOG.log(Level.INFO, "Waiting (blocking) for a connection request on {0} : {1}", new Object[]{serverSocket.getInetAddress(), Integer.toString(serverSocket.getLocalPort())});
-                clientSocket = serverSocket.accept();
-                LOG.log(Level.INFO, "A client has arrived. We now have a client socket with following attributes:");
-                logSocketAddress(clientSocket);
+            clientSocket = waitingForNewConnection(serverSocket);
 
+            while (true) {
                 LOG.log(Level.INFO, "Getting a Reader and a Writer connected to the client socket...");
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 out = new PrintWriter(clientSocket.getOutputStream());
 
                 String clientCommand = in.readLine();
-                String[] command = Parser.splitCommand(clientCommand);
+                LOG.log(Level.INFO, "Getting client command : {0}", clientCommand);
 
-                if (command.length != 4)
-                    throw new InterruptedException("Commande invalide");
+                if (!clientCommand.equals(STOP_CONNECTION)) {
+                    String[] command = Parser.splitCommand(clientCommand);
 
-                if (!command[0].equals("plsdodat"))
-                    throw new InterruptedException("Ouais, écoute, ça va pas le faire…");
+                    if (command.length == 4) {
+                        if (!command[0].equals("plsdodat")) {
+                            LOG.log(Level.INFO, "First argument didn't ask for the task, rejecting command…");
+                            out.println("Ouais, écoute, ça va pas le faire…");
+                            out.flush();
+                        } else {
+                            LOG.log(Level.INFO, "Parsing command…");
+                            try {
+                                double op1 = Parser.getNumber(command[1]);
+                                LOG.log(Level.INFO, "Getting first operand : {0}", op1);
+                                double op2 = Parser.getNumber(command[2]);
+                                LOG.log(Level.INFO, "Getting second operand : {0}", op2);
+                                char op = Parser.getOperator(command[3]);
+                                LOG.log(Level.INFO, "Getting operator : {0}", op);
+                                double result = Calculator.operation(op1, op2, op);
+                                LOG.log(Level.INFO, "Sending answer : {0}", result);
+                                out.println("Tiens, c'est tout bon : " + result);
+                                out.flush();
+                            } catch (InterruptedException ie) {
+                                String errorMessage = ie.getMessage();
+                                LOG.log(Level.SEVERE, "Parsing error… {0}", errorMessage);
+                                out.println(errorMessage);
+                                out.flush();
+                            }
+                        }
+                    } else {
+                        LOG.log(Level.INFO, "Getting invalind command…");
+                        out.println("Désolé, mais c'est pas une commande valide.");
+                        out.flush();
+                    }
+                } else {
+                    LOG.log(Level.INFO, "Client asking to stop connection");
+                    out.println("Ça joue ! Au revoir !");
+                    out.flush();
+                    clientSocket.close();
 
-                int op1 = Parser.getNumber(command[1]);
-                int op2 = Parser.getNumber(command[2]);
-                char op = Parser.getOperator(command[3]);
-                int result = Calculator.operation(op1, op2, op);
-
-                out.println("Tiens, c'est tout bon : " + result);
-                out.flush();
+                    clientSocket = waitingForNewConnection(serverSocket);
+                }
             }
-
-        } catch (IOException | InterruptedException ex) {
+        } catch (IOException ex) {
             LOG.log(Level.SEVERE, ex.getMessage());
         } finally {
             LOG.log(Level.INFO, "We are done. Cleaning up resources, closing streams and sockets...");
             try {
+                assert in != null;
                 in.close();
             } catch (IOException ex) {
                 Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
             }
+            assert out != null;
             out.close();
             try {
                 clientSocket.close();
@@ -103,5 +130,20 @@ public class Server {
         LOG.log(Level.INFO, "             Local port: {0}", new Object[]{Integer.toString(clientSocket.getLocalPort())});
         LOG.log(Level.INFO, "  Remote Socket address: {0}", new Object[]{clientSocket.getRemoteSocketAddress()});
         LOG.log(Level.INFO, "            Remote port: {0}", new Object[]{Integer.toString(clientSocket.getPort())});
+    }
+
+    /**
+     * Waiting for the connection from a new client
+     *
+     * @param serverSocket the server socket
+     * @return socket for the client socket
+     * @throws IOException is needed but don't know yet why
+     */
+    private Socket waitingForNewConnection(ServerSocket serverSocket) throws IOException {
+        LOG.log(Level.INFO, "Waiting (blocking) for a connection request on {0} : {1}", new Object[]{serverSocket.getInetAddress(), Integer.toString(serverSocket.getLocalPort())});
+        Socket clientSocket = serverSocket.accept();
+        LOG.log(Level.INFO, "A client has arrived. We now have a client socket with following attributes:");
+        logSocketAddress(clientSocket);
+        return clientSocket;
     }
 }

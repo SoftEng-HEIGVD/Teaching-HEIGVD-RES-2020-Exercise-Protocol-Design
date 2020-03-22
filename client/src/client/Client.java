@@ -9,9 +9,9 @@ import java.util.logging.Logger;
 public class Client {
     private int port;
     private InetAddress hostname;
-    boolean isReading = false;
-    private String userInput;
-    private String serverAnswer;
+    private final String STOP_CLIENT = "kthx";
+    private final String HELP_MESSAGE = "help";
+
     static final Logger LOG = Logger.getLogger(Client.class.getName());
 
     public Client (int port, InetAddress hostname) {
@@ -30,24 +30,31 @@ public class Client {
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
 
-            // isReading = true;
-            while (true) {
-                System.out.println("Tape ton instruction (genre `plsdodat 1 1 +`) :");
+            String userInput;
+            do {
+                System.out.println("Tape ton instruction :");
                 userInput = inputReader.readLine();
+
+                if (userInput.equals(HELP_MESSAGE)) {
+                    helpMessage();
+                    continue;
+                }
 
                 out.println(userInput);
                 out.flush();
 
-                System.out.println("steuplé, tu peux m'faire ça ?");
-                serverAnswer = in.readLine();
-                System.out.println("Réponse : " + serverAnswer);
-                // isReading = false;
-            }
+                if (!userInput.equals(STOP_CLIENT))
+                    System.out.println("steuplé, tu peux m'faire ça ?");
 
+                String serverAnswer = in.readLine();
+                // LOG.log(Level.INFO, String.format("Réponse du serveur : %s", serverAnswer));
+                System.out.println("Réponse du serveur : " + serverAnswer + "\n");
+            } while (!userInput.equals(STOP_CLIENT));
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, null, ex);
         } finally {
             try {
+                assert in != null;
                 in.close();
             } catch (IOException ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
@@ -59,5 +66,19 @@ public class Client {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+
+    private void helpMessage() {
+        System.out.println();
+        System.out.println("Message d'aide");
+        System.out.println();
+        System.out.println("Pour envoyer une commande au serveur, taper");
+        System.out.println("`plsdodat <opérande 1> <opérande 2> <opétateur>`");
+        System.out.println("où <opérateur> est soit : +, -, * ou /");
+        System.out.println();
+        System.out.println("Pour quitter le client, taper");
+        System.out.println("`kthx`");
+        System.out.println();
+
     }
 }
