@@ -49,7 +49,6 @@ public class Server implements Runnable
 				synchronized (this.connectedWorkers) {
 					for (Worker worker : Server.this.connectedWorkers) {
 						if (((System.nanoTime() - worker.lastActivity) >= minute)) {
-							System.out.println(".");
 							worker.disconnect();
 							Server.this.unregisterWorker(worker);
 						}
