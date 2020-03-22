@@ -10,9 +10,8 @@ import java.util.Scanner;
 import static main.java.ch.heig.res.protocol.protocol.x47726579.Protocol.*;
 
 /**
- * This class implements a simple client for our custom presence protocol.
- * When the client connects to a server, a thread is started to listen for
- * notifications sent by the server.
+ * This class implements a simple client
+ * This client is not meant to be called in parallel to anything else
  *
  * @author Olivier Liechti
  * @modified_by Laurent Scherer
@@ -63,9 +62,9 @@ public class Client
 
 				while ((commandLine = input.nextLine()).isBlank() && commandLine.length() < 3) { ; }
 				commandLine = commandLine.toUpperCase();
-				System.out.println("commandLine = " + commandLine);
 				if (commandLine.equals(CMD_EXT)) {
-					disconnect();
+					out.println(CMD_EXT);
+					cleanup();
 					break;
 				} else if (commandLine.equals(CMD_KILL)) {
 					out.println(CMD_KILL);
@@ -76,13 +75,6 @@ public class Client
 				out.flush();
 			}
 		} catch (IOException ex) {System.out.println("ex = " + ex);}
-	}
-
-	public void disconnect()
-	{
-		connected = false;
-		out.println(CMD_EXT);
-		cleanup();
 	}
 
 	private void cleanup()

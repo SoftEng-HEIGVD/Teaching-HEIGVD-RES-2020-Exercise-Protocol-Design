@@ -18,8 +18,7 @@ import static main.java.ch.heig.res.protocol.protocol.x47726579.Protocol.*;
 /**
  * This class is a multi-threaded server of the custom presence protocol. The
  * server binds a socket on the specified port and waits for incoming connection
- * requests. It keeps track of connected clients in a list. When new clients
- * arrive, leave or send messages, the server notifies all connected clients.
+ * requests. It keeps track of connected clients in a list.
  *
  * @author Olivier Liechti
  * @modified_by Laurent Scherer
@@ -27,26 +26,28 @@ import static main.java.ch.heig.res.protocol.protocol.x47726579.Protocol.*;
 public class Server implements Runnable
 {
 
-	final static Logger LOG = Logger.getLogger(Server.class.getName());
+	final static Logger LOG    = Logger.getLogger(Server.class.getName());
+	final static long   minute = 60_000_000_000L;
+
 
 	static {
 		System.setProperty("java.util.logging.SimpleFormatter.format", "[%1$tF %1$tT] [%4$-7s] %5$s %n");
 	}
 
 
-	boolean      shouldRun;
+	boolean      running;
 	ServerSocket serverSocket;
 	final List<Worker> connectedWorkers;
 
 	public Server()
 	{
-		this.shouldRun = true;
+		this.running = true;
 		this.connectedWorkers = Collections.synchronizedList(new LinkedList<>());
 	}
 
 	public boolean isRunning()
 	{
-		return shouldRun;
+		return running;
 	}
 
 	private void registerWorker(Worker worker)
@@ -82,14 +83,22 @@ public class Server implements Runnable
 	public void run()
 	{
 		try {
-			LOG.log(Level.FINE, "Starting Presence Server on port {0}", DEFAULT_PORT);
+			LOG.log(Level.INFO, "Starting Presence Server on port {0}", DEFAULT_PORT);
 			serverSocket = new ServerSocket(DEFAULT_PORT);
-			while (shouldRun) {
+			while (running) {
 				Socket clientSocket = serverSocket.accept();
 				Worker newWorker    = new Worker(clientSocket);
 				registerWorker(newWorker);
 				new Thread(newWorker).start();
-
+				synchronized (connectedWorkers) {
+					LOG.info("Disconnecting workers");
+					// any worker idle for more than 60 seconds is disconnected
+					for (Worker worker : connectedWorkers) {
+						if (((System.nanoTime() - worker.lastActivity) >= minute)) {
+							worker.disconnect();
+						}
+					}
+				}
 			}
 			serverSocket.close();
 			LOG.info("shouldRun is false... server going down");
@@ -102,7 +111,7 @@ public class Server implements Runnable
 	private void shutdown()
 	{
 		LOG.info("Shutting down server...");
-		shouldRun = false;
+		running = false;
 		try {
 			serverSocket.close();
 		} catch (IOException ex) {
@@ -119,7 +128,8 @@ public class Server implements Runnable
 		PrintWriter    out;
 		boolean        connected;
 		String         userName;
-		int            result = 0;
+		int            result       = 0;
+		long           lastActivity = System.nanoTime();
 
 
 		public Worker(Socket clientSocket)
@@ -159,6 +169,7 @@ public class Server implements Runnable
 
 			try {
 				while (connected && ((commandLine = in.readLine()) != null)) {
+					lastActivity = System.nanoTime();
 					String[] tokens = commandLine.split(" ");
 					switch (tokens[0].toUpperCase()) {
 						case (CMD_MUL):

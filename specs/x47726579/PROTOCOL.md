@@ -48,7 +48,7 @@ CLI#001 : Goodbye
   * binds the connection with the new client
 
 "Asked for computation" message : 
-  * executes the math and sends the answer to the client
+  * executes the math and sends the answer to the client; only integers will be considered
 
 "Goodbye" message : 
   * closes connection

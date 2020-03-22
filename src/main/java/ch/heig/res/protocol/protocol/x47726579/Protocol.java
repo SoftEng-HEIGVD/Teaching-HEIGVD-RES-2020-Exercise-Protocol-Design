@@ -13,6 +13,7 @@ public class Protocol
 	public static final String CMD_MUL      = "MUL";
 	public static final String CMD_EXT      = "EXT";
 	public static final String CMD_KILL     = "KILL";
+	// this will be used to know when the server is done transmitting information
 	public static final String CMD_END      = "END MSG";
 
 }
