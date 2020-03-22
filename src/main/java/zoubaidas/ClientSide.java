@@ -1,5 +1,7 @@
 package zoubaidas;
 
+import sun.reflect.annotation.ExceptionProxy;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -24,9 +26,28 @@ public class ClientSide {
         BufferedReader reader = null;
         PrintWriter writer = null;
 
-        LOG.info("Starting connection with server ... \n");
+        LOG.info("I am a client... \n");
         try {
+            LOG.log(Level.INFO, "Creating server socket and binding " + LISTEN_PORT);
             clientSocket = new Socket(ip_adress, LISTEN_PORT);
+            //Logging server socket infos
+            Utils.logSocketAddress(LOG, clientSocket);
+
+            reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            writer = new PrintWriter(clientSocket.getOutputStream());
+
+            writer.println("add 1 2");
+        } catch (IOException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                reader.close();
+                writer.close();
+                clientSocket.close();
+            } catch  (IOException ex) {
+                LOG.log(Level.SEVERE, null, ex);
+            }
         }
     }
 }
+

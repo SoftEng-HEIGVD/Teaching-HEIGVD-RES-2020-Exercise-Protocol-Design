@@ -25,7 +25,7 @@ public class ServerSide {
             LOG.log(Level.INFO, "Creating server socket and binding it on any if on port " + LISTEN_PORT);
             ServerSocket serverSocket = new ServerSocket(LISTEN_PORT);
             //Logging server socket infos
-            logServerSocketAddress(serverSocket);
+            Utils.logServerSocketAddress(LOG, serverSocket);
 
 
             while (true) {
@@ -33,7 +33,7 @@ public class ServerSide {
                 Socket clientSocket = serverSocket.accept();
 
                 LOG.log(Level.INFO, "A client has arrived. We now have a client socket with following attributes:");
-                logSocketAddress(clientSocket);
+                Utils.logSocketAddress(LOG, clientSocket);
 
                 LOG.log(INFO, "Serving client ... : a reader and a writer are being connected to client socket ");
                 BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -62,28 +62,6 @@ public class ServerSide {
         }
     }
 
-    /**
-     * A utility method to print server socket information
-     *
-     * @param serverSocket the socket that we want to log
-     */
-    private void logServerSocketAddress(ServerSocket serverSocket) {
-        LOG.log(Level.INFO, "       Local IP address: {0}", new Object[]{serverSocket.getLocalSocketAddress()});
-        LOG.log(Level.INFO, "             Local port: {0}", new Object[]{Integer.toString(serverSocket.getLocalPort())});
-        LOG.log(Level.INFO, "               is bound: {0}", new Object[]{serverSocket.isBound()});
-    }
-
-    /**
-     * A utility method to print socket information
-     *
-     * @param clientSocket the socket that we want to log
-     */
-    private void logSocketAddress(Socket clientSocket) {
-        LOG.log(Level.INFO, "       Local IP address: {0}", new Object[]{clientSocket.getLocalAddress()});
-        LOG.log(Level.INFO, "             Local port: {0}", new Object[]{Integer.toString(clientSocket.getLocalPort())});
-        LOG.log(Level.INFO, "  Remote Socket address: {0}", new Object[]{clientSocket.getRemoteSocketAddress()});
-        LOG.log(Level.INFO, "            Remote port: {0}", new Object[]{Integer.toString(clientSocket.getPort())});
-    }
 
     /**
      * A utility method to parse a client request. It must find an operator operand1 operand2
