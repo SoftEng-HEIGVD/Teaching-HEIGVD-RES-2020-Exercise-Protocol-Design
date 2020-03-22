@@ -21,6 +21,9 @@ public class Client {
     boolean connected = false;
     private int idClient = ++nbClient;
 
+    /**
+     * Default constructor of Client
+     */
     public Client() {
         // Ignore logs under WARNING level
         LOG.setLevel(Level.WARNING);
@@ -32,7 +35,7 @@ public class Client {
      * @param serverAddress the IP address used by the Presence Server
      */
     public String connect(String serverAddress) {
-        return connect(serverAddress, Protocol.PRESENCE_DEFAULT_PORT);
+        return connect(serverAddress, Protocol.DEFAULT_PORT);
     }
 
     /**
@@ -67,6 +70,9 @@ public class Client {
         return response;
     }
 
+    /**
+     * Disconnect the client from the server
+     */
     public void disconnect() {
         LOG.log(Level.INFO, "Attempting to disconnect");
         connected = false;
@@ -80,6 +86,9 @@ public class Client {
         }
     }
 
+    /**
+     * Closes in, out and closes socket
+     */
     private void cleanup() {
         try {
             if (in != null) {
@@ -102,6 +111,13 @@ public class Client {
         }
     }
 
+    /**
+     * Sends a calculation to the server and returns the reply of the server.
+     * @param a first operand
+     * @param b second operand
+     * @param op a compatible Operator
+     * @return String reply of the server
+     */
     public String getCalculationResult(int a, int b, Operator op) {
         LOG.log(Level.INFO, "Client {0} trying to calculate", idClient);
         if (!connected) {
