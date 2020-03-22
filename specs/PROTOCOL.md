@@ -1,0 +1,22 @@
+# Specifications
+
+- What transport protocol do we use?
+  - TCP
+- How does the client find the server (addresses and ports)?
+  - 10.192.19.159, port 49500
+- Who speaks first?
+  - The client
+- What is the sequence of messages exchanged by the client and the server? (flow)
+  - Hello I am a Roro client
+  - Hello I am a Bastien server
+  - 2 3 +
+  - Result : 5
+  - 4 8 + 7 +
+  - Result : 19
+  - GOOD BYE
+- What happens when a message is received from the other party? (semantics)
+  - Encoding : UTF8
+- What is the syntax of the messages? How we generate and parse them? (syntax)  
+  - The mathematical calculation will be written in [Reverse Polish notation](https://en.wikipedia.org/wiki/Reverse_Polish_notation). Exemple : ( 2 + 3 ) * 4 => * + 2 3 4
+- Who closes the connection and when?
+  - The server closes the connection. When the client notified it with "GOOD BYE", the server closes the connection.
