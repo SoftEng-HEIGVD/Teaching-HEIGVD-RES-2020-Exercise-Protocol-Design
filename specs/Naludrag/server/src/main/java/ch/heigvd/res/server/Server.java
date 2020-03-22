@@ -101,8 +101,8 @@ public class Server implements Runnable{
 
     /**
      * Function that shutdown the server.
-     * This function is not used for the moment but we let this function because we thought that it could become intersting
-     * to shutdown the server.
+     * This function is not used for the moment but we let this function because we thought that it could become interesting
+     * to shutdown the server after x seconds without any client for example.
      */
     private void shutdown() {
         LOG.info("Shutting down server...");
@@ -116,7 +116,7 @@ public class Server implements Runnable{
     }
 
     /**
-     * Inner-Class of server that permits to define what a client of the server can do
+     * Innerclass of Server that permits to define what a client of the server can do
      */
     class Worker implements Runnable {
 
@@ -128,12 +128,12 @@ public class Server implements Runnable{
 
         /**
          * Constructor of the class Worker
-         * @param clientSocket Socket that represents the socket used to communicate with the client
+         * @param clientSocket Socket that represents the socket that is used to communicate with the client
          */
         public Worker(Socket clientSocket) {
             this.clientSocket = clientSocket;
             try {
-                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(),Protocol.CHARSET));
+                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), Protocol.CHARSET));
                 out = new PrintWriter(clientSocket.getOutputStream());
                 connected = true;
                 idWorker = ++nbWorker;
@@ -152,6 +152,7 @@ public class Server implements Runnable{
                         connected = false;
                     } else if (tokens[0].toUpperCase().equals(Protocol.CMD_HELLO)) {
                         StringBuilder str = new StringBuilder("HELLO, GIVE CALCULATIONS(supported operators : ");
+                        //Run trough all available operators to send to the client
                         for(Operator op : Operator.values()){
                             str.append(op.toString());
                             str.append(" ");
@@ -159,7 +160,7 @@ public class Server implements Runnable{
                         str.append(")");
                         sendNotification(str.toString());
                     } else {
-                        //Creation of a new object calculator that permits to do a operation with a String array
+                        //Creation of a new object calculator that permits to calculate an operation with a String array
                         Calculator calculator = new Calculator(tokens);
                         new Thread(calculator).start();
                     }
@@ -210,7 +211,7 @@ public class Server implements Runnable{
         }
 
         /**
-         * Function that will permit to send notifications to the clients
+         * Function that will permit to send messages to the clients
          * @param message String containing the message that we want to send
          */
         public void sendNotification(String message) {
@@ -219,7 +220,7 @@ public class Server implements Runnable{
         }
 
         /**
-         * Function tha will disconnect the worker from the server
+         * Function that will disconnect the worker from the server
          */
         private void disconnect() {
             LOG.log(Level.INFO, "Disconnecting worker {0}", idWorker);
@@ -239,7 +240,7 @@ public class Server implements Runnable{
             int operand2;
 
             /**
-             * Specified Constrcutor to initalize an object Calculator
+             * Specified Constructor to initialize an object Calculator
              * @param tokens array of string that contains the operation that as to be done
              */
             public Calculator(String[] tokens) {

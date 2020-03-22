@@ -33,6 +33,7 @@ public class Client {
      * This method is used to connect to the server on the default port.
      *
      * @param serverAddress the IP address used by the Presence Server
+     * @return String reply of the server
      */
     public String connect(String serverAddress) {
         return connect(serverAddress, Protocol.DEFAULT_PORT);
@@ -43,13 +44,14 @@ public class Client {
      *
      * @param serverAddress the IP address used by the Presence Server
      * @param serverPort the port used by the Presence Server
+     * @return String reply of the server
      */
     public String connect(String serverAddress, int serverPort) {
         String response = "";
         LOG.log(Level.INFO, "Client {0} trying to connect", idClient);
         try {
             clientSocket = new Socket(serverAddress, serverPort);
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(),Protocol.CHARSET));
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), Protocol.CHARSET));
             out = new PrintWriter(clientSocket.getOutputStream());
             connected = true;
         } catch (IOException e) {
@@ -76,7 +78,7 @@ public class Client {
     public void disconnect() {
         LOG.log(Level.INFO, "Attempting to disconnect");
         connected = false;
-        //If the client didn't succeeded the connection out is null
+        //If the client didn't succeeded the connection out(outputStream) is null
         if(out != null) {
             out.println(Protocol.CMD_BYE);
             cleanup();
