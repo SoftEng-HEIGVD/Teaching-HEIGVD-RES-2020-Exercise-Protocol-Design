@@ -95,7 +95,7 @@ public class multiThreadedServer {
             public ServantWorker(Socket clientSocket) {
                 try {
                     this.clientSocket = clientSocket;
-                    in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                    in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(),"UTF-8"));
                     out = new PrintWriter(clientSocket.getOutputStream());
                 } catch (IOException ex) {
                     Logger.getLogger(multiThreadedServer.class.getName()).log(Level.SEVERE, null, ex);
@@ -107,27 +107,23 @@ public class multiThreadedServer {
 
                 try {
 
-                    //String clientIn = in.readLine();
-                    //if(clientIn.equals(protocol.CMD_CLIENTIN))
-                        //throw new UnknownFormatConversionException("Client bugged");
-
                     out.print(protocol.CMD_SERVERIN);
                     out.flush();
 
                     while(true){
 
                         String clientIn = in.readLine();
-                        if(clientIn.equals(protocol.CMD_CLIENTOUT))
+                        if(clientIn.equals(protocol.CMD_CLIENTOUT)) {
                             break;
-
+                        }
 
                         if(clientIn.equals(protocol.CMD_CLIENTIN)){
                             continue;
                         }
 
-                        // TODO: Pose problème !
                         if(!protocol.checkSyntax(clientIn)) {
                             out.print(protocol.CMD_SERVERNOOP);
+                            out.flush();
                             continue;
                         }
 
@@ -146,10 +142,16 @@ public class multiThreadedServer {
                                 res = n1 * n2;
                                 break;
                             case '/' :
+                                if(n2 == 0){
+                                    out.print(protocol.CMD_SERVERNOOP);
+                                    out.flush();
+                                    continue;
+                                }
                                 res = n1 / n2;
                                 break;
                             default:
                                 out.print(protocol.CMD_SERVERNOOP);
+                                out.flush();
                                 continue;
                         }
 

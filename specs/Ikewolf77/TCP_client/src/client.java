@@ -23,7 +23,7 @@ public class client {
     /**
      * This method does the whole processing
      */
-    public void sendWrongHttpRequest() {
+    public void start() {
         Socket clientSocket = null;
         OutputStream os = null;
         InputStream is = null;
@@ -56,7 +56,7 @@ public class client {
             while (true) {
                 //ask calculation in
                 LOG.log(Level.INFO, "Enter a calculation <number> <op> <number>: ");
-                String op = reader.readLine() + NEW_LINE;
+                String op = reader.readLine();
 
                 //check if quit
                 if(op.equals(protocol.CMD_CLIENTOUT)) {
@@ -64,7 +64,7 @@ public class client {
                     break;
                 }
 
-                op += " " + protocol.CMD_CLIENTCALC;
+                op += " " + protocol.CMD_CLIENTCALC + NEW_LINE;
                 os.write(op.getBytes());
 
                 //get server answer
@@ -103,7 +103,7 @@ public class client {
         System.setProperty("java.util.logging.SimpleFormatter.format", "%5$s %n");
 
         client client = new client();
-        client.sendWrongHttpRequest();
+        client.start();
 
     }
 

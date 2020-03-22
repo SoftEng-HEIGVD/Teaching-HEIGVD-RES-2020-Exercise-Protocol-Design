@@ -8,10 +8,10 @@ public class protocol {
     public static final String CMD_SERVERNOOP = "Unrecognized command";
 
     public static Boolean checkSyntax(String s){
-        if(s.length() != 5)
+        if(s.length() != 15)
             return false;
 
-        if(!Character.isDigit(s.charAt(0)) || s.charAt(1) != ' ' || !Character.isDigit(s.charAt(4)) || s.charAt(3) != ' ')
+        if(!Character.isDigit(s.charAt(0)) || s.charAt(1) != ' ' || !Character.isDigit(s.charAt(4)) || s.charAt(3) != ' ' || !s.substring(6).equals(CMD_CLIENTCALC))
             return false;
 
         return true;
