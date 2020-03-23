@@ -55,6 +55,7 @@ public class CalculatorServer {
      * @throws Exception if there are missing operator and/or componenent or if there is a division by 0
      */
     private int calculate(String calc) throws Exception {
+        //TODO : allow more "complicated" operations (eg.: 2 + 1 - 3 * 4)
         String components[] = new String[COMPONENTS];
         int component1, component2;
         char operator[] = new char[COMPONENTS-1];
