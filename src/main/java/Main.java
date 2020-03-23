@@ -3,6 +3,11 @@ import server.Server;
 
 import java.io.IOException;
 
+/**
+ * Main program for both server and client.
+ * run this with no arguments for server mode
+ * run this with @ip or DNS name for client mode
+ */
 public class Main {
 
     public static void main(String[] args) {
