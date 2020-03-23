@@ -48,8 +48,15 @@ public class CalculatorServer {
         new Thread(new ReceptionistWorker()).start();
     }
 
+    /**
+     * Method used to do a simple calculation
+     * @param calc (String) the calculation to evaluate
+     * @return reslut (int) the result of the calculation
+     * @throws Exception if there are missing operator and/or componenent or if there is a division by 0
+     */
     private int calculate(String calc) throws Exception {
         String components[] = new String[COMPONENTS];
+        int component1, component2;
         char operator[] = new char[COMPONENTS-1];
         int index = 0;
         for (int i = 0; i < calc.length(); ++i) {
@@ -66,18 +73,25 @@ public class CalculatorServer {
             }
         }
 
+        if(components[1] == null || components[1] == null) {
+            throw new Exception("The given calculus is invalid");
+        }
+
+        component1 = Integer.parseInt(components[0]);
+        component2 = Integer.parseInt(components[1]);
+
         switch (operator[0]){
-            case '+' : return Integer.parseInt(components[0]) + Integer.parseInt(components[1]);
-            case '-' : return Integer.parseInt(components[0]) - Integer.parseInt(components[1]);
+            case '+' : return component1 + component2;
+            case '-' : return component1 - component2;
             case '/' :
-                if( Integer.parseInt(components[1]) != 0) {
-                    return Integer.parseInt(components[0]) / Integer.parseInt(components[1]);
+                if( component2 != 0) {
+                    return component1 / component2;
                 } else {
                     throw new ArithmeticException("You can't divide a number by 0 !");
                 }
-            case '*' : return Integer.parseInt(components[0]) * Integer.parseInt(components[1]);
-            case '^' : return Integer.parseInt(components[0]) ^ Integer.parseInt(components[1]);
-            default: throw new Exception("A problem occurred");
+            case '*' : return component1 * component2;
+            case '^' : return component1 ^ component2;
+            default: throw new Exception("Unrecognized operation");
         }
     }
 
@@ -110,7 +124,6 @@ public class CalculatorServer {
                     Logger.getLogger(CalculatorServer.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-
         }
 
         /**
