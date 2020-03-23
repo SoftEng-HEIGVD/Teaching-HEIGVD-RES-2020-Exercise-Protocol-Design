@@ -41,28 +41,29 @@ public class Server
             connectionOpened = true;
             System.out.println("Connection established");
         }
-        else if (connectionOpened)
-        {
-            try
-            {
-                result = calculateRequest(fromClient.readLine());
-            }
-            catch (Exception e)
-            {
-                throw new IOException("Invalid format");
-            }
-        }
-        else
-        {
-            throw new IOException("Invalid format");
-        }
 
-        if (connectionOpened && fromClient.readLine().equals("RECEIVED"))
+        String line;
+        while (connectionOpened && (line=fromClient.readLine())!=null)
         {
-            sendToClient("CLOSE");
-            connectionOpened = false;
-            fromClient.close();
-            toClient.close();
+            if (line.equals("RECEIVED"))
+            {
+                sendToClient("CLOSE");
+                connectionOpened = false;
+                fromClient.close();
+                toClient.close();
+            }
+            else
+            {
+                try
+                {
+                    result = calculateRequest(line);
+                    sendToClient(String.valueOf(result));
+                }
+                catch (Exception e)
+                {
+                    throw new IOException("Invalid format");
+                }
+            }
         }
     }
 
@@ -106,13 +107,13 @@ public class Server
                 }//end switch
             }//end if-else
         }//end for
-        System.out.println("Calculation done, result is " + result + "\n");
+        System.out.println("Calculation done, result is " + numberStack.firstElement() + "\n");
         return numberStack.firstElement();
     }
 
     private void sendToClient(String instruct) throws IOException
     {
-        toClient.write(instruct);
+        toClient.write(instruct + "\n");
         toClient.flush();
     }
 }

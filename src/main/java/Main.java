@@ -12,9 +12,8 @@ public class Main {
         if(args.length > 0){
             try {
                 Client c = new Client(args[0]);
-                c.sendRequest("2 3 * 4 +");
+                c.sendRequest("23*");
                 c.verifyResponse();
-
                 c.terminate();
 
             } catch (IOException e) {

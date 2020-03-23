@@ -15,7 +15,9 @@ public class Client
         is = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         os = new BufferedWriter(new PrintWriter(socket.getOutputStream()));
         sendRequest("OPEN");
+        System.out.println("OPEN sent");
         if(!is.readLine().equals("ACK")){
+            System.out.println("Doit être ACK");
             terminate();
         }
     }
@@ -28,21 +30,23 @@ public class Client
     }
 
     public void sendRequest(String request) throws IOException {
-        os.write(request);
+        os.write(request + "\n");
         os.flush();
     }
 
     public void verifyResponse() throws IOException {
         String r = is.readLine();
         if(r.equals("CLOSE")){
+            System.out.println("CLOSE received");
             terminate();
         }
         if(r.equals("INVALID FORMAT")){
+            System.out.println("INVALID FORMAT SENT");
             terminate();
             throw new IOException("Invalid request format");
         }
         if(r.matches("^[0-9]*$")){
-            os.write("RECEIVED");
+            sendRequest("RECEIVED");
             System.out.println(r);
             return;
         }
