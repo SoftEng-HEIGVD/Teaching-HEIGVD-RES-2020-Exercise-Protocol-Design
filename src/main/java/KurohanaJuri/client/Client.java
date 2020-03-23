@@ -1,16 +1,14 @@
+package KurohanaJuri.client;
+
 import java.io.*;
 import java.net.Socket;
 
 public class Client {
 
-    private final static String HOSTNAME = "10.192.91.10";
-    private final static String LOCALHOST = "127.0.0.1";
-    private final static int PORT = 9999;
 
-
-    public static void main(String[] args) {
+    public Client(String hostname, int port) {
         // Create a client and try to connect
-        try (Socket clientSocket = new Socket(LOCALHOST, PORT)) {
+        try (Socket clientSocket = new Socket(hostname, port)) {
 
             InputStream is = clientSocket.getInputStream();
             OutputStream os = clientSocket.getOutputStream();
@@ -37,7 +35,7 @@ public class Client {
                 String[] inputArray = userInput.split(" ");
 
 
-                // Write through the socker
+                // Write through the socket
                 PrintWriter writer = new PrintWriter(os);
 
                 writer.println("COMPUTE " + inputArray[1] + " " + inputArray[0] + " " + inputArray[2]);

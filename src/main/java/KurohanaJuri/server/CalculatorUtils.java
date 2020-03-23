@@ -1,3 +1,5 @@
+package KurohanaJuri.server;
+
 public class CalculatorUtils {
 
     private static final char OP_ADDITION       = '+';

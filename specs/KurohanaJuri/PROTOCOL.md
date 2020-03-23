@@ -2,7 +2,7 @@
 
 * Transport protocol : TCP
 * Adredress and port : `10.192.91.10:220`
-* Speaks first : Client
+* Speaks first : KurohanJuri.client.Client
 * Flow :
 ![](Images/TCP.gif)
 * Semantics :
@@ -10,4 +10,4 @@
   * Send a proper response back
 * Syntax :
   `Message {CONNECTION|COMPUTE|END} [Operation] [val1] [val2]`
-* Closed by : Client 
+* Closed by : KurohanJuri.client.Client 
