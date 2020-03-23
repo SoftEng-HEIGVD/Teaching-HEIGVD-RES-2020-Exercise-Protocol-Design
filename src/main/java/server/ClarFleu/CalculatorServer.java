@@ -22,7 +22,7 @@ import static java.lang.System.out;
  *          Clarisse Fleurimont
  */
 public class CalculatorServer {
-    private final static int COMPONENTS = 2;
+    private final static int COMPONENTS = 3;
     final static Logger LOG = Logger.getLogger(CalculatorServer.class.getName());
 
     int port;
@@ -54,45 +54,43 @@ public class CalculatorServer {
      * @return reslut (int) the result of the calculation
      * @throws Exception if there are missing operator and/or componenent or if there is a division by 0
      */
-    private int calculate(String calc) throws Exception {
-        //TODO : allow more "complicated" operations (eg.: 2 + 1 - 3 * 4)
+    private double calculate(String calc) throws Exception {
         String components[] = new String[COMPONENTS];
-        int component1, component2;
-        char operator[] = new char[COMPONENTS-1];
         int index = 0;
         for (int i = 0; i < calc.length(); ++i) {
             char c = calc.charAt(i);
-            if(Character.isDigit(c)) {
+            if(c != ' ') {
                 if(components[index] == null) {
                     components[index] = "" + c;
                 } else {
                     components[index] += c;
                 }
-            } else if(c != ' ') {
-                operator[index] = c;
+            } else {
                 ++index;
+            }
+            if(index >= COMPONENTS) {
+                throw new Exception("There are too many arguments");
             }
         }
 
-        if(components[1] == null || components[1] == null) {
-            throw new Exception("The given calculus is invalid");
+        for (String comp :
+                components) {
+            if (comp == null)
+                throw new Exception("One component is missing");
         }
 
-        component1 = Integer.parseInt(components[0]);
-        component2 = Integer.parseInt(components[1]);
-
-        switch (operator[0]){
-            case '+' : return component1 + component2;
-            case '-' : return component1 - component2;
-            case '/' :
-                if( component2 != 0) {
-                    return component1 / component2;
+        switch (components[1]){
+            case "+" : return Double.parseDouble(components[0]) + Double.parseDouble(components[2]);
+            case "-" : return Double.parseDouble(components[0]) - Double.parseDouble(components[2]);
+            case "/" :
+                if( Double.parseDouble(components[2]) != 0) {
+                    return Double.parseDouble(components[0]) / Double.parseDouble(components[2]);
                 } else {
                     throw new ArithmeticException("You can't divide a number by 0 !");
                 }
-            case '*' : return component1 * component2;
-            case '^' : return component1 ^ component2;
-            default: throw new Exception("Unrecognized operation");
+            case "*" : return Double.parseDouble(components[0]) * Double.parseDouble(components[2]);
+            case "%" : return Double.parseDouble(components[0]) % Double.parseDouble(components[2]);
+            default  : throw new Exception("Unrecognized operation");
         }
     }
 
@@ -152,11 +150,18 @@ public class CalculatorServer {
             @Override
             public void run() {
                 String line;
-                boolean shouldRun = true;
+                boolean shouldRun = false;
 
-                out.println("Hello, I am your calculator, what do you want me to calculate ?\nSay 'Bye' to exit.");
-                out.flush();
                 try {
+                    LOG.info("Reading until client sends HELLO to open the connection...");
+                    while (!shouldRun && (line = in.readLine()) != null) {
+                        if(line.equalsIgnoreCase("hello")){
+                            shouldRun = true;
+                            out.println("Hello, I am your calculator, what do you want me to calculate ?\nSay 'Bye' to exit.");
+                        }
+                        out.flush();
+                    }
+
                     LOG.info("Reading until client sends BYE or closes the connection...");
                     while ((shouldRun) && (line = in.readLine()) != null) {
                         if (line.equalsIgnoreCase("bye")) {
@@ -164,9 +169,9 @@ public class CalculatorServer {
                             shouldRun = false;
                         } else {
                             try {
-                                out.println("> " + line.toUpperCase() + " = " + calculate(line));
+                                out.println("> " + calculate(line));
                             } catch (Exception e) {
-                                out.println("Error : " + e);
+                                out.println("Error : " + e.getMessage());
                             }
 
                         }
