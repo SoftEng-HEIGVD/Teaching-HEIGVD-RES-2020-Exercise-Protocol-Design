@@ -4,7 +4,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
+import java.io.IOException;
+import java.io.*;
+import java.net.Socket;
+
 public class CalculatorClient {
+
+    final static int BUFFER_SIZE = 1024;
+    String host;
+    int port;
 
     // constants
     private final int buttonWidth = 75;
@@ -25,7 +33,7 @@ public class CalculatorClient {
     private final Font font = new Font(fontName, Font.PLAIN, 23);
     private final Font opFont = new Font(fontName, Font.PLAIN, 35);
 
-    private enum buttonClicked {
+    private enum Action {
         NUM,
         DEC,
         OP,
@@ -38,12 +46,16 @@ public class CalculatorClient {
     private JTextField field;
 
     private String calculus;
-    private String lastResult;
     private boolean decimalNumber = false;
-    private char lastSign = '+';
-    private buttonClicked lastAction;
+    private Action lastAction;
 
-    public CalculatorClient() {
+    public CalculatorClient(String host, int port) {
+        // Network stuff
+        this.host = host;
+        this.port = port;
+
+
+        //GUI Stuff
         // setting frame size
         frame = new JFrame(); //creating instance of JFrame
         frame.getContentPane().setPreferredSize(new Dimension(frameWidth, frameHeight));
@@ -86,10 +98,10 @@ public class CalculatorClient {
         field.setBorder(javax.swing.BorderFactory.createEmptyBorder());
         frame.add(field);
 
-        clear();
-
         frame.setLayout(null); //using no layout managers
         frame.setVisible(true); //making the frame visible
+
+        clear();
     }
 
     private void appendNum(int i) {
@@ -98,11 +110,11 @@ public class CalculatorClient {
                 if (i == 0) {
                     return;
                 } else {
-                    calculus = "+" + String.valueOf(i);
+                    calculus = "+" + i;
                 }
                 break;
             case EQUAL:
-                calculus = "+" + String.valueOf(i);
+                calculus = "+" + i;
                 break;
             case OP:
                 calculus += "+" + i;
@@ -117,7 +129,7 @@ public class CalculatorClient {
                 }
         }
 
-        lastAction = buttonClicked.NUM;
+        lastAction = Action.NUM;
         update(calculus);
     }
 
@@ -128,7 +140,7 @@ public class CalculatorClient {
                 calculus = calculus.substring(0, calculus.length() - 3) + newOp;
                 break;
             case EQUAL:
-                calculus = lastResult + newOp;
+                calculus = calculus + newOp;
                 break;
             case DEC:
                 calculus += "0" + newOp;
@@ -140,12 +152,12 @@ public class CalculatorClient {
         }
 
         decimalNumber = false;
-        lastAction = buttonClicked.OP;
+        lastAction = Action.OP;
         update(calculus);
     }
 
     private void appendDecimalpoint() {
-        if (lastAction == buttonClicked.ERROR) {
+        if (lastAction == Action.ERROR) {
             return;
         }
 
@@ -164,47 +176,59 @@ public class CalculatorClient {
         }
 
         decimalNumber = true;
-        lastAction = buttonClicked.DEC;
+        lastAction = Action.DEC;
         update(calculus);
     }
 
     private void changeSign() {
-        if (lastAction == buttonClicked.ERROR) {
+        if (lastAction == Action.ERROR) {
             return;
         }
 
         int index = lastIndexOfSign(calculus);
         if (index == -1) {
-            displayError(); // no sign was found, error.
+            displayError("SIGN ERROR"); // no sign was found, error.
             return;
         }
 
-        lastSign = lastSign == '+' ? '-' : '+';
-        calculus = calculus.substring(0, index) + lastSign + calculus.substring(index + 1);
+        char newSign = calculus.charAt(index) == '+' ? '-' : '+';
+        calculus = calculus.substring(0, index) + newSign + calculus.substring(index + 1);
 
         update(calculus);
     }
 
     private void equal() {
-        if (lastAction == buttonClicked.ERROR) {
+        if (lastAction == Action.ERROR) {
             return;
         }
 
-        calculus = "RESULT";
-        lastResult = "+17";
-        lastSign = '+';
+        String answer = sendMessage(calculus);
+        if (answer.startsWith("ERROR")) {
+            displayError(answer);
+            return;
+        }
 
-        lastAction = buttonClicked.EQUAL;
+        if (!answer.contains("+")) {
+            answer = "+" + answer;
+        }
+
+        if (answer.contains(".")) {
+            decimalNumber = true;
+        } else {
+            decimalNumber = false;
+        }
+
+        calculus = answer;
+
+        lastAction = Action.EQUAL;
         update(calculus);
     }
 
     private void clear() {
         calculus = "+0";
-        lastResult = "+0";
-        lastSign = '+';
         decimalNumber = false;
 
-        lastAction = buttonClicked.CLEAR;
+        lastAction = Action.CLEAR;
         update(calculus);
     }
 
@@ -234,9 +258,9 @@ public class CalculatorClient {
         return -1; // There was an error, no sign char was found
     }
 
-    private void displayError() {
-        calculus = "ERROR";
-        lastAction = buttonClicked.ERROR;
+    private void displayError(String error) {
+        calculus = error;
+        lastAction = Action.ERROR;
         update(calculus);
     }
 
@@ -254,5 +278,58 @@ public class CalculatorClient {
 
     private JButton createButton(int horizIndex, int vertIndex, String label, Color backgroundColor, Color foregroundColor, ActionListener actionListener) {
         return createButton(horizIndex, vertIndex, 1, 1, label, backgroundColor, foregroundColor, font, actionListener);
+    }
+
+    /**
+     * This method does the whole network thing.
+     * @param msg The message to send
+     * @return True if the server answered normally, false if there was an error.
+     */
+    public String sendMessage(String msg) {
+        Socket clientSocket = null;
+        OutputStream os = null;
+        InputStream is = null;
+
+        try {
+            clientSocket = new Socket(host, port);
+            os = clientSocket.getOutputStream();
+            is = clientSocket.getInputStream();
+
+            String request = msg;
+            os.write(request.getBytes());
+
+            ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream();
+            byte[] buffer = new byte[BUFFER_SIZE];
+            int newBytes;
+            while ((newBytes = is.read(buffer)) != -1) {
+                responseBuffer.write(buffer, 0, newBytes);
+            }
+
+            System.out.println("Response sent by the server: " + responseBuffer.toString());
+            return responseBuffer.toString();
+
+        } catch (IOException ex) {
+            System.out.println("Une erreur IO est survenue");
+            return "ERROR";
+        } finally {
+            try {
+                is.close();
+            } catch (IOException ex) {
+                System.out.println("Une erreur IO est survenue");
+                return "ERROR";
+            }
+            try {
+                os.close();
+            } catch (IOException ex) {
+                System.out.println("Une erreur IO est survenue");
+                return "ERROR";
+            }
+            try {
+                clientSocket.close();
+            } catch (IOException ex) {
+                System.out.println("Une erreur IO est survenue");
+                return "ERROR";
+            }
+        }
     }
 }
