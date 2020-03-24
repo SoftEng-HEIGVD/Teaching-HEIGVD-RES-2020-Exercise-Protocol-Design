@@ -4,15 +4,22 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.*;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 public class CalculatorClient {
 
     final static int BUFFER_SIZE = 1024;
     String host;
     int port;
+
+    Socket clientSocket = null;
+    BufferedReader in = null;
+    PrintWriter out = null;
 
     // constants
     private final int buttonWidth = 75;
@@ -62,7 +69,11 @@ public class CalculatorClient {
         frame.getContentPane().setBackground(darkDarkGray);
         frame.pack();
         frame.setResizable(false);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter() {
+                                    public void windowClosing(WindowEvent e) {
+                                        exit();
+                                    }
+                                });
 
         frame.add(createButton(0, 1, "AC", darkGray, Color.WHITE,  e -> clear()));
         frame.add(createButton(1, 1, "+/-", darkGray, Color.WHITE, e -> changeSign()));
@@ -102,6 +113,23 @@ public class CalculatorClient {
         frame.setVisible(true); //making the frame visible
 
         clear();
+
+        // Setting up connection
+        try {
+            clientSocket = new Socket(host, port);
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            out = new PrintWriter(clientSocket.getOutputStream());
+        } catch (UnknownHostException e) {
+            displayError("ERROR: UNK HOST");
+        } catch (IOException e) {
+            displayError("ERROR: IO SETUP");
+        }
+
+        // Greetings$
+        String msg = sendMessage("HELLO");
+        if (!msg.equals("HELLO CALC")) {
+            displayError("ERROR: SRV ANS");
+        }
     }
 
     private void appendNum(int i) {
@@ -282,54 +310,31 @@ public class CalculatorClient {
 
     /**
      * This method does the whole network thing.
-     * @param msg The message to send
+     * @param request The message to send
      * @return True if the server answered normally, false if there was an error.
      */
-    public String sendMessage(String msg) {
-        Socket clientSocket = null;
-        OutputStream os = null;
-        InputStream is = null;
-
+    public String sendMessage(String request) {
         try {
-            clientSocket = new Socket(host, port);
-            os = clientSocket.getOutputStream();
-            is = clientSocket.getInputStream();
-
-            String request = msg;
-            os.write(request.getBytes());
-
-            ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream();
-            byte[] buffer = new byte[BUFFER_SIZE];
-            int newBytes;
-            while ((newBytes = is.read(buffer)) != -1) {
-                responseBuffer.write(buffer, 0, newBytes);
-            }
-
-            System.out.println("Response sent by the server: " + responseBuffer.toString());
-            return responseBuffer.toString();
-
+            out.println(request);
+            out.flush();
+            return in.readLine();
         } catch (IOException ex) {
-            System.out.println("Une erreur IO est survenue");
-            return "ERROR";
-        } finally {
-            try {
-                is.close();
-            } catch (IOException ex) {
-                System.out.println("Une erreur IO est survenue");
-                return "ERROR";
-            }
-            try {
-                os.close();
-            } catch (IOException ex) {
-                System.out.println("Une erreur IO est survenue");
-                return "ERROR";
-            }
-            try {
-                clientSocket.close();
-            } catch (IOException ex) {
-                System.out.println("Une erreur IO est survenue");
-                return "ERROR";
-            }
+            return "ERROR: IO";
+        }
+    }
+
+    public void exit() {
+        System.out.print(sendMessage("BYE"));
+        try {
+            in.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        out.close();
+        try {
+            clientSocket.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 }

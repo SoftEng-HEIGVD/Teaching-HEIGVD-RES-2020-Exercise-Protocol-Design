@@ -81,7 +81,7 @@ public class CalculatorServer {
         switch (components[1]){
             case "+" : return Double.parseDouble(components[0]) + Double.parseDouble(components[2]);
             case "-" : return Double.parseDouble(components[0]) - Double.parseDouble(components[2]);
-            case "/" :
+            case "÷" :
                 if( Double.parseDouble(components[2]) != 0) {
                     return Double.parseDouble(components[0]) / Double.parseDouble(components[2]);
                 } else {
@@ -156,7 +156,7 @@ public class CalculatorServer {
                     while (!shouldRun && (line = in.readLine()) != null) {
                         if(line.equalsIgnoreCase("hello")){
                             shouldRun = true;
-                            out.println("Hello, I am your calculator, what do you want me to calculate ?\nSay 'Bye' to exit.");
+                            out.println("HELLO CALC");
                         }
                         out.flush();
                     }
@@ -169,7 +169,7 @@ public class CalculatorServer {
                         } else {
                             try {
                                 double result = calculate(line);
-                                out.println("> " + ((result == (long) result) ? String.format("%d",(long)result) : result));
+                                out.println(((result == (long) result) ? String.format("%d",(long)result) : result));
                             } catch (Exception e) {
                                 out.println("ERROR : " + e.getMessage());
                             }
