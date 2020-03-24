@@ -1,6 +1,6 @@
 package server.ClarFleu;
 
-public class Launcher {
+public class ServerLauncher {
     public static void main(String[] args) {
         System.setProperty("java.util.logging.SimpleFormatter.format", "%5$s %n");
 
