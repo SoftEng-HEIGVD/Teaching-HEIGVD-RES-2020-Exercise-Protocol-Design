@@ -96,7 +96,7 @@ public class CalculatorClient {
         frame.add(createButton(0, 2, "7", lightGray, Color.WHITE, e -> appendNum(7)));
         frame.add(createButton(1, 2, "8", lightGray, Color.WHITE, e -> appendNum(8)));
         frame.add(createButton(2, 2, "9", lightGray, Color.WHITE, e -> appendNum(9)));
-        frame.add(createButton(2, 5, ".", lightGray, Color.WHITE, e -> appendDecimalpoint()));
+        frame.add(createButton(2, 5, ".", lightGray, Color.WHITE, e -> appendDecimalPoint()));
 
         field = new JTextField();
         field.setEditable(false);
@@ -138,20 +138,20 @@ public class CalculatorClient {
                 if (i == 0) {
                     return;
                 } else {
-                    calculus = "+" + i;
+                    calculus = String.valueOf(i);
                 }
                 break;
             case EQUAL:
-                calculus = "+" + i;
+                calculus = String.valueOf(i);
                 break;
             case OP:
-                calculus += "+" + i;
+                calculus += i;
                 break;
             case ERROR:
                 return;
             default:
                 if (singleZero()) {
-                    calculus = calculus.substring(0, calculus.length() - 2) + "+" + i;
+                    calculus = calculus.substring(0, calculus.length() - 1) + i;
                 } else {
                     calculus += i;
                 }
@@ -184,7 +184,7 @@ public class CalculatorClient {
         update(calculus);
     }
 
-    private void appendDecimalpoint() {
+    private void appendDecimalPoint() {
         if (lastAction == Action.ERROR) {
             return;
         }
@@ -195,7 +195,7 @@ public class CalculatorClient {
 
         switch(lastAction) {
             case OP:
-                calculus += "+0.";
+                calculus += "0.";
                 break;
             case DEC:
                 return;
@@ -214,13 +214,18 @@ public class CalculatorClient {
         }
 
         int index = lastIndexOfSign(calculus);
-        if (index == -1) {
+        if (index == -2) {
             displayError("SIGN ERROR"); // no sign was found, error.
             return;
+        } else if (index == -1) {
+            calculus = "-" + calculus;
+        } else {
+            if (calculus.charAt(index) == ' ') {// This is the implied +. Need to add a -, the space is already there
+                calculus = calculus.substring(0, index + 1) + '-' + calculus.substring(index + 1);
+            } else {// this is the - and a space behind it. Need to delete the -, the space is now the implied +. If there is no space, it is back to being the initial state.
+                calculus = calculus.substring(0, index) + calculus.substring(index + 1);
+            }
         }
-
-        char newSign = calculus.charAt(index) == '+' ? '-' : '+';
-        calculus = calculus.substring(0, index) + newSign + calculus.substring(index + 1);
 
         update(calculus);
     }
@@ -236,15 +241,7 @@ public class CalculatorClient {
             return;
         }
 
-        if (!answer.contains("+")) {
-            answer = "+" + answer;
-        }
-
-        if (answer.contains(".")) {
-            decimalNumber = true;
-        } else {
-            decimalNumber = false;
-        }
+        decimalNumber = answer.contains(".");
 
         calculus = answer;
 
@@ -253,7 +250,7 @@ public class CalculatorClient {
     }
 
     private void clear() {
-        calculus = "+0";
+        calculus = "0";
         decimalNumber = false;
 
         lastAction = Action.CLEAR;
@@ -266,24 +263,27 @@ public class CalculatorClient {
 
     private boolean singleZero() {
         String[] split = calculus.split(" ");
-        return split[split.length-1].equals("+0");
+        return split[split.length-1].equals("0");
     }
 
     /**
-     * Finds the last index of the + or - char that isn't surrounded by spaces
+     * Finds the last index of the implied + or - char that isn't surrounded by spaces
      * @return Said index
      */
     private int lastIndexOfSign(String string) {
-        for (int i = string.length() - 1; i >= 0; i--) {
-            if (string.charAt(i) == '+' || string.charAt(i) == '-') {
-                if (i == 0) {
-                    return 0;
-                } else if (!(string.charAt(i-1) == ' ' && string.charAt(i+1) == ' ')) {
+        for (int i = string.length() - 2; i >= 0; i--) {
+            if (string.charAt(i) == ' ' || string.charAt(i) == '-') {
+                if (Character.isDigit(string.charAt(i+1))) { //This is the sign we're looking for
                     return i;
                 }
             }
         }
-        return -1; // There was an error, no sign char was found
+
+        if (Character.isDigit(string.charAt(0))) {
+            return -1; // This is the first number and it is positive, it has no space behind it (index 0)
+        }
+
+        return -2; // There was an error, no sign char was found
     }
 
     private void displayError(String error) {
@@ -324,7 +324,7 @@ public class CalculatorClient {
     }
 
     public void exit() {
-        System.out.print(sendMessage("BYE"));
+        sendMessage("BYE");
         try {
             in.close();
         } catch (IOException ex) {
@@ -336,5 +336,7 @@ public class CalculatorClient {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+
+        System.exit(0);
     }
 }
