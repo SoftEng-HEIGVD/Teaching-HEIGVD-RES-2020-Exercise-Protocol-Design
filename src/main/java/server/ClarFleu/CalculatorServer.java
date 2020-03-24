@@ -69,14 +69,13 @@ public class CalculatorServer {
                 ++index;
             }
             if(index >= COMPONENTS) {
-                throw new Exception("There are too many arguments");
+                throw new Exception("EXCES COMP");
             }
         }
 
-        for (String comp :
-                components) {
+        for (String comp : components) {
             if (comp == null)
-                throw new Exception("One component is missing");
+                throw new Exception("COMP MISS");
         }
 
         switch (components[1]){
@@ -86,11 +85,11 @@ public class CalculatorServer {
                 if( Double.parseDouble(components[2]) != 0) {
                     return Double.parseDouble(components[0]) / Double.parseDouble(components[2]);
                 } else {
-                    throw new ArithmeticException("You can't divide a number by 0 !");
+                    throw new ArithmeticException("DIV 0");
                 }
-            case "*" : return Double.parseDouble(components[0]) * Double.parseDouble(components[2]);
+            case "x" : return Double.parseDouble(components[0]) * Double.parseDouble(components[2]);
             case "%" : return Double.parseDouble(components[0]) % Double.parseDouble(components[2]);
-            default  : throw new Exception("Unrecognized operation");
+            default  : throw new Exception("UNK OP");
         }
     }
 
@@ -169,9 +168,10 @@ public class CalculatorServer {
                             shouldRun = false;
                         } else {
                             try {
-                                out.println("> " + calculate(line));
+                                double result = calculate(line);
+                                out.println("> " + ((result == (long) result) ? String.format("%d",(long)result) : result));
                             } catch (Exception e) {
-                                out.println("Error : " + e.getMessage());
+                                out.println("ERROR : " + e.getMessage());
                             }
 
                         }
