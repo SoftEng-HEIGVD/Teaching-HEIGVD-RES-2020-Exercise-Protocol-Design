@@ -37,6 +37,12 @@ The calculation requests MUST have the following structure :
 ```
 There cannot be more that two components to a computation.\
 + signs are implicit, - signs are explicit.\
+Supported operations are:
+    - +
+    - -
+    - x
+    - ÷
+    - %
 
 Errors:\
 If the servers can't process a computation, it will answer:
