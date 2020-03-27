@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,7 +16,10 @@ public class CalcServer {
         System.setProperty("java.util.logging.SimpleFormatter.format", "[%1$tF %1$tT] [%4$s] %5$s%n");
         LOG = Logger.getLogger(CalcServer.class.getName());
     }
+
     final static int PORT = 4452;
+    final static String VERSION = "0.2.1";
+    final static String WELCOME_MESSAGE = "CALC SERVER (Ali v" + VERSION + ")";
 
     private enum SupportedOperation {ADD, SUB, MULT, DIV};
 
@@ -79,7 +81,7 @@ public class CalcServer {
                 String line;
                 boolean shouldRun = true;
 
-                out.println("CALC SERVER (Ali v.0.2.1)");
+                out.println(WELCOME_MESSAGE);
                 out.flush();
                 StringBuilder supOp = new StringBuilder();
                 for (SupportedOperation op : SupportedOperation.values()) {
@@ -94,21 +96,23 @@ public class CalcServer {
                     LOG.info("Waiting for operations or client closes the connection...");
                     while ((shouldRun) && (line = in.readLine()) != null) {
                         String[] parts = line.split(" ");
-
-                        LOG.info("Parts: " + Arrays.toString(parts));
-
-                        // TODO check parts
-                        String operation = parts[0];
-                        float operand1 = Float.parseFloat(parts[1]);
-                        float operand2 = Float.parseFloat(parts[2]);
-
                         try {
+                            if(parts.length != 3) {
+                                throw new IllegalArgumentException("Number of args incorrect");
+                            }
+                            String operation = parts[0];
+                            float operand1 = Float.parseFloat(parts[1]);
+                            float operand2 = Float.parseFloat(parts[2]);
+
                             float result = executeOperation(SupportedOperation.valueOf(operation), operand1, operand2);
-                            out.print(String.format("%.2f%n", result));
+                            out.println(String.format("RESULT %.2f", result).replace(',', '.'));
                             out.flush();
                             LOG.info("Result: " + result);
                         } catch (Exception e) {
-                            LOG.warning("Error in operation");
+                            LOG.severe(e.getMessage());
+                            out.println("ERROR parsing failed");
+                            out.flush();
+                            shouldRun = false;
                         }
                     }
 
@@ -139,6 +143,15 @@ public class CalcServer {
                 }
             }
 
+            /**
+             * Execution the operation and return the result
+             *
+             * @param operation Operation to execute
+             * @param operand1
+             * @param operand2
+             * @throws IllegalArgumentException If operation is incorrect
+             * @return Result
+             */
             private float executeOperation(SupportedOperation operation, float operand1, float operand2) {
                switch (operation) {
                    case ADD:
@@ -150,7 +163,7 @@ public class CalcServer {
                    case DIV:
                        return operand1 / operand2;
                    default:
-                       throw new RuntimeException("Operation not supported");
+                       throw new IllegalArgumentException("Operation not supported");
                }
             }
         }
