@@ -1,14 +1,96 @@
-import javafx.application.Application;
-        import javafx.stage.Stage;
+import java.io.*;
+import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-        public class Client extends Application {
+/**
+* This is not really an HTTP client, but rather a very simple program that
+* establishes a TCP connection with a real HTTP server. Once connected, the
+* client sends "garbage" to the server (the client does not send a proper
+* HTTP request that the server would understand). The client then reads the
+* response sent back by the server and logs it onto the console.
+*
+* @author Olivier Liechti
+*/
+public class Client {
 
-        public static void main(String[] args) {
-        launch(args);
+    static final Logger LOG = Logger.getLogger(Client.class.getName());
+
+    final static int BUFFER_SIZE = 1024;
+
+    /**
+    * This method does the whole processing
+    */
+    public void sendToServer() {
+        Socket clientSocket = null;
+        OutputStream os = null;
+        InputStream is = null;
+
+        try {
+            clientSocket = new Socket("localhost", 2205);
+
+            os = clientSocket.getOutputStream();
+            is = clientSocket.getInputStream();
+
+            while(true){
+
+                //user input
+                Scanner userInput = new Scanner(System.in);
+                System.out.println("Entrez le calcul à effectuer selon la convention opérateur opérande1 opérande2:");
+                String strUserInput = userInput.nextLine();
+
+                if(strUserInput.equals("X")){
+                    break;
+                }
+
+                //send to the server
+                os.write(strUserInput.getBytes());
+
+                //read the server response
+                ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream();
+                byte[] buffer = new byte[BUFFER_SIZE];
+                int newBytes;
+                while ((newBytes = is.read(buffer)) != -1) {
+                responseBuffer.write(buffer, 0, newBytes);
+                }
+
+                System.out.println(responseBuffer);
+
+
+            }
+
+            LOG.log(Level.INFO, "Response sent by the server: ");
+            LOG.log(Level.INFO, responseBuffer.toString());
+        } catch (IOException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                is.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            try {
+                os.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            try {
+                clientSocket.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
+    }
 
-        @Override
-        public void start(Stage primaryStage) {
+    /**
+    * @param args the command line arguments
+    */
+    public static void main(String[] args) {
+        System.setProperty("java.util.logging.SimpleFormatter.format", "%5$s %n");
 
-        }
-        }
+        Client client = new Client();
+        client.sendToServer();
+
+    }
+
+}
