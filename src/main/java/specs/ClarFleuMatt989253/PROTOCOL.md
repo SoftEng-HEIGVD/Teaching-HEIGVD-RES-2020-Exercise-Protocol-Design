@@ -14,12 +14,14 @@ The client speaks first.
 -- Server awaits connection
 Client : -- connects with the port number
 -- Server binds the connection
-Server : What do you want me to calculate ?
+Client: HELLO
+Server : HELLO CALC
 Client : 2 * 4
-Server : 2 * 4 = 8
+Server : 8
 Client : 3 + 9 * 2
-Server : 3 + 9 = 12
-Client : Bye
+Server : ERROR: COMP
+Client : BYE
+Serveur: Goodbye!
 -- Connection closed
 ```
 - What happens when a message is received from the other party? (semantics)
@@ -33,7 +35,15 @@ The calculation requests MUST have the following structure :
 ``` 
 <number> <symbol> <number>
 ```
-For example, see the information above.
+There cannot be more that two components to a computation.\
++ signs are implicit, - signs are explicit.\
+
+Errors:\
+If the servers can't process a computation, it will answer:
+```
+ERROR: _error_
+```
+Where _error_ can be any error message that will be display to the client
 
 - Who closes the connection and when? \
 The connection can be closed on two different occasions :
