@@ -7,6 +7,7 @@ to a server. Then, the server will calculate a result and send it back to the cl
 - Port (default) : 12000
 - Encoding : StandardCharsets.UTF_8
 - Speaks first : client
+- This is a stateless server, it wont't keep any state like the intermediate result
 
 ## FLOW
 *All transmissions describe bellow are in the good order*
