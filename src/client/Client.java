@@ -10,8 +10,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Client {
-    private double firstOperand;
-    private double secondOperand;
+    private String firstOperand;
+    private String secondOperand;
     private String operator;
     private boolean stopRequest = false;
     static final Logger LOG = Logger.getLogger(Client.class.getName());
@@ -31,9 +31,13 @@ public class Client {
             writer.flush();
             checkServerMessage(Protocol.SERVER_OPENING);
 
-            while(!stopRequest){
+            while(true){
                 getUserInput();
-                writer.write(Double.toString(firstOperand) + " " + operator.toString() + " " + Double.toString(secondOperand) +"\n");   //TODO reconversion string bête
+                if(stopRequest){
+                    writer.write(firstOperand + "\n");
+                    break;
+                }
+                writer.write(firstOperand + " " + operator.toString() + " " + secondOperand +"\n");
                 writer.flush();
                 checkServerMessage(null);
             }
@@ -68,11 +72,10 @@ public class Client {
         }
     }
 
-    private boolean getUserInput() {
+    private void getUserInput() {
         Scanner scan = new Scanner(System.in);
         String input = scan.next();
         String[] inputTokens = new String[3];
-        boolean valid = false;
 
         StringTokenizer st = new StringTokenizer(input, " ", false);
         int numberOfTokens = 0;
@@ -80,22 +83,17 @@ public class Client {
             inputTokens[numberOfTokens++] = st.nextToken();
         }
 
-        if(numberOfTokens == 1){
-            valid = checkCloseRequest(inputTokens[0]);
-        }else if(numberOfTokens != 3){
-            valid = false;
-        }else{
+
+        if(numberOfTokens == 3){
             operator = inputTokens[1];
-            firstOperand = Double.parseDouble(inputTokens[0]);  //TODO exception
-            secondOperand = Double.parseDouble(inputTokens[2]);
-            valid = checkUserInput();
+            firstOperand = inputTokens[0];
+            secondOperand = inputTokens[2];
+        }else if(numberOfTokens == 1){
+            checkCloseRequest(inputTokens[0]);
         }
-
-        return valid;
-
     }
 
-    private boolean checkUserInput() {
+    /*private boolean checkUserInput() {
         boolean valid = false;
         for(int i = 0; i < Protocol.OPERATORS.length; ++i){
             if(Protocol.OPERATORS[i].equals(operator)){
@@ -108,7 +106,7 @@ public class Client {
         }
 
         return valid;
-    }
+    }*/
 
     private boolean checkCloseRequest(String message) {
         stopRequest = message.equals(Protocol.CLIENT_CLOSE_REQUEST);
