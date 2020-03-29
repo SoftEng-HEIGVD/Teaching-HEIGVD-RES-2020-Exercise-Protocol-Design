@@ -30,16 +30,17 @@ message and sends it to the client.
 **Syntax** :
 [Operand] and [Result] are numbers (can be double, negative).
 
-Numbers : ('-')?[0-9]+('.'[0-9]+)?
-- optional '-'
+Numbers :
+- optional '-' or '+'
 - at least 1 digit [0-9]
-- optional '.' and at least 1 digit
+- optional '.' and additional digits
 - no spaces
 
 [Result] has maximum 6 decimal digits.
 
 [Operator] must be either '+', '-', '*', '/'
 
-The syntax of messages desbribed in **Flow** section must be strictly respected to get an answer from server.
+The syntax of messages desbribed in **Flow** section must be strictly respected (including spaces) to get an answer 
+from server.
 
 The client sends the request to close the connection, but the closure itself is done both on client and server-side.

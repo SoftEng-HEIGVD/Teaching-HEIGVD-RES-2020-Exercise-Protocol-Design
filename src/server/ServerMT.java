@@ -221,7 +221,8 @@ public class ServerMT {
                     result = firstOperand / secondOperand;
                 }
 
-                return firstOperand + " " + operator + " " + secondOperand  + " = " + result + "\n";
+                return firstOperand + " " + operator + " " + secondOperand  + " = "
+                        + Protocol.resultFormat.format(result) + "\n";
             }
 
 
