@@ -27,14 +27,15 @@ public class Client {
             reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
 
-            writer.write(Protocol.CLIENT_OPENING);
+            writer.write(Protocol.CLIENT_OPENING + '\n');
             writer.flush();
             checkServerMessage(Protocol.SERVER_OPENING);
 
             while(true){
                 getUserInput();
                 if(stopRequest){
-                    writer.write(firstOperand + "\n");
+                    writer.write(Protocol.CLIENT_CLOSE_REQUEST + "\n");
+                    writer.flush();
                     break;
                 }
                 writer.write(firstOperand + " " + operator.toString() + " " + secondOperand +"\n");
@@ -74,7 +75,7 @@ public class Client {
 
     private void getUserInput() {
         Scanner scan = new Scanner(System.in);
-        String input = scan.next();
+        String input = scan.nextLine();
         String[] inputTokens = new String[3];
 
         StringTokenizer st = new StringTokenizer(input, " ", false);
@@ -115,6 +116,9 @@ public class Client {
 
     private void checkServerMessage(String message) throws IOException {
         String line = reader.readLine();
+        if(line == null){
+            throw new IOException("null line read from server // incorrect initiation");
+        }
         if (message != null && !line.equals(message)) {
             throw new IOException("Unexpected message from server");
         }

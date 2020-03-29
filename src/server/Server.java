@@ -54,7 +54,7 @@ public class Server {
                 }
 
                 LOG.log(Level.INFO,"Client has started protocol initiation...");
-                writer.write(Protocol.SERVER_OPENING+'\n');
+                writer.write(Protocol.SERVER_OPENING + '\n');
                 writer.flush();
 
                 LOG.log(Level.INFO,"Trying to read from client...");
@@ -65,7 +65,7 @@ public class Server {
                     //Commande invalide
                     if(!getAndCheckUserInput(line)){
                         LOG.log(Level.WARNING,"Invalid user input");
-                        writer.write(Protocol.SERVER_ERROR);
+                        writer.write(Protocol.SERVER_ERROR + '\n');
                         writer.flush();
                         continue;
                     }
