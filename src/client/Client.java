@@ -38,7 +38,7 @@ public class Client {
                     writer.flush();
                     break;
                 }
-                writer.write(firstOperand + " " + operator.toString() + " " + secondOperand +"\n");
+                writer.write(firstOperand + " " + operator + " " + secondOperand +"\n");
                 writer.flush();
                 checkServerMessage(null);
             }
@@ -76,7 +76,7 @@ public class Client {
     private void getUserInput() {
         Scanner scan = new Scanner(System.in);
         String input = scan.nextLine();
-        String[] inputTokens = new String[3];
+        String[] inputTokens = {"","",""};
 
         StringTokenizer st = new StringTokenizer(input, " ", false);
         int numberOfTokens = 0;
@@ -84,30 +84,13 @@ public class Client {
             inputTokens[numberOfTokens++] = st.nextToken();
         }
 
-
-        if(numberOfTokens == 3){
-            operator = inputTokens[1];
-            firstOperand = inputTokens[0];
-            secondOperand = inputTokens[2];
-        }else if(numberOfTokens == 1){
+        if(numberOfTokens == 1){
             checkCloseRequest(inputTokens[0]);
         }
+         operator = inputTokens[1];
+         firstOperand = inputTokens[0];
+         secondOperand = inputTokens[2];
     }
-
-    /*private boolean checkUserInput() {
-        boolean valid = false;
-        for(int i = 0; i < Protocol.OPERATORS.length; ++i){
-            if(Protocol.OPERATORS[i].equals(operator)){
-                valid = true;
-            }
-        }
-
-        if(secondOperand == 0 && operator.equals("/")){
-            valid = false;
-        }
-
-        return valid;
-    }*/
 
     private boolean checkCloseRequest(String message) {
         stopRequest = message.equals(Protocol.CLIENT_CLOSE_REQUEST);
