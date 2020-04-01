@@ -50,7 +50,7 @@ public class Server {
     public void serveClients(){
         LOG.info("Starting the Receptionist Worker on a new thread ...");
         ReceptionistWorker receptionistWorker = new ReceptionistWorker(port);
-        receptionistWorker.run();
+        new Thread(receptionistWorker).start();
     }
 
 

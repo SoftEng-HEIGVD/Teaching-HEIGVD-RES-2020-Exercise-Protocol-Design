@@ -36,7 +36,7 @@ public class ReceptionistWorker implements Runnable {
                 Server.LOG.info("A new client has arrived. Starting a new thread and delegating work to a new servant...");
 
                 ServantWorker servantWorker = new ServantWorker(clientSocket);
-                servantWorker.run();
+                new Thread(servantWorker).start();
 
             } catch (IOException e) {
                 Server.LOG.warning("Error occurred on the Socket Client initialisation (server accept) : " + e.getMessage());
