@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
@@ -27,7 +24,7 @@ public class ServantWorker implements Runnable {
         try {
             // Notice that we have a UTF-8 encoding
             this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));
-            this.out = new PrintWriter(clientSocket.getOutputStream());
+            this.out = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), StandardCharsets.UTF_8));
         } catch (IOException e) {
             Server.LOG.warning("Error occurred on in / out buffer creation : " + e.getMessage());
         }
